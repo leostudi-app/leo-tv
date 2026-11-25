@@ -1,4 +1,4 @@
-/* ARTHUR core logic — pure functions, no DOM. Shared by index.html and the Node tests. */
+/* OLIVER core logic — pure functions, no DOM. Shared by index.html and the Node tests. */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api; // Node (tests)
@@ -15,7 +15,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const STORAGE_KEY = 'arthur.v1';
+  const STORAGE_KEY = 'oliver.v1';
   const HISTORY_LEN = 10; // rolling window used to judge mastery
   const MASTERY = 0.8; // 80% first-try accuracy unlocks the next level
 
@@ -77,7 +77,7 @@
   // Memory Pairs: board sizes grow across a game (pairs per board).
   const PAIRS_SIZES = [3, 3, 4, 5, 6];
 
-  // ARTHUR makes each noise himself; art for every animal lives in index.html.
+  // OLIVER makes each noise himself; art for every animal lives in index.html.
   const ANIMALS = {
     dog: 'Woof! Woof!', cat: 'Meow!', pig: 'Oink! Oink!', cow: 'Moooo!',
     sheep: 'Baa! Baa!', duck: 'Quack! Quack!', frog: 'Ribbit! Ribbit!', lion: 'Roar!'
@@ -92,13 +92,13 @@
   const JIGSAW_PIECES = JIGSAW_COLS * JIGSAW_ROWS;
   // Original pictures drawn in index.html (symbols #pic0..#pic3).
   const PUZZLES = [
-    { name: 'Arthur playing football', done: 'Arthur is playing football!' },
+    { name: 'Oliver playing football', done: 'Oliver is playing football!' },
     { name: 'a birthday party', done: "It's a birthday party!" },
     { name: 'the bottom of the sea', done: "It's under the sea!" },
     { name: 'a rocket in space', done: "It's a rocket in space!" }
   ];
 
-  // Prize videos chosen by Arthur's dad; editable in the grown-ups area.
+  // Prize videos chosen by Oliver's dad; editable in the grown-ups area.
   // Video N plays after game N (Number Balloons first ... Number Order tenth).
   const DEFAULT_VIDEOS = ['nEUTY8n2iZo', 'XcTvDcJt058', 'uaEcjl_jO9w', 'S-lkBBl-KG4', 'oVL8CvA5NIs',
     'uFs-T_iq6lc', '64FUWQMZakY', 'd3XW_lvBRVw', 'PfpLAqAtjnI', 'EW6cIIRayXc',
@@ -447,7 +447,7 @@
     return free.length ? free[Math.floor(rng() * free.length)] : null;
   }
 
-  // Race Day: one-button racing. Jump the cones in ARTHUR's lane; races get longer and busier.
+  // Race Day: one-button racing. Jump the cones in OLIVER's lane; races get longer and busier.
   const RACE_LENGTH = 4200; // track units from start line to finish
   // Cones stay well apart (a full jump plus time to get ready) so it's fair with a TV remote's small delay.
   const RACE_ROUNDS = [{ cones: 3, speed: 1 }, { cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }];
@@ -502,7 +502,7 @@
     return ids[i];
   }
 
-  /** Splits what ARTHUR says into sentences; each sentence has its own recorded voice clip. */
+  /** Splits what OLIVER says into sentences; each sentence has its own recorded voice clip. */
   function speechParts(text) {
     return String(text || '').split(/(?<=[.!?])\s+/).map((t) => t.trim()).filter(Boolean);
   }
