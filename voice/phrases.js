@@ -1,16 +1,16 @@
-/* Lists every sentence OLIVER can say, so each can be recorded once as a voice clip.
+/* Lists every sentence CHARLIE can say, so each can be recorded once as a voice clip.
    Run: node voice/phrases.js > voice/phrases.json  (the voice workflow does this). Mirrors the say() calls in index.html. */
 const C = require('../core.js');
 
 const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-const PRAISE = ['Brilliant!', 'Well done, Oliver!', 'Amazing!', "You're a superstar, Oliver!", 'Fantastic!', 'Yes! Great job!'];
+const PRAISE = ['Brilliant!', 'Well done, Charlie!', 'Amazing!', "You're a superstar, Charlie!", 'Fantastic!', 'Yes! Great job!'];
 const PLURAL = ['footballs', 'apples', 'stars', 'music notes'];
 const SHAPES = C.BASIC_SHAPES.concat(C.EXTRA_SHAPES);
 const nums = Array.from({ length: 10 }, (_, i) => i + 1);
 const texts = [];
 const add = (...t) => texts.push(...t);
 
-add(...C.GAMES.map((g) => g.name), 'Hello Oliver! Pick a game!', 'Hello Oliver! Can you hear me?', ...PRAISE);
+add(...C.GAMES.map((g) => g.name), 'Hello Charlie! Pick a game!', 'Hello Charlie! Can you hear me?', ...PRAISE);
 // Number games
 for (const n of nums) {
   add(`Can you find number ${n}?`, `Kick the ball into goal number ${n}!`, `That's number ${n}.`, `Goal! Number ${n}!`,
@@ -24,7 +24,7 @@ add('Which shape fits in the hole?');
 // Animals
 for (const [a, sound] of Object.entries(C.ANIMALS)) add(`Listen! ${sound} Which animal says that?`, `That's a ${a}.`, `Yes! The ${a} says ${sound}`);
 // Jigsaw
-for (const p of C.PUZZLES) add(`Let's make a picture of ${p.name}! Pick a piece, then find where it goes.`, `You did it, Oliver! ${p.done}`);
+for (const p of C.PUZZLES) add(`Let's make a picture of ${p.name}! Pick a piece, then find where it goes.`, `You did it, Charlie! ${p.done}`);
 add('Where does this piece go?', 'Pick a piece first!', 'Look for the glowing space!', 'Not there. Look at the picture!', 'Yes!', 'Perfect!', 'Great!');
 // Penalty
 add('Penalty time! Pick where to shoot!', 'Shoot again!', 'Ooh, the goalie saved it! Try again!', 'What a save! Have another go!');
@@ -55,11 +55,11 @@ add('Nee naw! Fire! Drive to the fire and spray the water!', 'Fire! Fire! Put it
 add('Race day! Jump over the cones and win the race!', 'Another race! Jump over the cones!', 'Oops! Jump over the cones!', 'You won the race!', 'Try again! Jump over the cones!',
   "Ooh, you came second! So close! Let's race again!", "Ooh, you came third! Jump over the cones! Let's race again!");
 // Rewards, video, friends
-add('Wow! You finished the game, Oliver! Open your surprise!', 'Watch your video, or skip it?', "Let's dance!",
+add('Wow! You finished the game, Charlie! Open your surprise!', 'Watch your video, or skip it?', "Let's dance!",
   'Here are all your friends!', 'Play games to find new friends!');
 for (const f of C.FRIENDS) add(`You found ${f.name}!`, `${f.name} is your new friend!`);
 // Birthday (25 Nov 2026)
-add('Happy birthday to you', 'Happy birthday dear Oliver', 'Happy birthday to you!', "Let's play!");
+add('Happy birthday to you', 'Happy birthday dear Charlie', 'Happy birthday to you!', "Let's play!");
 
 const seen = new Map();
 for (const t of texts) for (const part of C.speechParts(t)) seen.set(C.clipKey(part), part);
