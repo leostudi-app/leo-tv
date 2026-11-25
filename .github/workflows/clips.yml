@@ -34,4 +34,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add clips
           git commit -m "Fetch funny clips" || echo "nothing to commit"
-          git push
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done  # another job may have pushed first
