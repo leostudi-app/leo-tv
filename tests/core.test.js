@@ -231,3 +231,12 @@ test('each game has its own video, wrapping and skipping on errors', () => {
   s.settings.videoIds = [];
   assert.equal(C.videoForGame(s, 'balloons'), null);
 });
+
+test('ten built-in videos; old default lists upgrade, custom lists are kept', () => {
+  assert.equal(C.defaultState().settings.videoIds.length, 10);
+  const old = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 5) } }) });
+  assert.deepEqual(old.settings.videoIds, C.DEFAULT_VIDEOS);
+  const mine = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: ['aaaaaaaaaaa'] } }) });
+  assert.deepEqual(mine.settings.videoIds, ['aaaaaaaaaaa']);
+  assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 10);
+});
