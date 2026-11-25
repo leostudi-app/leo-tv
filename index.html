@@ -209,6 +209,22 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .hspot:focus-visible,.hspot.pad:focus{outline:6px solid #fff;box-shadow:0 0 0 12px #ffc93c88}
 .hspot.miss{animation:wobble .4s}
 @media (max-width:640px) and (orientation:portrait){.hscene{width:100%}}
+/* Fire Rescue */
+.task.firetask{width:100%}
+.fscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.fscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.fscene .truck{transition:transform .45s ease-in-out}
+.fscene .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .5s infinite alternate;transition:transform .35s,opacity .35s}
+.fscene .fire.out .flame{animation:none;transform:scale(0);opacity:0}
+.fscene .fire.new{animation:pop .4s}
+@keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.9,1.12)}}
+.fscene .steam{opacity:0}.fscene .fire.out .steam{animation:steam 1s}
+@keyframes steam{0%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.fscene .water{stroke-dasharray:6 14;animation:spray .25s linear infinite}
+@keyframes spray{to{stroke-dashoffset:-20}}
+.fcol{position:absolute;top:0;height:100%;background:transparent;border:0;border-radius:20px;padding:0;cursor:pointer}
+.fcol:focus-visible,.fcol.pad:focus{outline:6px solid #fff;outline-offset:-10px;box-shadow:inset 0 0 0 16px #ffc93c55}
+@media (max-width:640px) and (orientation:portrait){.fscene{width:100%}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -712,7 +728,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; $('task').classList.remove('hidetask'); state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; $('task').classList.remove('hidetask', 'firetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -724,6 +740,7 @@ async function newRound() {
   if (currentGame === 'build') return buildRound();
   if (currentGame === 'pairs') return pairsRound();
   if (currentGame === 'hide') return hideRoundStart();
+  if (currentGame === 'fire') return fireRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -747,6 +764,7 @@ function promptFor(r) {
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
+    case 'fire': return roundIndex === 0 ? 'Nee naw! Fire! Drive to the fire and spray the water!' : 'Fire! Fire! Put it out!';
     case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
   }
 }
@@ -1225,8 +1243,100 @@ async function pickSpot(btn) {
   await funWin(`Boo! You found ${cur.h.hider}!`);
 }
 
+/* ---------- Fire Rescue: drive LEO's fire engine to each fire and spray it out ---------- */
+const FX = [100, 300, 500, 700, 900]; // centre of each building
+const FY = [175, 300]; // upper and lower window rows
+const BUILD_COLS = [['#ffd6a5', 120], ['#bde0fe', 70], ['#ffc8dd', 140], ['#caffbf', 90], ['#fdffb6', 110]]; // colour, roof height
+function fireFlame(x, y, id) {
+  return `<g class="fire new" id="${id}"><g class="steam" fill="#fff"><circle cx="${x - 14}" cy="${y - 20}" r="14"/><circle cx="${x + 10}" cy="${y - 30}" r="18"/><circle cx="${x + 2}" cy="${y - 8}" r="12"/></g>`
+    + `<g class="flame"><path d="M${x} ${y + 30}c-34 0-40-30-24-52 4 14 12 16 12 16-2-26 10-44 26-54-4 18 6 28 14 38 10 12 14 24 10 34-4 12-16 18-38 18z" fill="#e63946"/>`
+    + `<path d="M${x} ${y + 30}c-20 0-24-18-14-32 2 8 8 10 8 10 0-16 8-26 16-32-2 12 4 18 8 24 6 8 8 16 4 22-4 6-10 8-22 8z" fill="#ff9a3c"/>`
+    + `<path d="M${x} ${y + 30}c-10 0-12-10-6-18 2 6 6 6 6 6 0-8 4-14 8-16 0 6 2 10 4 14 2 6 2 10-2 12-2 2-6 2-10 2z" fill="#ffd54a"/></g></g>`;
+}
+function fireScene() {
+  const buildings = FX.map((x, i) => {
+    const [col, roof] = BUILD_COLS[i], top = 100 + roof * 0.5;
+    const wins = FY.map((y) => `<rect x="${x - 34}" y="${y - 28}" width="68" height="58" rx="6" fill="#2b4a6b"/><path d="M${x} ${y - 28}v58M${x - 34} ${y}h68" stroke="#fff" stroke-width="5"/><rect x="${x - 38}" y="${y + 28}" width="76" height="8" rx="3" fill="#fff"/>`).join('');
+    return `<rect x="${x - 82}" y="${top}" width="164" height="${432 - top}" fill="${col}"/><rect x="${x - 90}" y="${top - 14}" width="180" height="18" rx="6" fill="#0002"/>${wins}`
+      + (i === 2 ? `<rect x="${x - 24}" y="370" width="48" height="62" rx="6" fill="#e63946"/>` : `<rect x="${x - 20}" y="374" width="40" height="58" rx="6" fill="#8d5a2b"/>`);
+  }).join('');
+  // LEO in a yellow helmet, riding an original red fire engine; the hose nozzle sits at (0,-58) relative to the truck.
+  const truck = `<g class="truck" id="truck" style="transform:translateX(${FX[2]}px)"><g transform="translate(0 6) scale(.85)">
+    <rect x="-118" y="-40" width="236" height="86" rx="14" fill="#e63946"/><rect x="-118" y="20" width="236" height="12" fill="#fff"/>
+    <rect x="40" y="-112" width="80" height="76" rx="12" fill="#e63946"/><rect x="50" y="-102" width="60" height="44" rx="8" fill="#cfe8ff"/>
+    <svg x="40" y="-140" width="80" height="98" viewBox="0 -16 200 246"><use href="#leo"/><path d="M26 52q74-96 148 0z" fill="#ffc93c"/><rect x="14" y="44" width="172" height="16" rx="8" fill="#e0a800"/><circle cx="100" cy="22" r="14" fill="#e63946"/></svg>
+    <g stroke="#ccc" stroke-width="6" stroke-linecap="round"><path d="M-110 -52h136M-110 -66h136"/><path d="M-100 -66v14M-76 -66v14M-52 -66v14M-28 -66v14M-4 -66v14M20 -66v14"/></g>
+    <circle cx="0" cy="-58" r="12" fill="#2a7de1"/><rect x="-92" y="-10" width="40" height="26" rx="5" fill="#ffd54a"/>
+    <circle cx="-72" cy="-50" r="0"/><rect x="-8" y="-104" width="16" height="16" rx="4" fill="#2a7de1"/><circle cx="0" cy="-108" r="9" fill="#5fb0ff" class="siren"/>
+    <g fill="#2b2118"><circle cx="-70" cy="48" r="24"/><circle cx="76" cy="48" r="24"/></g><g fill="#ccc"><circle cx="-70" cy="48" r="9"/><circle cx="76" cy="48" r="9"/></g></g></g>`;
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs><linearGradient id="fsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#fsSky)"/><g fill="#fff" opacity=".9"><ellipse cx="200" cy="60" rx="56" ry="20"/><ellipse cx="780" cy="50" rx="60" ry="20"/></g>
+    ${buildings}<rect y="432" width="1000" height="16" fill="#bbb"/><rect y="448" width="1000" height="112" fill="#555b66"/>
+    <path d="M0 506h1000" stroke="#fff" stroke-width="6" stroke-dasharray="40 30"/>
+    <g id="fires"></g><g id="water"></g><g transform="translate(0 470)">${truck}</g></svg>`;
+}
+GAME_ICON.fire = `<svg viewBox="0 0 120 100"><rect x="8" y="40" width="104" height="40" rx="8" fill="#e63946"/><rect x="78" y="20" width="32" height="26" rx="6" fill="#e63946"/><rect x="84" y="25" width="20" height="13" rx="3" fill="#cfe8ff"/><path d="M14 32h60M14 24h60" stroke="#bbb" stroke-width="4"/><circle cx="34" cy="82" r="11" fill="#2b2118"/><circle cx="90" cy="82" r="11" fill="#2b2118"/><path d="M40 30c-12 0-14-10-8-18 2 5 4 6 4 6 0-9 4-15 9-19-1 7 2 10 5 14 4 4 5 9 4 12-2 4-6 5-14 5z" fill="#ff9a3c" transform="translate(-6 -4)"/></svg>`;
+let fr = null;
+function fireRoundStart() {
+  const plan = C.fireRoundPlan(roundIndex);
+  fr = { plan, col: fr ? fr.col : 2, active: [], spawned: 0, out: 0, last: null, busy: false, id: 0 };
+  round = { type: 'fire' }; locked = false;
+  const task = $('task');
+  task.classList.add('firetask');
+  const cols = FX.map((x, i) => `<button class="fcol" data-nav data-col="${i}" aria-label="building ${i + 1}" style="left:${(x - 100) / 10}%;width:20%"></button>`).join('');
+  task.innerHTML = `<div class="fscene">${fireScene()}${cols}</div>`;
+  $('truck').style.transform = `translateX(${FX[fr.col]}px)`;
+  task.querySelectorAll('.fcol').forEach((b) => {
+    b.addEventListener('click', () => sprayAt(Number(b.dataset.col)));
+    b.addEventListener('focus', () => { if (usingPad) driveTo(Number(b.dataset.col)); });
+  });
+  for (let k = 0; k < plan.atOnce; k++) spawnFire();
+  if (usingPad) task.querySelector(`.fcol[data-col="${fr.col}"]`)?.focus();
+  repeatPrompt();
+}
+function spawnFire() {
+  if (!fr || fr.spawned >= fr.plan.total) return;
+  const spot = C.nextFire(fr.active, fr.last);
+  if (!spot) return;
+  const f = { ...spot, id: `fire${fr.id++}` };
+  fr.active.push(f); fr.spawned++;
+  $('fires').insertAdjacentHTML('beforeend', fireFlame(FX[f.col], FY[f.floor], f.id));
+  tone(180, 0, 0.25, 'sawtooth', 0.08);
+}
+function driveTo(col) {
+  if (!fr || fr.col === col) return;
+  fr.col = col;
+  $('truck').style.transform = `translateX(${FX[col]}px)`;
+  tone(300, 0, 0.12, 'square', 0.06); tone(400, 0.12, 0.12, 'square', 0.06);
+}
+async function sprayAt(col) {
+  if (!fr || locked || fr.busy) return;
+  const cur = fr;
+  const moving = cur.col !== col;
+  driveTo(col);
+  cur.busy = true;
+  if (moving) await wait(450);
+  // Spray the lowest fire in this building, or a splash at the windows if there is none.
+  const target = cur.active.filter((f) => f.col === col).sort((a, b) => b.floor - a.floor)[0];
+  const tx = FX[col], ty = target ? FY[target.floor] + 10 : FY[1];
+  $('water').innerHTML = `<path class="water" d="M${tx} 425Q${tx - 60} ${(425 + ty) / 2 - 40} ${tx} ${ty}" stroke="#5fb0ff" stroke-width="14" fill="none" stroke-linecap="round"/>`;
+  tone(900, 0, 0.5, 'sawtooth', 0.03);
+  await wait(650);
+  if (fr !== cur) return;
+  $('water').innerHTML = '';
+  cur.busy = false;
+  if (!target) { sfx.nearly(); say('No fire there! Look for the flames!'); return; }
+  cur.active = cur.active.filter((f) => f !== target); cur.last = target; cur.out++;
+  const el = $(target.id); el.classList.remove('new'); el.classList.add('out');
+  setTimeout(() => el.remove(), 1100);
+  if (cur.out >= cur.plan.total) { locked = true; confetti(); await funWin('Hooray! All the fires are out!'); return; }
+  sfx.right();
+  say(rand(['Splash! The fire is out!', 'Well done, firefighter!', 'Woosh! Great spraying!']));
+  if (cur.spawned < cur.plan.total) setTimeout(() => { if (fr === cur) { spawnFire(); if (cur.active.length < cur.plan.atOnce) spawnFire(); } }, 900);
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';

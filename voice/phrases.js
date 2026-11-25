@@ -48,6 +48,9 @@ for (const p of ['dogs', 'cats', 'pigs', 'cows', 'sheep', 'ducks', 'frogs', 'lio
 // Hide & Seek
 for (const h of C.HIDERS) add(`Hide and seek! Can you find ${h}?`, `Can you find ${h}?`, `Boo! You found ${h}!`);
 add('Not there! Keep looking!', "Here's a clue! Look carefully!");
+// Fire Rescue
+add('Nee naw! Fire! Drive to the fire and spray the water!', 'Fire! Fire! Put it out!', 'No fire there! Look for the flames!',
+  'Hooray! All the fires are out!', 'Splash! The fire is out!', 'Well done, firefighter!', 'Woosh! Great spraying!');
 // Rewards, video, friends
 add('Wow! You finished the game, Leo! Open your surprise!', 'Watch your video, or skip it?', "Let's dance!",
   'Here are all your friends!', 'Play games to find new friends!');

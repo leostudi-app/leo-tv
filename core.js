@@ -37,7 +37,8 @@
     { id: 'order', name: 'Number Order', types: ['order'] },
     { id: 'build', name: 'Shape Builder', types: ['build'] }, // one colour per layer
     { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] },
-    { id: 'hide', name: 'Hide & Seek', types: ['hide'] } // find the puppy family
+    { id: 'hide', name: 'Hide & Seek', types: ['hide'] }, // find the puppy family
+    { id: 'fire', name: 'Fire Rescue', types: ['fire'] } // drive the fire engine, spray the fires
   ];
 
   // Shape Builder: each picture is built layer by layer; every layer is one shape in one colour.
@@ -426,6 +427,24 @@
     };
   }
 
+  // Fire Rescue: fires pop up in the windows of a street; drive to each one and spray it out.
+  const FIRE_COLS = 5; // buildings along the street
+  const FIRE_FLOORS = 2; // window rows per building
+  const FIRE_ROUNDS = [{ total: 2, atOnce: 1 }, { total: 3, atOnce: 1 }, { total: 3, atOnce: 2 }, { total: 4, atOnce: 2 }, { total: 5, atOnce: 2 }];
+
+  function fireRoundPlan(roundIndex) {
+    return FIRE_ROUNDS[Math.min(Math.max(0, roundIndex), FIRE_ROUNDS.length - 1)];
+  }
+
+  /** A window for the next fire: never one already burning, and not the last one put out. */
+  function nextFire(active, last = null, rng = Math.random) {
+    const busy = new Set(active.map((f) => `${f.col},${f.floor}`));
+    if (last) busy.add(`${last.col},${last.floor}`);
+    const free = [];
+    for (let col = 0; col < FIRE_COLS; col++) for (let floor = 0; floor < FIRE_FLOORS; floor++) if (!busy.has(`${col},${floor}`)) free.push({ col, floor });
+    return free.length ? free[Math.floor(rng() * free.length)] : null;
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -495,6 +514,7 @@
     ANIMALS, orderRound, nextInOrder, COLOURS, BUILDS, BUILD_SHAPES, buildOptions, PAIRS_SIZES, memoryDeck, isPair,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
     speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
+    FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });

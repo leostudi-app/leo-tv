@@ -126,8 +126,8 @@ test('loadState survives corrupt storage and keeps new defaults', () => {
 });
 
 test('eight games, each mapping rounds to valid round types', () => {
-  assert.equal(C.GAMES.length, 13);
-  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
+  assert.equal(C.GAMES.length, 14);
+  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide', 'fire'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
   assert.deepEqual([0, 1, 2].map((i) => C.roundTypeFor('count', i)), ['countIt', 'drumCount', 'countIt']);
   assert.throws(() => C.roundTypeFor('nope', 0), /Unknown game/);
 });
@@ -224,7 +224,7 @@ test('number order: consecutive, shuffled, growing; starts at 1 until mastered',
 test('each game has its own video, wrapping and skipping on errors', () => {
   const s = C.defaultState();
   s.settings.videoIds = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'];
-  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2']); // games 11-13 wrap until more videos are added
+  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2', 'v3']); // games 11-14 wrap until more videos are added
   assert.equal(C.videoForGame(s, 'order', 1), 'v0'); // next one along when a video won't play
   s.settings.videoIds = ['a', 'b', 'c'];
   assert.equal(C.videoForGame(s, 'tune'), 'b'); // game 8 of 10 wraps round 3 videos
@@ -274,4 +274,18 @@ test('hide and seek: a known hider and spot each round, never repeating, and har
   }
   assert.ok(C.hideRound(0).peek > C.hideRound(4).peek);
   assert.equal(C.hideRound(99).peek, C.HIDE_PEEK[C.HIDE_PEEK.length - 1]);
+});
+
+test('fire rescue: fires only appear in free windows, and rounds grow', () => {
+  const active = [{ col: 0, floor: 0 }, { col: 2, floor: 1 }];
+  for (let k = 0; k < 50; k++) {
+    const f = C.nextFire(active, { col: 4, floor: 0 });
+    assert.ok(f.col >= 0 && f.col < C.FIRE_COLS && f.floor >= 0 && f.floor < C.FIRE_FLOORS);
+    assert.ok(!active.some((a) => a.col === f.col && a.floor === f.floor));
+    assert.ok(!(f.col === 4 && f.floor === 0));
+  }
+  const all = []; for (let c = 0; c < C.FIRE_COLS; c++) for (let f = 0; f < C.FIRE_FLOORS; f++) all.push({ col: c, floor: f });
+  assert.equal(C.nextFire(all), null);
+  assert.ok(C.fireRoundPlan(4).total > C.fireRoundPlan(0).total);
+  assert.deepEqual(C.fireRoundPlan(99), C.FIRE_ROUNDS[C.FIRE_ROUNDS.length - 1]);
 });
