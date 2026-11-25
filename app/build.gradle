@@ -7,7 +7,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId 'app.leostudi.olivertv'
+        applicationId 'app.leostudi.seraphinatv'
         minSdk 22          // Fire OS 5 and newer
         targetSdk 34
         versionCode 1
