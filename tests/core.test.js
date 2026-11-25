@@ -135,7 +135,7 @@ test('eight games, each mapping rounds to valid round types', () => {
 test('prize videos default to the chosen links, including for older saved progress', () => {
   assert.deepEqual(C.defaultState().settings.videoIds, C.DEFAULT_VIDEOS);
   const old = { getItem: () => JSON.stringify({ stars: 2, settings: { videoIds: [] } }) };
-  assert.equal(C.loadState(old).settings.videoIds.length, 10);
+  assert.equal(C.loadState(old).settings.videoIds.length, 12);
   const custom = { getItem: () => JSON.stringify({ settings: { videoIds: ['aaaaaaaaaaa'] } }) };
   assert.deepEqual(C.loadState(custom).settings.videoIds, ['aaaaaaaaaaa']);
 });
@@ -232,13 +232,15 @@ test('each game has its own video, wrapping and skipping on errors', () => {
   assert.equal(C.videoForGame(s, 'balloons'), null);
 });
 
-test('ten built-in videos; old default lists upgrade, custom lists are kept', () => {
-  assert.equal(C.defaultState().settings.videoIds.length, 10);
+test('twelve built-in videos; old default lists upgrade, custom lists are kept', () => {
+  assert.equal(C.defaultState().settings.videoIds.length, 12);
+  const ten = C.loadState({ getItem: () => JSON.stringify({ version: 3, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 10) } }) });
+  assert.equal(ten.settings.videoIds.length, 12);
   const old = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 5) } }) });
   assert.deepEqual(old.settings.videoIds, C.DEFAULT_VIDEOS);
   const mine = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: ['aaaaaaaaaaa'] } }) });
   assert.deepEqual(mine.settings.videoIds, ['aaaaaaaaaaa']);
-  assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 10);
+  assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 12);
 });
 
 test('shape builder: every layer is one known shape and colour; options hold exactly one right answer', () => {

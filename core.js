@@ -98,8 +98,10 @@
   // Prize videos chosen by Leo's dad; editable in the grown-ups area.
   // Video N plays after game N (Number Balloons first ... Number Order tenth).
   const DEFAULT_VIDEOS = ['nEUTY8n2iZo', 'XcTvDcJt058', 'uaEcjl_jO9w', 'S-lkBBl-KG4', 'oVL8CvA5NIs',
-    'uFs-T_iq6lc', '64FUWQMZakY', 'd3XW_lvBRVw', 'PfpLAqAtjnI', 'EW6cIIRayXc'];
-  const OLD_DEFAULT_VIDEOS = DEFAULT_VIDEOS.slice(0, 5); // the first list; devices still on it get all ten
+    'uFs-T_iq6lc', '64FUWQMZakY', 'd3XW_lvBRVw', 'PfpLAqAtjnI', 'EW6cIIRayXc',
+    'eEV_z7kXO6c', 'GHpyJ5svbgM'];
+  // Earlier built-in lists: a device still on one of these (never customised) moves to the full list.
+  const OLD_DEFAULT_LISTS = [DEFAULT_VIDEOS.slice(0, 5).join(), DEFAULT_VIDEOS.slice(0, 10).join()];
 
   // Original collectable friends (no third-party characters).
   const FRIENDS = [
@@ -119,7 +121,7 @@
 
   function defaultState() {
     return {
-      version: 3,
+      version: 4,
       settings: { starsPerReward: 5, tvMinutes: 4, videoIds: DEFAULT_VIDEOS.slice(), pin: null },
       stars: 0,
       rewardsEarned: 0,
@@ -139,8 +141,8 @@
     if (!Array.isArray(settings.videoIds) || settings.videoIds.length === 0) settings.videoIds = DEFAULT_VIDEOS.slice();
     // v2: 8 games x (play + 4 min prize) is about an hour. Move the old 10-minute default to 4.
     if ((raw.version || 1) < 2 && settings.tvMinutes === 10) settings.tvMinutes = 4;
-    // v3: ten built-in videos. Only replace a list nobody has customised (exactly the old five).
-    if ((raw.version || 1) < 3 && settings.videoIds.join() === OLD_DEFAULT_VIDEOS.join()) settings.videoIds = DEFAULT_VIDEOS.slice();
+    // v3/v4: more built-in videos. Only replace a list nobody has customised (exactly an old built-in list).
+    if ((raw.version || 1) < 4 && OLD_DEFAULT_LISTS.includes(settings.videoIds.join())) settings.videoIds = DEFAULT_VIDEOS.slice();
     return {
       ...base,
       ...raw,
