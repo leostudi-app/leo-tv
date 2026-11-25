@@ -173,7 +173,7 @@ test('copy my tune: sequences, lengths and checking', () => {
     assert.equal(q.length, 4); assert.ok(q.every((p) => p >= 0 && p < 4));
     for (let i = 2; i < q.length; i++) assert.ok(!(q[i] === q[i - 1] && q[i] === q[i - 2]));
   }
-  assert.deepEqual([0, 1, 2, 3, 4, 9].map(C.simonLength), [2, 2, 3, 3, 4, 4]);
+  assert.deepEqual([0, 1, 2, 3, 4, 9].map((i) => C.simonLength(i)), [2, 2, 3, 3, 4, 4]);
   assert.equal(C.checkSimon([1, 2, 3], [1, 2]), 'continue');
   assert.equal(C.checkSimon([1, 2, 3], [1, 3]), 'wrong');
   assert.equal(C.checkSimon([1, 2, 3], [1, 2, 3]), 'done');
@@ -301,4 +301,50 @@ test('race day: cones sit between start and finish, well spaced, and races get b
     for (let i = 1; i < cones.length; i++) assert.ok(cones[i] - cones[i - 1] >= 750);
   }
   assert.ok(C.raceRoundPlan(4).cones > C.raceRoundPlan(0).cones);
+});
+
+test('levels: Middle and Big change the number games, and everything else gets harder', () => {
+  const at = (level) => ({ ...C.defaultState(level), stats: C.defaultState().stats });
+  for (let k = 0; k < 200; k++) {
+    const mid = C.makeRound('goal', at(2));
+    assert.equal(mid.ask, 'plus'); assert.equal(mid.a + mid.b, mid.target); assert.ok(mid.target <= 20);
+    assert.ok(mid.options.includes(mid.target) && new Set(mid.options).size === 3 && mid.options.every((x) => x >= 1));
+    const big = C.makeRound('findNumber', at(3));
+    assert.equal(big.ask, 'times'); assert.equal(big.a * big.b, big.target);
+    assert.equal(big.options.length, 4); assert.equal(new Set(big.options).size, 4); assert.ok(big.options.includes(big.target));
+    const take = C.makeRound('goal', at(3));
+    assert.equal(take.ask, 'minus'); assert.equal(take.a - take.b, take.target); assert.ok(take.target >= 1);
+    const find = C.makeRound('findNumber', at(2));
+    assert.ok(!find.ask && find.target >= 1 && find.target <= 20);
+    const count = C.makeRound('countIt', at(3));
+    assert.ok(count.target >= 6 && count.target <= 20);
+    const ord = C.orderRound(4, at(3));
+    assert.deepEqual(ord.numbers, [...ord.numbers].sort((a, b) => a - b)); assert.ok(ord.numbers.every((n) => n >= 1 && n <= 100));
+    assert.equal(new Set(ord.numbers).size, ord.numbers.length);
+  }
+  assert.equal(C.makeRound('findNumber', at(1)).ask, undefined); // Little is unchanged
+  assert.ok(C.simonLength(4, 3) > C.simonLength(4, 1));
+  assert.ok(C.pairsSize(4, 3) > C.pairsSize(4, 1));
+  assert.ok(C.hideRound(4, null, Math.random, 3).peek < C.hideRound(4).peek);
+  assert.equal(C.hideRound(0, null, Math.random, 3).clue, false);
+  for (const level of [1, 2, 3]) for (let r = 0; r < 5; r++) {
+    const plan = C.raceRoundPlan(r, level), cones = C.raceObstacles(plan.cones, plan.length, Math.random, plan.gap);
+    assert.equal(cones.length, plan.cones); assert.ok(cones[cones.length - 1] <= plan.length - 350);
+  }
+  assert.equal(C.clampLevel('9'), 1); assert.equal(C.defaultState(3).settings.level, 3);
+  assert.equal(C.loadState({ getItem: () => JSON.stringify({ version: 5, settings: {} }) }, 'x', 3).settings.level, 3); // new setting takes the child's default
+});
+
+test('kids: each web address opens the right child, with birthdays only on the day', () => {
+  const K = require('../kids.js');
+  assert.equal(K.pickKid('play.leostudi.app'), 'leo');
+  assert.equal(K.pickKid('charlie-play-learn.vercel.app'), 'charlie');
+  assert.equal(K.pickKid('localhost', '?kid=seraphina'), 'seraphina');
+  assert.equal(K.pickKid('something-else.example'), 'leo');
+  assert.equal(K.kid('leo').storageKey, 'leo.v1'); // Leo keeps his saved progress
+  assert.equal(K.birthdayAge(K.kid('leo'), new Date(2026, 10, 25)), 4);
+  assert.equal(K.birthdayAge(K.kid('leo'), new Date(2026, 10, 26)), null);
+  assert.equal(K.birthdayAge(K.kid('arthur'), new Date(2026, 10, 25)), null);
+  assert.equal(K.ordinal(1), '1st'); assert.equal(K.ordinal(12), '12th'); assert.equal(K.ordinal(22), '22nd');
+  assert.equal(K.kid('charlie').level, 3);
 });

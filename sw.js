@@ -1,6 +1,6 @@
 // Offline cache for the app shell. YouTube and fonts always go to the network.
-const CACHE = 'leo-v2';
-const SHELL = ['./', 'index.html', 'core.js', 'manifest.webmanifest', 'icon.svg', 'apple-touch-icon.png'];
+const CACHE = 'leo-v3';
+const SHELL = ['./', 'index.html', 'core.js', 'kids.js', 'manifest.webmanifest', 'icon.svg', 'apple-touch-icon.png'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(
   caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())

@@ -5,7 +5,7 @@ name: Record LEO's voice
 on:
   push:
     branches: [web]
-    paths: ['voice/phrases.js', 'core.js', '.github/workflows/voice.yml', 'voice/record.py']
+    paths: ['voice/phrases.js', 'core.js', 'kids.js', '.github/workflows/voice.yml', 'voice/record.py']
   workflow_dispatch:
 
 permissions:

@@ -9,9 +9,19 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="LEO">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" id="manifestLink" href="manifest.webmanifest">
+<link rel="icon" id="iconLink" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" id="touchIconLink" href="apple-touch-icon.png">
+<script src="kids.js"></script>
+<script>
+  // Which child's version this is (by web address); their name, character and icons are set before anything shows.
+  window.KID = LeoKids.kid(LeoKids.pickKid(location.hostname, location.search));
+  document.title = KID.NAME + ' – Play & Learn';
+  document.querySelector('meta[name="apple-mobile-web-app-title"]').setAttribute('content', KID.NAME);
+  document.getElementById('manifestLink').href = 'kids/' + KID.slug + '/manifest.webmanifest';
+  document.getElementById('iconLink').href = 'kids/' + KID.slug + '/icon.svg';
+  document.getElementById('touchIconLink').href = 'kids/' + KID.slug + '/apple-touch-icon.png';
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
@@ -51,6 +61,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 @keyframes bob{50%{transform:translateY(-10px) rotate(-2deg)}}
 .row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 #homeJar{visibility:hidden}
+.levels{flex-wrap:wrap;gap:10px}.levels .big{font-size:clamp(16px,2.2vw,22px);padding:10px 16px}
 #home{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}#home::-webkit-scrollbar{display:none}
 /* Centre vertically with auto margins: if the menu is taller than the screen (phones), the top stays reachable instead of being pushed off. */
 #start>:first-child,#home>.menu-head{margin-top:auto}#start>:last-child,#home>:last-child{margin-bottom:auto}
@@ -76,9 +87,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .task{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,3vh,26px)}
 .show{min-height:clamp(90px,22vh,200px);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;max-width:640px}
 .show svg{width:clamp(56px,10vw,96px);height:auto}
+.sum{white-space:nowrap;font-size:clamp(36px,min(9vh,11vw),96px);font-weight:800;color:#fff;text-shadow:0 4px 0 #0003;letter-spacing:.04em}
+.show.many{display:grid;grid-template-columns:repeat(5,auto);gap:6px 14px}.show.many svg{width:clamp(30px,4.6vw,50px)} /* big counts: rows of five */
 .show .hole{width:clamp(130px,24vw,220px)}.show .hole svg{width:100%}
-.answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,3vw,32px);width:100%;max-width:820px}
+.answers{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:clamp(10px,3vw,32px);width:100%;max-width:820px}
 .ans{background:#fff;color:var(--ink);border-radius:32px;aspect-ratio:1;display:grid;place-items:center;box-shadow:0 10px 0 #0003;font-size:clamp(64px,14vw,140px);font-weight:800}
+.answers[style*="--n:4"]{max-width:900px}.ans.d2{font-size:clamp(48px,9vw,110px)}.ans.d3{font-size:clamp(36px,6.5vw,84px)} /* two- and three-digit answers */
 .ans svg{width:72%;height:72%}
 .ans.wrong{animation:wobble .5s;opacity:.45}
 .ans.right{background:var(--ok);color:#fff;animation:pop .5s}
@@ -152,7 +166,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .slot,.piece{width:var(--p);height:var(--p);padding:0;border-radius:8px;overflow:hidden;background:#ffffff55;display:block}
 .slot svg,.piece svg{width:100%;height:100%;display:block}
 .slot{outline:3px dashed #fff;outline-offset:-3px}
-.slot.empty svg{opacity:.22}
+.slot.empty svg{opacity:var(--guide,.22)}
 .slot.filled{outline:none;animation:pop .4s}
 .piece{background:#fff;box-shadow:0 6px 0 #0003}
 .piece.sel{transform:translateY(-8px) scale(1.08);box-shadow:0 0 0 6px #ffc93c,0 10px 0 #0003}
@@ -204,6 +218,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .card.back{background:linear-gradient(135deg,#ff9a3c,#e63946)}
 .card.back svg{width:60%;height:60%}
 .card.matched{opacity:.55;box-shadow:none}
+.cards.sixteen{--c:min(8.6vw,17vh);gap:clamp(6px,1vw,12px)}
 @media (max-width:640px) and (orientation:portrait){.cards{--c:min(20vw,13vh);grid-template-columns:repeat(min(var(--cols),4),var(--c))}}
 /* Hide & Seek */
 .task.hidetask{width:100%}
@@ -250,7 +265,8 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 <!-- Reusable art: LEO, star -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="leo" viewBox="0 -16 200 246">
+    <symbol id="leo" viewBox="0 -16 200 246"></symbol>
+    <symbol id="host-lion" viewBox="0 -16 200 246">
       <g fill="#f28c28">
         <circle cx="100" cy="88" r="78"/>
         <circle cx="38" cy="60" r="26"/><circle cx="162" cy="60" r="26"/><circle cx="30" cy="110" r="26"/><circle cx="170" cy="110" r="26"/>
@@ -268,7 +284,67 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
       <path d="M48 176l-12 26 22 6 4-22zM152 176l12 26-22 6-4-22z" fill="#fff"/>
       <path d="M86 160l14 14 14-14" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
       <path d="M100 186l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff"/>
-    </symbol>
+        </symbol>
+    <symbol id="host-dino" viewBox="0 -16 200 246">
+      <!-- The host: an original friendly green dinosaur in the red-and-white shirt. -->
+      <path d="M150 196q40 2 44-30q-4 20-42 12z" fill="#4fb35e"/>
+      <g fill="#ffc93c" stroke="#e0a800" stroke-width="3" stroke-linejoin="round">
+        <path d="M58 44 70 6l18 30z"/><path d="M84 30 100-8l16 38z"/><path d="M112 36l18-30 12 38z"/><path d="M40 70l2-34 24 20z"/><path d="M134 56l24-20 2 34z"/>
+      </g>
+      <rect x="74" y="140" width="52" height="40" rx="14" fill="#4fb35e"/>
+      <ellipse cx="100" cy="92" rx="72" ry="64" fill="#5cc46a"/>
+      <g fill="#4fb35e"><circle cx="56" cy="62" r="7"/><circle cx="146" cy="60" r="6"/><circle cx="138" cy="44" r="4"/><circle cx="62" cy="46" r="4"/></g>
+      <ellipse cx="100" cy="120" rx="50" ry="30" fill="#b8ec9a"/>
+      <circle cx="76" cy="80" r="16" fill="#fff"/><circle cx="124" cy="80" r="16" fill="#fff"/>
+      <ellipse cx="79" cy="83" rx="8" ry="10" fill="#2b2118"/><ellipse cx="121" cy="83" rx="8" ry="10" fill="#2b2118"/>
+      <circle cx="82" cy="79" r="3" fill="#fff"/><circle cx="124" cy="79" r="3" fill="#fff"/>
+      <circle cx="90" cy="108" r="3.5" fill="#2f7a3a"/><circle cx="110" cy="108" r="3.5" fill="#2f7a3a"/>
+      <circle cx="54" cy="110" r="9" fill="#ff9a8a" opacity=".55"/><circle cx="146" cy="110" r="9" fill="#ff9a8a" opacity=".55"/>
+      <path d="M80 124q20 18 40 0" fill="none" stroke="#2b2118" stroke-width="5" stroke-linecap="round"/>
+      <path d="M48 176q52-30 104 0v40q-52 18-104 0z" fill="#e63946"/>
+      <path d="M48 176l-12 26 22 6 4-22zM152 176l12 26-22 6-4-22z" fill="#fff"/>
+      <circle cx="36" cy="206" r="9" fill="#5cc46a"/><circle cx="164" cy="206" r="9" fill="#5cc46a"/>
+      <path d="M86 160l14 14 14-14" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M100 186l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff"/>
+        </symbol>
+    <symbol id="host-princess" viewBox="0 -16 200 246">
+      <!-- The host: an original cartoon princess with a gold tiara and a pink dress. -->
+      <path d="M30 96q-6-82 70-86 76 4 70 86 6 52-14 84H44q-20-32-14-84z" fill="#6b3f26"/>
+      <rect x="88" y="140" width="24" height="22" rx="8" fill="#f2c29c"/>
+      <path d="M72 156h56l34 60q-62 18-124 0z" fill="#ff7eb6"/>
+      <path d="M58 196q42 12 84 0" stroke="#fff" stroke-width="5" fill="none" opacity=".7"/>
+      <circle cx="62" cy="166" r="15" fill="#ffb3d1"/><circle cx="138" cy="166" r="15" fill="#ffb3d1"/>
+      <circle cx="40" cy="204" r="9" fill="#f2c29c"/><circle cx="160" cy="204" r="9" fill="#f2c29c"/>
+      <path d="M100 172l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff"/>
+      <ellipse cx="100" cy="94" rx="54" ry="56" fill="#f8d2b0"/>
+      <path d="M46 88q4-46 54-48 50 2 54 48-22-30-54-26-34-4-54 26z" fill="#6b3f26"/>
+      <path d="M58 46 64 14l14 18 22-26 22 26 14-18 6 32q-42-12-84 0z" fill="#ffc93c" stroke="#e0a800" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="100" cy="26" r="6" fill="#ff7eb6"/><circle cx="78" cy="38" r="4" fill="#5fb0ff"/><circle cx="122" cy="38" r="4" fill="#5fb0ff"/>
+      <ellipse cx="78" cy="94" rx="9" ry="11" fill="#2b2118"/><ellipse cx="122" cy="94" rx="9" ry="11" fill="#2b2118"/>
+      <circle cx="81" cy="90" r="3.5" fill="#fff"/><circle cx="125" cy="90" r="3.5" fill="#fff"/>
+      <path d="M68 80q8-6 16-2M116 78q8-4 16 2" stroke="#6b3f26" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="64" cy="114" r="9" fill="#ff9a8a" opacity=".5"/><circle cx="136" cy="114" r="9" fill="#ff9a8a" opacity=".5"/>
+      <path d="M86 122q14 14 28 0" fill="none" stroke="#c2185b" stroke-width="5" stroke-linecap="round"/>
+        </symbol>
+    <symbol id="host-penguin" viewBox="0 -16 200 246">
+      <!-- The host: an original friendly penguin in the red-and-white shirt. -->
+      <ellipse cx="72" cy="226" rx="20" ry="9" fill="#ff9a3c"/><ellipse cx="128" cy="226" rx="20" ry="9" fill="#ff9a3c"/>
+      <ellipse cx="34" cy="182" rx="14" ry="30" fill="#2b3a55" transform="rotate(28 34 182)"/><ellipse cx="166" cy="182" rx="14" ry="30" fill="#2b3a55" transform="rotate(-28 166 182)"/>
+      <rect x="62" y="130" width="76" height="60" rx="26" fill="#2b3a55"/>
+      <path d="M88 26q4-22 12-30 6 12 4 28M100 24q10-18 22-20-6 14-14 24" fill="#2b3a55"/>
+      <ellipse cx="100" cy="94" rx="72" ry="68" fill="#2b3a55"/>
+      <path d="M100 66q-22-24-46-6-24 22-8 62 16 34 54 36 38-2 54-36 16-40-8-62-24-18-46 6z" fill="#fff"/>
+      <circle cx="78" cy="88" r="10" fill="#2b2118"/><circle cx="122" cy="88" r="10" fill="#2b2118"/>
+      <circle cx="81" cy="84" r="3.5" fill="#fff"/><circle cx="125" cy="84" r="3.5" fill="#fff"/>
+      <circle cx="60" cy="114" r="9" fill="#ff9a8a" opacity=".55"/><circle cx="140" cy="114" r="9" fill="#ff9a8a" opacity=".55"/>
+      <path d="M86 106q14-8 28 0l-14 16z" fill="#ff9a3c" stroke="#e07f24" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M88 130q12 8 24 0" fill="none" stroke="#2b2118" stroke-width="4" stroke-linecap="round"/>
+      <path d="M48 176q52-30 104 0v40q-52 18-104 0z" fill="#e63946"/>
+      <path d="M48 176l-12 26 22 6 4-22zM152 176l12 26-22 6-4-22z" fill="#fff"/>
+      <path d="M86 160l14 14 14-14" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M100 186l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff"/>
+        </symbol>
+
     <!-- Jigsaw pictures: 500x200, cut into a 5x2 grid of 100px pieces. All original art. -->
     <symbol id="pic0" viewBox="0 0 500 200">
       <rect width="500" height="120" fill="#8fd3ff"/>
@@ -303,7 +379,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
       <path d="M185 145h130" stroke="#fff" stroke-width="4" stroke-dasharray="10 8"/>
       <g fill="#ffc93c"><rect x="207" y="88" width="8" height="30" rx="3"/><rect x="232" y="88" width="8" height="30" rx="3"/><rect x="258" y="88" width="8" height="30" rx="3"/><rect x="284" y="88" width="8" height="30" rx="3"/></g>
       <g fill="#ff9a3c"><ellipse cx="211" cy="80" rx="5" ry="8"/><ellipse cx="236" cy="80" rx="5" ry="8"/><ellipse cx="262" cy="80" rx="5" ry="8"/><ellipse cx="288" cy="80" rx="5" ry="8"/></g>
-      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">LEO 4</text>
+      <text id="cakeText" x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif"></text>
       <rect x="350" y="122" width="44" height="44" rx="4" fill="#2a7de1"/><path d="M372 122v44M350 144h44" stroke="#ffc93c" stroke-width="6"/>
       <rect x="402" y="132" width="36" height="34" rx="4" fill="#e63946"/><path d="M420 132v34M402 149h36" stroke="#fff" stroke-width="5"/>
       <g fill="#8a5cf6"><circle cx="150" cy="150" r="5"/><circle cx="170" cy="100" r="4"/><circle cx="330" cy="70" r="5"/></g>
@@ -341,13 +417,13 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 
 <section id="start" class="screen on" aria-label="Start">
   <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
-  <h1>LEO</h1>
+  <h1 id="startName"></h1>
   <button class="big" id="startBtn" data-nav>Let's play!</button>
 </section>
 
 <section id="birthday" class="screen" aria-label="Happy birthday">
   <div class="balloons" id="balloons"></div>
-  <h1>Happy 4th Birthday, Leo!</h1>
+  <h1 id="bdayTitle"></h1>
   <div class="bday-scene">
     <svg class="bday-leo wave" aria-hidden="true"><use href="#leo"/></svg>
     <svg class="cake" viewBox="0 0 200 230" aria-label="Birthday cake with a number 4 candle">
@@ -415,16 +491,17 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
   </div>
   <form id="settingsView" class="panel" hidden>
     <h2>Grown-ups</h2>
+    <div><h3>Level</h3><div class="row levels" id="levelBtns"></div><span class="note" id="levelHelp"></span></div>
     <label>Rounds per game (prize at the end) <input id="setStars" data-nav type="number" min="3" max="10" inputmode="numeric"></label>
     <label>Prize videos, one YouTube link per line (video 1 plays after game 1, and so on)
       <textarea id="setVideos" data-nav placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
-    <p class="note">Tip: lock the device to LEO with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
+    <p class="note">Tip: lock the device to this app with Guided Access (iPhone/iPad) or screen pinning (Android) so <span id="pronoun">he</span> can't leave the app.</p>
     <div><h3>Numbers</h3><div class="bars" id="numBars"></div></div>
     <div><h3>Shapes</h3><div class="bars" id="shapeBars"></div></div>
     <p class="note" id="levelNote"></p>
     <p class="note" id="voiceNote"></p>
-    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test LEO's voice</button></div>
+    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test the voice</button></div>
     <p class="note">Settings and videos are saved on this device only, so set them on each phone, tablet or TV.</p>
     <div class="row"><button class="big" type="submit" data-nav>Save</button><button class="big blue" type="button" id="setBack" data-nav>Back</button></div>
     <div class="row"><button type="button" class="note" id="resetBtn" data-nav>Reset progress</button><button type="button" class="note" id="pinChange" data-nav>Change PIN</button></div>
@@ -439,9 +516,14 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 {
 'use strict';
 const C = window.LeoCore;
+const K = window.KID, N = K.name; // this child's name, used in everything said and shown
+const LV = () => state.settings.level; // difficulty: 1 Little, 2 Middle, 3 Big
+document.getElementById('leo').innerHTML = document.getElementById('host-' + K.host).innerHTML;
+document.getElementById('startName').textContent = K.NAME;
+document.getElementById('pronoun').textContent = K.pronoun;
 const $ = (id) => document.getElementById(id);
-let state = C.loadState(safeStorage());
-const save = () => C.saveState(safeStorage(), state);
+let state = C.loadState(safeStorage(), K.storageKey, K.level);
+const save = () => C.saveState(safeStorage(), state, K.storageKey);
 
 function safeStorage() { try { return window.localStorage; } catch (e) { return null; } }
 function rand(list) { return list[Math.floor(Math.random() * list.length)]; }
@@ -703,8 +785,8 @@ function confetti() {
 }
 
 /* ---------- Game loop ---------- */
-const PRAISE = ['Brilliant!', 'Well done, Leo!', 'Amazing!', "You're a superstar, Leo!", 'Fantastic!', 'Yes! Great job!'];
-const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const PRAISE = ['Brilliant!', `Well done, ${N}!`, 'Amazing!', `You're a superstar, ${N}!`, 'Fantastic!', 'Yes! Great job!'];
+const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
 let round = null, firstTry = true, locked = false, lastType = null, promptText = '';
 let currentGame = null, roundIndex = 0;
 const GAME_ICON_BASE = {
@@ -729,7 +811,7 @@ const ANIMAL_ART = {
   sheep: '<svg viewBox="0 0 100 100"><g fill="#f5f5f5" stroke="#ddd" stroke-width="2"><circle cx="30" cy="30" r="16"/><circle cx="50" cy="22" r="16"/><circle cx="70" cy="30" r="16"/><circle cx="22" cy="52" r="16"/><circle cx="78" cy="52" r="16"/><circle cx="32" cy="74" r="16"/><circle cx="68" cy="74" r="16"/><circle cx="50" cy="80" r="16"/></g><ellipse cx="18" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="82" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="50" cy="54" rx="22" ry="27" fill="#5d5d66"/><circle cx="41" cy="48" r="5" fill="#fff"/><circle cx="59" cy="48" r="5" fill="#fff"/><circle cx="42" cy="49" r="2.5" fill="#2b2118"/><circle cx="60" cy="49" r="2.5" fill="#2b2118"/><path d="M44 68q6 5 12 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
   duck: '<svg viewBox="0 0 100 100"><path d="M50 6q4 8-2 12" fill="none" stroke="#f9a825" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="48" r="36" fill="#ffeb3b"/><circle cx="36" cy="40" r="6" fill="#2b2118"/><circle cx="64" cy="40" r="6" fill="#2b2118"/><circle cx="38" cy="38" r="2" fill="#fff"/><circle cx="66" cy="38" r="2" fill="#fff"/><ellipse cx="50" cy="62" rx="22" ry="9" fill="#ff9800"/><ellipse cx="50" cy="68" rx="18" ry="7" fill="#f57c00"/></svg>',
   frog: '<svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="15" fill="#4caf50"/><circle cx="70" cy="30" r="15" fill="#4caf50"/><ellipse cx="50" cy="60" rx="40" ry="30" fill="#4caf50"/><circle cx="30" cy="28" r="9" fill="#fff"/><circle cx="70" cy="28" r="9" fill="#fff"/><circle cx="31" cy="29" r="5" fill="#2b2118"/><circle cx="71" cy="29" r="5" fill="#2b2118"/><path d="M22 62q28 22 56 0" fill="none" stroke="#1b5e20" stroke-width="4" stroke-linecap="round"/><circle cx="26" cy="54" r="5" fill="#ff8a80" opacity=".6"/><circle cx="74" cy="54" r="5" fill="#ff8a80" opacity=".6"/></svg>',
-  lion: '<svg viewBox="0 0 200 246"><use href="#leo" width="200" height="246"/></svg>'
+  lion: '<svg viewBox="0 0 200 246"><use href="#host-lion" width="200" height="246"/></svg>'
 };
 const EAR = '<svg class="ear" viewBox="0 0 100 100"><path d="M20 38h16l22-18v60L36 62H20z" fill="#fff"/><path d="M68 34q10 16 0 32M78 24q18 26 0 52" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';
 const GAME_ICON = { ...GAME_ICON_BASE, animals: ANIMAL_ART.cow };
@@ -743,7 +825,7 @@ function renderMenu() {
     t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // LEO reads the game names to a non-reader
   });
 }
-function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
+function goHome() { renderJars(); show('home'); say(`Hello ${N}! Pick a game!`); }
 function startGame(id) {
   currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
@@ -766,19 +848,22 @@ async function newRound() {
   await repeatPrompt();
 }
 
+const SUM_WORD = { plus: 'plus', minus: 'take away', times: 'times' };
+const SUM_SIGN = { plus: '+', minus: '−', times: '×' };
+function sumPrompt(r) { return `What is ${r.a} ${SUM_WORD[r.ask]} ${r.b}?`; }
 function promptFor(r) {
   switch (r.type) {
-    case 'findNumber': return `Can you find number ${r.target}?`;
-    case 'goal': return `Kick the ball into goal number ${r.target}!`;
+    case 'findNumber': return r.ask ? sumPrompt(r) : `Can you find number ${r.target}?`;
+    case 'goal': return r.ask ? `${sumPrompt(r)} Kick it in the right goal!` : `Kick the ball into goal number ${r.target}!`;
     case 'countIt': return `How many ${PLURAL[r.thing]}? Let's count!`;
     case 'drumCount': return 'Listen to my drum. How many bangs?';
     case 'findShape': return `Can you find the ${r.target}?`;
     case 'shapeFit': return 'Which shape fits in the hole?';
-    case 'jigsaw': return `Let's make a picture of ${C.PUZZLES[r.pic].name}! Pick a piece, then find where it goes.`;
+    case 'jigsaw': return `Let's make a picture of ${C.puzzleText(C.PUZZLES[r.pic].name, N)}! Pick a piece, then find where it goes.`;
     case 'penalty': return 'Penalty time! Pick where to shoot!';
     case 'simon': return 'Listen to my tune, then copy me!';
     case 'animal': return `Listen! ${r.sound} Which animal says that?`;
-    case 'order': return `Put the numbers in order! Start with number ${r.numbers[0]}.`;
+    case 'order': return LV() === 3 ? 'Put the numbers in order, smallest first!' : `Put the numbers in order! Start with number ${r.numbers[0]}.`;
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
@@ -796,19 +881,22 @@ function renderRound() {
   if (r.type === 'shapeFit') showHtml = `<div class="hole">${shapeSvg(r.target, 'hole')}</div>`;
   if (r.type === 'animal') showHtml = EAR + '<button class="again" id="againBtn" data-nav>Hear it again</button>';
   if (r.skill === 'numbers') {
+    const big = Math.max(...r.options), d = () => (big >= 100 ? ' d3' : big >= 10 ? ' d2' : ''); // same size for every option
     answers = r.options.map((n) => r.type === 'goal'
-      ? `<button class="ans goal" data-nav data-v="${n}"><span>${n}</span>${GOAL}</button>`
+      ? `<button class="ans goal${d(n)}" data-nav data-v="${n}"><span>${n}</span>${GOAL}</button>`
       : r.type === 'findNumber'
-        ? `<button class="ans balloon" data-nav data-v="${n}" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</button>`
-        : `<button class="ans" data-nav data-v="${n}">${n}</button>`).join('');
+        ? `<button class="ans balloon${d(n)}" data-nav data-v="${n}" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</button>`
+        : `<button class="ans${d(n)}" data-nav data-v="${n}">${n}</button>`).join('');
+    if (r.ask) showHtml = `<div class="sum">${r.a} ${SUM_SIGN[r.ask]} ${r.b} = ?</div>`;
   } else if (r.type === 'animal') {
     answers = r.options.map((a) => `<button class="ans" data-nav data-v="${a}" aria-label="${a}">${ANIMAL_ART[a]}</button>`).join('');
   } else {
     // Same colour for every option in "fits" rounds so he matches by shape, not colour.
     answers = r.options.map((s) => `<button class="ans" data-nav data-v="${s}">${shapeSvg(s, 'fill', r.type === 'shapeFit' ? '#ffc93c' : undefined)}</button>`).join('');
   }
-  const pitch = r.type === 'goal' ? `<div class="pitch"><div class="answers">${answers}</div><div id="ball">${THING.ball}</div></div>` : `<div class="answers">${answers}</div>`;
-  $('task').innerHTML = `<div class="show">${showHtml}</div>${pitch}`;
+  const nStyle = ` style="--n:${r.options.length}"`;
+  const pitch = r.type === 'goal' ? `<div class="pitch"><div class="answers"${nStyle}>${answers}</div><div id="ball">${THING.ball}</div></div>` : `<div class="answers"${nStyle}>${answers}</div>`;
+  $('task').innerHTML = `<div class="show${r.type === 'countIt' && r.target > 10 ? ' many' : ''}">${showHtml}</div>${pitch}`;
   $('task').querySelectorAll('.ans').forEach((b) => b.addEventListener('click', () => answer(b)));
   const again = $('againBtn'); if (again) again.addEventListener('click', r.type === 'animal' ? repeatPrompt : playDrum);
   if (usingPad) $('task').querySelector('.ans')?.focus();
@@ -849,7 +937,7 @@ async function answer(btn) {
     await wait(650); sfx.cheer();
   }
   sfx.right();
-  state = C.recordAnswer(state, round.skill, round.target, firstTry);
+  if (!round.noStats) state = C.recordAnswer(state, round.skill, round.target, firstTry);
   const res = C.addStar(state); state = res.state; save(); renderJars(); roundIndex++;
   let praise = rand(PRAISE);
   if (round.type === 'countIt' || round.type === 'drumCount') praise = `${Array.from({ length: round.target }, (_, i) => i + 1).join(', ')}. ${NUM_WORD[round.target]}! ${praise}`;
@@ -889,7 +977,7 @@ function renderJigsaw(focus) {
     : `<button class="slot empty" data-nav data-slot="${i}" aria-label="Space ${i + 1}">${pieceSvg(jig.pic, i)}</button>`).join('');
   const tray = jig.order.filter((i) => !jig.placed.includes(i))
     .map((i) => `<button class="piece${jig.sel === i ? ' sel' : ''}" data-nav data-piece="${i}" aria-label="Piece">${pieceSvg(jig.pic, i)}</button>`).join('');
-  $('task').innerHTML = `<div class="jig${done ? ' done' : ''}"><div class="board${done ? ' done' : ''}" id="board">${slots}</div>${done ? '' : `<div class="tray">${tray}</div>`}</div>`;
+  $('task').innerHTML = `<div class="jig${done ? ' done' : ''}" style="--guide:${C.jigGuide(LV())}"><div class="board${done ? ' done' : ''}" id="board">${slots}</div>${done ? '' : `<div class="tray">${tray}</div>`}</div>`;
   $('task').querySelectorAll('.piece').forEach((b) => b.addEventListener('click', () => pickPiece(Number(b.dataset.piece))));
   $('task').querySelectorAll('.slot.empty').forEach((b) => b.addEventListener('click', () => dropPiece(Number(b.dataset.slot), b)));
   if (usingPad || focus) {
@@ -921,11 +1009,11 @@ async function dropPiece(slot, btn) {
   // Fill the star jar as the picture comes together.
   state = { ...state, stars: Math.round(jig.placed.length / C.JIGSAW_PIECES * state.settings.starsPerReward) }; save(); renderJars();
   sfx.right();
-  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Leo!'])); return; }
+  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', `Well done, ${N}!`])); return; }
   locked = true;
   renderJigsaw();
   confetti(); sfx.fanfare();
-  await say(`You did it, Leo! ${C.PUZZLES[jig.pic].done}`);
+  await say(`You did it, ${N}! ${C.puzzleText(C.PUZZLES[jig.pic].done, N)}`);
   await wait(1200);
   if (current === 'play' && currentGame === 'jigsaw') { state = { ...state, stars: state.settings.starsPerReward }; save(); startReward(); }
 }
@@ -953,7 +1041,7 @@ function penaltyRound() {
 async function shoot(spot, btn) {
   if (locked) return;
   locked = true;
-  const dive = C.keeperDive(spot, { firstShot: pen.shots === 0, lastSaved: pen.lastSaved });
+  const dive = C.keeperDive(spot, { firstShot: pen.shots === 0, lastSaved: pen.lastSaved, level: LV() });
   pen.shots++;
   const keeper = $('keeper'), ball = $('pball');
   keeper.style.transform = `translateX(${[-202, -50, 102][dive]}%) rotate(${[-25, 0, 25][dive]}deg)`;
@@ -991,7 +1079,7 @@ function lightPad(i, ms = 420) {
   el.classList.add('lit'); setTimeout(() => el.classList.remove('lit'), ms);
 }
 async function tuneRound() {
-  tune = { seq: C.simonSequence(C.simonLength(roundIndex)), input: [], playing: false };
+  tune = { seq: C.simonSequence(C.simonLength(roundIndex, LV())), input: [], playing: false };
   round = { type: 'simon' }; locked = false;
   $('task').innerHTML = `<div class="pads">${PADS.map((p, i) => `<button class="pad" data-nav data-pad="${i}" style="background:${p.c}" aria-label="Drum ${i + 1}">${NOTE_ICON}</button>`).join('')}</div>`;
   $('task').querySelectorAll('.pad').forEach((b) => b.addEventListener('click', () => tapPad(Number(b.dataset.pad))));
@@ -1050,7 +1138,8 @@ async function tapNumber(n, btn) {
   if (n !== want) {
     sfx.nearly(); ord.misses++; firstTry = false;
     btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
-    if (ord.misses >= 2) { $('task').querySelector(`.onum[data-n="${want}"]`)?.classList.add('hint'); say(`Look for number ${want}!`); }
+    if (ord.misses >= 2 && LV() < 3) { $('task').querySelector(`.onum[data-n="${want}"]`)?.classList.add('hint'); say(`Look for number ${want}!`); }
+    else if (LV() === 3) say(`That's ${n}. Find the smallest number left!`);
     else say(ord.placed.length ? `That's ${n}. What comes after ${ord.placed[ord.placed.length - 1]}?` : `That's ${n}. Find number ${want} first!`);
     return;
   }
@@ -1059,7 +1148,8 @@ async function tapNumber(n, btn) {
   renderOrder();
   if (C.nextInOrder(ord.numbers, ord.placed) !== null) { say(NUM_WORD[n] || String(n)); return; }
   locked = true; confetti();
-  await funWin(`${ord.numbers.join(', ')}! ${rand(PRAISE)}`);
+  const consecutive = ord.numbers.every((v, i) => i === 0 || v === ord.numbers[i - 1] + 1);
+  await funWin(consecutive ? `${ord.numbers.join(', ')}! ${rand(PRAISE)}` : `You put them in order! ${rand(PRAISE)}`);
 }
 
 /* ---------- Shape builder: add each layer by finding its shape in its colour ---------- */
@@ -1118,19 +1208,19 @@ let mem = null;
 const PLURAL_ANIMAL = { dog: 'dogs', cat: 'cats', pig: 'pigs', cow: 'cows', sheep: 'sheep', duck: 'ducks', frog: 'frogs', lion: 'lions' };
 const CARD_BACK = '<svg viewBox="0 0 100 100"><use href="#star" fill="#fff" opacity=".9"/></svg>';
 function pairsRound() {
-  const n = C.PAIRS_SIZES[Math.min(roundIndex, C.PAIRS_SIZES.length - 1)];
+  const n = C.pairsSize(roundIndex, LV());
   mem = { deck: C.memoryDeck(n, Object.keys(ANIMAL_ART)), open: [], matched: new Set(), busy: false };
   round = { type: 'pairs' }; locked = false;
   renderPairs(0);
   if (roundIndex === 0) repeatPrompt(); else say('Here are more cards!');
 }
 function renderPairs(focusIdx) {
-  const cols = mem.deck.length <= 6 ? 3 : mem.deck.length / 2;
+  const cols = mem.deck.length <= 6 ? 3 : mem.deck.length >= 16 ? 4 : mem.deck.length / 2; // 16 cards (Middle/Big): a 4 x 4 square that fits the TV
   const cards = mem.deck.map((item, i) => {
     const up = mem.open.includes(i) || mem.matched.has(i);
     return `<button class="card${up ? '' : ' back'}${mem.matched.has(i) ? ' matched' : ''}" data-nav data-i="${i}" aria-label="${up ? item : 'card'}">${up ? ANIMAL_ART[item] : CARD_BACK}</button>`;
   }).join('');
-  $('task').innerHTML = `<div class="cards" style="--cols:${cols}">${cards}</div>`;
+  $('task').innerHTML = `<div class="cards${mem.deck.length >= 16 ? ' sixteen' : ''}" style="--cols:${cols}">${cards}</div>`;
   $('task').querySelectorAll('.card').forEach((b) => b.addEventListener('click', () => flipCard(Number(b.dataset.i))));
   if (usingPad || focusIdx != null) $('task').querySelector(`.card[data-i="${focusIdx || 0}"]`)?.focus();
 }
@@ -1226,7 +1316,7 @@ function hideScene(h, amount) {
 GAME_ICON.hide = `<svg viewBox="0 0 120 104"><g transform="translate(24 6) scale(.6)">${pup('Pip')}</g><g fill="#3fae62"><circle cx="30" cy="84" r="24"/><circle cx="60" cy="74" r="27"/><circle cx="90" cy="84" r="24"/><rect x="8" y="82" width="104" height="22" rx="10"/></g></svg>`;
 let hs = null;
 function hideRoundStart() {
-  const h = C.hideRound(roundIndex, hs && hs.h);
+  const h = C.hideRound(roundIndex, hs && hs.h, Math.random, LV());
   hs = { h, amount: h.peek, misses: 0 };
   round = { type: 'hide', hider: h.hider }; locked = false;
   const task = $('task');
@@ -1244,7 +1334,7 @@ async function pickSpot(btn) {
   if (btn.dataset.spot !== cur.h.spot) {
     sfx.nearly(); btn.classList.remove('miss'); void btn.offsetWidth; btn.classList.add('miss');
     cur.misses++;
-    if (cur.misses === 2) { // clue: peek out a bit further
+    if (cur.misses === 2 && cur.h.clue) { // clue: peek out a bit further (not at the Big level)
       cur.amount = Math.max(cur.amount, 0.8);
       $('hider').style.transform = pupAt(SPOTS[cur.h.spot], cur.amount);
       say("Here's a clue! Look carefully!");
@@ -1297,7 +1387,7 @@ function fireScene() {
 GAME_ICON.fire = `<svg viewBox="0 0 120 100"><rect x="8" y="40" width="104" height="40" rx="8" fill="#e63946"/><rect x="78" y="20" width="32" height="26" rx="6" fill="#e63946"/><rect x="84" y="25" width="20" height="13" rx="3" fill="#cfe8ff"/><path d="M14 32h60M14 24h60" stroke="#bbb" stroke-width="4"/><circle cx="34" cy="82" r="11" fill="#2b2118"/><circle cx="90" cy="82" r="11" fill="#2b2118"/><path d="M40 30c-12 0-14-10-8-18 2 5 4 6 4 6 0-9 4-15 9-19-1 7 2 10 5 14 4 4 5 9 4 12-2 4-6 5-14 5z" fill="#ff9a3c" transform="translate(-6 -4)"/></svg>`;
 let fr = null;
 function fireRoundStart() {
-  const plan = C.fireRoundPlan(roundIndex);
+  const plan = C.fireRoundPlan(roundIndex, LV());
   fr = { plan, col: fr ? fr.col : 2, active: [], spawned: 0, out: 0, last: null, busy: false, id: 0 };
   round = { type: 'fire' }; locked = false;
   const task = $('task');
@@ -1374,7 +1464,7 @@ function raceScene(r) {
   const stand = Array.from({ length: 12 }, (_, i) => `<g transform="translate(${i * 400} 0)"><rect x="0" y="170" width="360" height="70" fill="#8a5cf6"/><rect x="0" y="160" width="360" height="14" fill="#e63946"/>`
     + Array.from({ length: 14 }, (_, k) => `<circle cx="${14 + k * 25}" cy="${196 + (k % 2) * 18}" r="9" fill="${['#ffc93c', '#ff7eb6', '#5fb0ff', '#fff', '#2fbf71'][(k + i) % 5]}"/>`).join('')
     + `<path d="M380 160v-60" stroke="#fff" stroke-width="4"/><path d="M380 100l34 10-34 10z" fill="${['#e63946', '#ffc93c', '#2a7de1'][i % 3]}"/></g>`).join('');
-  const finishX = C.RACE_LENGTH + LEO_SCREEN_X + 170;
+  const finishX = r.plan.length + LEO_SCREEN_X + 170;
   const checks = Array.from({ length: 24 }, (_, k) => `<rect x="${(k % 2) * 18}" y="${250 + k * 12}" width="18" height="12" fill="${(k + Math.floor(k / 2)) % 2 ? '#2b2118' : '#fff'}"/>`).join('');
   return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs><linearGradient id="rsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
     <rect width="1000" height="560" fill="url(#rsSky)"/><circle cx="880" cy="70" r="40" fill="#ffd54a"/>
@@ -1398,8 +1488,8 @@ function raceScene(r) {
 GAME_ICON.race = `<svg viewBox="-6 -40 190 112"><g transform="translate(0 -10)">${raceCar('#e63946', 4, LEO_DRIVER)}</g></svg>`;
 let race = null, raceRetry = false;
 async function raceRoundStart() {
-  const plan = C.raceRoundPlan(roundIndex);
-  const r = { plan, cones: C.raceObstacles(plan.cones), hit: new Set(), leo: 0, rivals: [0, 0], jumpT: -1, slowUntil: 0, running: false, done: false, last: 0 };
+  const plan = C.raceRoundPlan(roundIndex, LV());
+  const r = { plan, cones: C.raceObstacles(plan.cones, plan.length, Math.random, plan.gap), jumpTime: Math.min(JUMP_TIME, JUMP_DISTANCE / (LEO_SPEED * plan.speed)), hit: new Set(), leo: 0, rivals: [0, 0], jumpT: -1, slowUntil: 0, running: false, done: false, last: 0 };
   race = r; round = { type: 'race', retry: raceRetry }; raceRetry = false; locked = false;
   const task = $('task');
   task.classList.add('racetask');
@@ -1422,10 +1512,10 @@ function raceJump() {
   const r = race;
   if (!r || r.done) return;
   if (!r.running) { repeatPrompt(); return; }
-  if (r.jumpT >= 0) { if (r.jumpT > JUMP_TIME - 0.35) r.queued = true; return; } // pressed just before landing: jump again on landing
+  if (r.jumpT >= 0) { if (r.jumpT > r.jumpTime - 0.35) r.queued = true; return; } // pressed just before landing: jump again on landing
   r.jumpT = 0; tone(520, 0, 0.15, 'triangle', 0.2); tone(780, 0.08, 0.15, 'triangle', 0.2);
 }
-const JUMP_TIME = 1.1, JUMP_HEIGHT = 135, LEO_SPEED = 430;
+const JUMP_TIME = 1.1, JUMP_HEIGHT = 135, LEO_SPEED = 430, JUMP_DISTANCE = 480; // faster races get a quicker jump that covers the same ground
 function raceTick(r, now) {
   if (race !== r || current !== 'play' || r.done) return;
   const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
@@ -1439,8 +1529,8 @@ function raceTick(r, now) {
     const v = LEO_SPEED * r.plan.speed * (1 + Math.max(-0.45, Math.min(0.45, (want - x) / 400)));
     return x + v * dt;
   });
-  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) { r.jumpT = r.queued ? 0 : -1; r.queued = false; } }
-  const air = r.jumpT >= 0 ? Math.sin((r.jumpT / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0;
+  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= r.jumpTime) { r.jumpT = r.queued ? 0 : -1; r.queued = false; } }
+  const air = r.jumpT >= 0 ? Math.sin((r.jumpT / r.jumpTime) * Math.PI) * JUMP_HEIGHT : 0;
   // A cone is hit if it passes under the car while the wheels are near the ground.
   r.cones.forEach((x, i) => {
     const sx = x - r.leo; // cone position relative to the car's front-left
@@ -1457,7 +1547,7 @@ function raceTick(r, now) {
   });
   r.air = air;
   raceDraw(r);
-  if (r.leo >= C.RACE_LENGTH) { raceFinish(r); return; }
+  if (r.leo >= r.plan.length) { raceFinish(r); return; }
   requestAnimationFrame((t) => raceTick(r, t));
 }
 function raceDraw(r) {
@@ -1500,7 +1590,7 @@ function startReward() {
   $('rewardTitle').textContent = game ? `${game.name}: all done!` : 'You earned a surprise!';
   $('rewardArt').innerHTML = BOX;
   $('rewardBtn').textContent = 'Open it!'; $('skipBtn').hidden = true;
-  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Leo! Open your surprise!');
+  show('reward'); sfx.fanfare(); confetti(); say(`Wow! You finished the game, ${N}! Open your surprise!`);
 }
 $('rewardBtn').addEventListener('click', async () => {
   if (rewardStage === 'box') {
@@ -1653,22 +1743,35 @@ function bars(items, stats, label) {
 function openSettings() {
   $('pinView').hidden = true; $('settingsView').hidden = false;
   $('setStars').value = state.settings.starsPerReward;
+  pendingLevel = state.settings.level; renderLevels();
   $('setVideos').value = state.settings.videoIds.map((id) => `https://www.youtube.com/watch?v=${id}`).join('\n');
   updateVideoCount(); updateVoiceNote();
   $('numBars').innerHTML = bars([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], state.stats.numbers, (n) => `Number ${n}`);
   $('shapeBars').innerHTML = bars(C.BASIC_SHAPES.concat(C.EXTRA_SHAPES), state.stats.shapes, (s) => s[0].toUpperCase() + s.slice(1));
   $('levelNote').textContent = `Now practising numbers 1–${C.numberMax(state)} and ${C.shapePool(state).length} shapes. Friends found: ${state.friends.length} of ${C.FRIENDS.length}. Percentages show first-try answers.`;
 }
+// Level picker: three big buttons (easy with a TV remote); applied when Save is pressed.
+let pendingLevel = 1;
+const LEVEL_HELP = {
+  1: 'Little (3–5): numbers to 10, short tunes, small puzzles. The games grow with practice.',
+  2: 'Middle (5–7): numbers to 20 and adding, longer tunes and number rows, more cards, trickier hiding and racing.',
+  3: 'Big (7–9): times tables, numbers to 100, long tunes, big memory boards, no jigsaw guide, fast races.'
+};
+function renderLevels() {
+  $('levelBtns').innerHTML = LeoKids.LEVELS.map((l) => `<button type="button" class="big ${l.id === pendingLevel ? '' : 'blue'}" data-nav data-level="${l.id}" aria-pressed="${l.id === pendingLevel}">${l.name} ${l.ages}</button>`).join('');
+  $('levelBtns').querySelectorAll('button').forEach((b) => b.addEventListener('click', () => { pendingLevel = Number(b.dataset.level); renderLevels(); $('levelBtns').querySelector(`[data-level="${pendingLevel}"]`).focus(); }));
+  $('levelHelp').textContent = LEVEL_HELP[pendingLevel];
+}
 function updateVoiceNote() {
   let msg;
   try {
-    if (clipSet && clipSet.size) msg = `Voice: LEO's recorded voice, Poppy (${clipSet.size} phrases)`;
+    if (clipSet && clipSet.size) msg = `Voice: recorded voice, Poppy (${clipSet.size} phrases)`;
     else if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
-    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the LEO app on TV)';
+    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the TV app)';
   } catch (e) { msg = 'Voice: unknown'; console.warn('[LEO] voice status', e); }
   $('voiceNote').textContent = msg;
 }
-$('voiceTest').addEventListener('click', () => { say('Hello Leo! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
+$('voiceTest').addEventListener('click', () => { say(`Hello ${N}! Can you hear me?`); setTimeout(updateVoiceNote, 1500); });
 function updateVideoCount() {
   const n = C.parseVideoList($('setVideos').value).length;
   $('videoCount').textContent = n
@@ -1679,6 +1782,7 @@ $('setVideos').addEventListener('input', updateVideoCount);
 $('settingsView').addEventListener('submit', (e) => {
   e.preventDefault();
   state.settings.starsPerReward = C.clampInt($('setStars').value, 3, 10, 5);
+  state.settings.level = C.clampLevel(pendingLevel);
   state.settings.videoIds = C.parseVideoList($('setVideos').value);
   state.nextVideo = 0;
   save(); goHome();
@@ -1715,7 +1819,9 @@ renderMenu();
 renderJars();
 
 /* ---------- Birthday surprise: 25 November 2026 only ---------- */
-function isBirthday(d = new Date()) { return d.getFullYear() === 2026 && d.getMonth() === 10 && d.getDate() === 25; }
+const BDAY_AGE = LeoKids.birthdayAge(K); // the age they turn today, or null
+function isBirthday() { return BDAY_AGE !== null; }
+if (BDAY_AGE) { $('bdayTitle').textContent = `Happy ${LeoKids.ordinal(BDAY_AGE)} Birthday, ${N}!`; $('cakeText').textContent = `${K.NAME} ${BDAY_AGE}`; }
 function playBirthdayTune() {
   // "Happy Birthday to You" (public domain melody), one beat = 0.32s.
   const G = 392, A = 440, B = 494, C5 = 523, D5 = 587, E5 = 659, F5 = 698, G5 = 784;
@@ -1726,7 +1832,7 @@ function playBirthdayTune() {
   const phraseStart = [0, 6, 12, 19]; // note index where each sung line begins
   notes.forEach(([f, beats], i) => { if (phraseStart.includes(i)) lineStarts.push(t); tone(f, t, beats * 0.3, 'triangle', 0.22); t += beats * 0.32; });
   // LEO sings along: one spoken line at the start of each musical phrase.
-  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!'];
+  const lines = ['Happy birthday to you', 'Happy birthday to you', `Happy birthday dear ${N}`, 'Happy birthday to you!'];
   lineStarts.forEach((start, i) => setTimeout(() => {
     if (hasClips(lines[i])) { $('bubble').textContent = lines[i]; sayClips(lines[i], true); return; }
     if (nativeVoice) { nativeSpeak(lines[i], true); return; }

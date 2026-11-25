@@ -1,5 +1,86 @@
 {
   "redirects": [
-    { "source": "/tv", "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk", "permanent": false }
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "play.leostudi.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "leo-play-learn.vercel.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "leostudi.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "arthur-play-learn.vercel.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/arthur-latest/arthur-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "oliver-play-learn.vercel.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/oliver-latest/oliver-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "seraphina-play-learn.vercel.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/seraphina-latest/seraphina-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "has": [
+        {
+          "type": "host",
+          "value": "charlie-play-learn.vercel.app"
+        }
+      ],
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/charlie-latest/charlie-tv.apk",
+      "permanent": false
+    },
+    {
+      "source": "/tv",
+      "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk",
+      "permanent": false
+    }
   ]
 }

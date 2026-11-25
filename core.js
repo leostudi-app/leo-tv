@@ -74,25 +74,47 @@
   ];
   const BUILD_SHAPES = ['square', 'rectangle', 'triangle', 'circle', 'star', 'heart'];
 
-  // Memory Pairs: board sizes grow across a game (pairs per board).
-  const PAIRS_SIZES = [3, 3, 4, 5, 6];
+  /*
+   * How each game changes with the level. 1 Little (3-5) is the original game; 2 Middle (5-7); 3 Big (7-9).
+   * Number games: Middle finds numbers to 20 and adds within 20; Big does times tables and taking away within 20.
+   */
+  const LEVEL_SPEC = {
+    1: { options: 3, countMax: null, drumMax: 5, allShapes: false, simon: [2, 2, 3, 3, 4], order: { lengths: [3, 3, 4, 4, 5], max: null, spread: false },
+      pairs: [3, 3, 4, 5, 6], peek: [0.6, 0.5, 0.42, 0.34, 0.28], clue: true, keeperSave: 0.25, jigGuide: 0.22,
+      fire: [{ total: 2, atOnce: 1 }, { total: 3, atOnce: 1 }, { total: 3, atOnce: 2 }, { total: 4, atOnce: 2 }, { total: 5, atOnce: 2 }],
+      race: { length: 4200, gap: 750, rounds: [{ cones: 3, speed: 1 }, { cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }] } },
+    2: { options: 3, countMax: 15, drumMax: 8, allShapes: true, simon: [3, 3, 4, 4, 5], order: { lengths: [4, 4, 5, 5, 6], max: 20, spread: false },
+      pairs: [4, 5, 6, 6, 8], peek: [0.45, 0.38, 0.32, 0.26, 0.2], clue: true, keeperSave: 0.3, jigGuide: 0.1,
+      fire: [{ total: 3, atOnce: 1 }, { total: 4, atOnce: 2 }, { total: 5, atOnce: 2 }, { total: 5, atOnce: 2 }, { total: 6, atOnce: 3 }],
+      race: { length: 4800, gap: 700, rounds: [{ cones: 4, speed: 1.05 }, { cones: 4, speed: 1.1 }, { cones: 5, speed: 1.1 }, { cones: 5, speed: 1.15 }, { cones: 6, speed: 1.2 }] } },
+    3: { options: 4, countMax: 20, drumMax: 10, allShapes: true, simon: [4, 5, 5, 6, 7], order: { lengths: [5, 5, 6, 6, 6], max: 100, spread: true },
+      pairs: [6, 8, 8, 8, 8], peek: [0.32, 0.26, 0.2, 0.16, 0.12], clue: false, keeperSave: 0.35, jigGuide: 0,
+      fire: [{ total: 4, atOnce: 2 }, { total: 5, atOnce: 2 }, { total: 6, atOnce: 3 }, { total: 7, atOnce: 3 }, { total: 8, atOnce: 3 }],
+      race: { length: 5400, gap: 700, rounds: [{ cones: 5, speed: 1.15 }, { cones: 5, speed: 1.2 }, { cones: 6, speed: 1.25 }, { cones: 6, speed: 1.3 }, { cones: 6, speed: 1.3 }] } }
+  };
+  const levelOf = (state) => clampLevel(state && state.settings ? state.settings.level : 1);
+  function levelSpec(stateOrLevel) {
+    return LEVEL_SPEC[typeof stateOrLevel === 'object' ? levelOf(stateOrLevel) : clampLevel(stateOrLevel)];
+  }
+  const atRound = (list, i) => list[Math.min(Math.max(0, i), list.length - 1)];
+  // The Little level's settings under their original names.
+  const PAIRS_SIZES = LEVEL_SPEC[1].pairs; // Memory Pairs: pairs per board, growing across a game
 
   // LEO makes each noise himself; art for every animal lives in index.html.
   const ANIMALS = {
     dog: 'Woof! Woof!', cat: 'Meow!', pig: 'Oink! Oink!', cow: 'Moooo!',
     sheep: 'Baa! Baa!', duck: 'Quack! Quack!', frog: 'Ribbit! Ribbit!', lion: 'Roar!'
   };
-  const ORDER_LENGTHS = [3, 3, 4, 4, 5];
+  const ORDER_LENGTHS = LEVEL_SPEC[1].order.lengths;
 
   const SIMON_PADS = 4;
-  const SIMON_LENGTHS = [2, 2, 3, 3, 4]; // grows gently across a game
 
   const JIGSAW_COLS = 5;
   const JIGSAW_ROWS = 2;
   const JIGSAW_PIECES = JIGSAW_COLS * JIGSAW_ROWS;
   // Original pictures drawn in index.html (symbols #pic0..#pic3).
   const PUZZLES = [
-    { name: 'Leo playing football', done: 'Leo is playing football!' },
+    { name: '{name} playing football', done: '{name} is playing football!' }, // {name}: the child's name
     { name: 'a birthday party', done: "It's a birthday party!" },
     { name: 'the bottom of the sea', done: "It's under the sea!" },
     { name: 'a rocket in space', done: "It's a rocket in space!" }
@@ -123,10 +145,20 @@
     { name: 'Tumble', colour: '#9be15d', ears: 'antenna' }
   ];
 
-  function defaultState() {
+  /** Difficulty: 1 Little (3-5), 2 Middle (5-7), 3 Big (7-9). */
+  function clampLevel(level) {
+    const n = Number(level);
+    return n === 2 || n === 3 ? n : 1;
+  }
+
+  function puzzleText(text, name) {
+    return String(text).replace(/\{name\}/g, name);
+  }
+
+  function defaultState(level = 1) {
     return {
       version: 5,
-      settings: { starsPerReward: 5, tvMinutes: 4, videoIds: DEFAULT_VIDEOS.slice(), pin: null },
+      settings: { starsPerReward: 5, tvMinutes: 4, videoIds: DEFAULT_VIDEOS.slice(), pin: null, level: clampLevel(level) },
       stars: 0,
       rewardsEarned: 0,
       friends: [], // indexes into FRIENDS
@@ -138,10 +170,11 @@
   }
 
   /** Merge stored data over defaults so new fields survive upgrades. */
-  function normaliseState(raw) {
-    const base = defaultState();
+  function normaliseState(raw, level = 1) {
+    const base = defaultState(level);
     if (!raw || typeof raw !== 'object') return base;
     const settings = { ...base.settings, ...(raw.settings || {}) };
+    settings.level = clampLevel(settings.level);
     if (!Array.isArray(settings.videoIds) || settings.videoIds.length === 0) settings.videoIds = DEFAULT_VIDEOS.slice();
     // v2: 8 games x (play + 4 min prize) is about an hour. Move the old 10-minute default to 4.
     if ((raw.version || 1) < 2 && settings.tvMinutes === 10) settings.tvMinutes = 4;
@@ -157,20 +190,20 @@
     };
   }
 
-  function loadState(storage) {
+  function loadState(storage, key = STORAGE_KEY, level = 1) {
     try {
-      const text = storage && storage.getItem(STORAGE_KEY);
-      return normaliseState(text ? JSON.parse(text) : null);
+      const text = storage && storage.getItem(key);
+      return normaliseState(text ? JSON.parse(text) : null, level);
     } catch (err) {
       // Corrupt or blocked storage: start fresh rather than crash the child's game.
       if (typeof console !== 'undefined') console.warn('[LEO] could not load progress', err);
-      return defaultState();
+      return defaultState(level);
     }
   }
 
-  function saveState(storage, state) {
+  function saveState(storage, state, key = STORAGE_KEY) {
     try {
-      if (storage) storage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (storage) storage.setItem(key, JSON.stringify(state));
       return true;
     } catch (err) {
       if (typeof console !== 'undefined') console.warn('[LEO] could not save progress', err);
@@ -265,33 +298,66 @@
     return Array.from({ length: b - a + 1 }, (_, i) => a + i);
   }
 
+  /** Answers near the right one (never below 1), so a wrong pick is a sensible slip. */
+  function nearOptions(target, count, rng, extra = []) {
+    const cands = [...new Set(extra.concat([target - 1, target + 1, target - 2, target + 2, target + 10, target - 10]))]
+      .filter((x) => x >= 1 && x !== target);
+    return shuffle([target, ...shuffle(cands, rng).slice(0, count - 1)], rng);
+  }
+
+  /** A sum for the number games at Middle (adding within 20) and Big (times tables, taking away within 20). */
+  function sumRound(type, level, rng) {
+    const n = SPEC_OPTIONS(level);
+    if (level === 2) {
+      const a = 1 + Math.floor(rng() * 10), b = 1 + Math.floor(rng() * Math.min(10, 20 - a));
+      return { type, skill: 'numbers', ask: 'plus', a, b, target: a + b, options: nearOptions(a + b, n, rng), noStats: true };
+    }
+    if (type === 'findNumber') {
+      const a = 2 + Math.floor(rng() * 9), b = 2 + Math.floor(rng() * 9);
+      return { type, skill: 'numbers', ask: 'times', a, b, target: a * b, options: nearOptions(a * b, n, rng, [a * (b + 1), a * (b - 1), (a + 1) * b, (a - 1) * b]), noStats: true };
+    }
+    const a = 11 + Math.floor(rng() * 10), b = 2 + Math.floor(rng() * 9);
+    return { type, skill: 'numbers', ask: 'minus', a, b, target: a - b, options: nearOptions(a - b, n, rng), noStats: true };
+  }
+  const SPEC_OPTIONS = (level) => LEVEL_SPEC[level].options;
+
   function makeRound(type, state, rng = Math.random) {
+    const level = levelOf(state), spec = LEVEL_SPEC[level];
     const nums = range(1, numberMax(state));
     switch (type) {
       case 'findNumber':
       case 'goal': {
+        if (level === 3 || (level === 2 && type === 'goal')) return sumRound(type, level, rng);
+        if (level === 2) {
+          const pool = range(1, 20), target = pool[Math.floor(rng() * pool.length)];
+          return { type, skill: 'numbers', target, options: nearOptions(target, spec.options, rng), noStats: target > 10 };
+        }
         const target = pickWeighted(nums, state.stats.numbers, rng);
         return { type, skill: 'numbers', target, options: makeOptions(target, nums, 3, rng) };
       }
       case 'countIt': {
+        if (spec.countMax) {
+          const pool = range(6, spec.countMax), target = pool[Math.floor(rng() * pool.length)];
+          return { type, skill: 'numbers', target, options: nearOptions(target, spec.options, rng), thing: shuffle(['ball', 'apple', 'star', 'note'], rng)[0], noStats: true };
+        }
         const target = pickWeighted(nums, state.stats.numbers, rng);
         return { type, skill: 'numbers', target, options: makeOptions(target, nums, 3, rng), thing: shuffle(['ball', 'apple', 'star', 'note'], rng)[0] };
       }
       case 'drumCount': {
-        const small = range(1, Math.min(5, numberMax(state))); // beats get hard to count past 5
+        const small = level === 1 ? range(1, Math.min(5, numberMax(state))) : range(3, spec.drumMax); // beats get hard to count past 5 for little ones
         const target = pickWeighted(small, state.stats.numbers, rng);
-        return { type, skill: 'numbers', target, options: makeOptions(target, small, 3, rng) };
+        return { type, skill: 'numbers', target, options: level === 1 ? makeOptions(target, small, 3, rng) : nearOptions(target, spec.options, rng), noStats: target > 10 };
       }
       case 'findShape':
       case 'shapeFit': {
-        const pool = shapePool(state);
+        const pool = spec.allShapes ? BASIC_SHAPES.concat(EXTRA_SHAPES) : shapePool(state);
         const target = pickWeighted(pool, state.stats.shapes, rng);
-        return { type, skill: 'shapes', target, options: makeOptions(target, pool, 3, rng) };
+        return { type, skill: 'shapes', target, options: makeOptions(target, pool, spec.options, rng) };
       }
       case 'animal': {
         const pool = Object.keys(ANIMALS);
         const target = pickWeighted(pool, state.stats.animals || {}, rng);
-        return { type, skill: 'animals', target, sound: ANIMALS[target], options: makeOptions(target, pool, 3, rng) };
+        return { type, skill: 'animals', target, sound: ANIMALS[target], options: makeOptions(target, pool, spec.options, rng) };
       }
       default:
         throw new Error(`Unknown round type: ${type}`);
@@ -350,8 +416,8 @@
     return seq;
   }
 
-  function simonLength(roundIndex) {
-    return SIMON_LENGTHS[Math.min(Math.max(roundIndex, 0), SIMON_LENGTHS.length - 1)];
+  function simonLength(roundIndex, level = 1) {
+    return atRound(levelSpec(level).simon, roundIndex);
   }
 
   /** 'wrong' as soon as an input differs, 'done' when the whole tune matches, else 'continue'. */
@@ -364,9 +430,9 @@
    * Where the goalie dives (0 left, 1 middle, 2 right). Saves are rare so it stays fun:
    * never on the first shot, never twice in a row, otherwise about one in four.
    */
-  function keeperDive(shot, { firstShot = false, lastSaved = false } = {}, rng = Math.random) {
+  function keeperDive(shot, { firstShot = false, lastSaved = false, level = 1 } = {}, rng = Math.random) {
     if (![0, 1, 2].includes(shot)) throw new Error('shot must be 0, 1 or 2');
-    const save = !firstShot && !lastSaved && rng() < 0.25;
+    const save = !firstShot && !lastSaved && rng() < levelSpec(level).keeperSave;
     if (save) return shot;
     const others = [0, 1, 2].filter((x) => x !== shot);
     return others[Math.floor(rng() * others.length) % others.length];
@@ -377,10 +443,18 @@
    * Starts at 1 until numbers are mastered, then can start anywhere up to 10.
    */
   function orderRound(roundIndex, state, rng = Math.random) {
-    const len = ORDER_LENGTHS[Math.min(Math.max(roundIndex, 0), ORDER_LENGTHS.length - 1)];
-    const top = numberMax(state);
-    const start = top > 5 ? 1 + Math.floor(rng() * (top - len + 1)) : 1;
-    const numbers = range(start, start + len - 1);
+    const spec = levelSpec(state).order;
+    const len = atRound(spec.lengths, roundIndex);
+    let numbers;
+    if (spec.spread) { // Big: any numbers up to 100, not next to each other
+      const picked = new Set();
+      while (picked.size < len) picked.add(1 + Math.floor(rng() * spec.max));
+      numbers = [...picked].sort((a, b) => a - b);
+    } else {
+      const top = spec.max || numberMax(state);
+      const start = top > 5 ? 1 + Math.floor(rng() * (top - len + 1)) : 1;
+      numbers = range(start, start + len - 1);
+    }
     let shuffled = shuffle(numbers, rng);
     if (shuffled.every((v, i) => v === numbers[i])) shuffled = numbers.slice(1).concat(numbers[0]);
     return { numbers, shuffled };
@@ -417,25 +491,26 @@
   // Hide & Seek: an original puppy family hides around the garden, showing less of themselves each round.
   const HIDERS = ['Pip', 'Mum', 'Dad', 'Tilly', 'Cousin Bo'];
   const HIDE_SPOTS = ['tree', 'bush', 'chimney', 'window', 'car'];
-  const HIDE_PEEK = [0.6, 0.5, 0.42, 0.34, 0.28]; // share of the peek still showing, round by round
+  const HIDE_PEEK = LEVEL_SPEC[1].peek; // share of the peek still showing, round by round
 
   /** Who hides where this round: never the same spot or hider twice running. */
-  function hideRound(roundIndex, prev = null, rng = Math.random) {
+  function hideRound(roundIndex, prev = null, rng = Math.random, level = 1) {
     const pick = (list, not) => { const pool = list.filter((x) => x !== not); return pool[Math.floor(rng() * pool.length)]; };
     return {
       hider: pick(HIDERS, prev && prev.hider),
       spot: pick(HIDE_SPOTS, prev && prev.spot),
-      peek: HIDE_PEEK[Math.min(Math.max(0, roundIndex), HIDE_PEEK.length - 1)]
+      peek: atRound(levelSpec(level).peek, roundIndex),
+      clue: levelSpec(level).clue
     };
   }
 
   // Fire Rescue: fires pop up in the windows of a street; drive to each one and spray it out.
   const FIRE_COLS = 5; // buildings along the street
   const FIRE_FLOORS = 2; // window rows per building
-  const FIRE_ROUNDS = [{ total: 2, atOnce: 1 }, { total: 3, atOnce: 1 }, { total: 3, atOnce: 2 }, { total: 4, atOnce: 2 }, { total: 5, atOnce: 2 }];
+  const FIRE_ROUNDS = LEVEL_SPEC[1].fire;
 
-  function fireRoundPlan(roundIndex) {
-    return FIRE_ROUNDS[Math.min(Math.max(0, roundIndex), FIRE_ROUNDS.length - 1)];
+  function fireRoundPlan(roundIndex, level = 1) {
+    return atRound(levelSpec(level).fire, roundIndex);
   }
 
   /** A window for the next fire: never one already burning, and not the last one put out. */
@@ -448,12 +523,13 @@
   }
 
   // Race Day: one-button racing. Jump the cones in LEO's lane; races get longer and busier.
-  const RACE_LENGTH = 4200; // track units from start line to finish
+  const RACE_LENGTH = LEVEL_SPEC[1].race.length; // track units from start line to finish (Little)
   // Cones stay well apart (a full jump plus time to get ready) so it's fair with a TV remote's small delay.
-  const RACE_ROUNDS = [{ cones: 3, speed: 1 }, { cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }];
+  const RACE_ROUNDS = LEVEL_SPEC[1].race.rounds;
 
-  function raceRoundPlan(roundIndex) {
-    return RACE_ROUNDS[Math.min(Math.max(0, roundIndex), RACE_ROUNDS.length - 1)];
+  function raceRoundPlan(roundIndex, level = 1) {
+    const r = levelSpec(level).race;
+    return { ...atRound(r.rounds, roundIndex), length: r.length, gap: r.gap };
   }
 
   /** Cone positions along the track: sorted, clear of the start and finish, and at least `gap` apart. */
@@ -525,13 +601,14 @@
   }
 
   return {
-    STORAGE_KEY, FRIENDS, BASIC_SHAPES, EXTRA_SHAPES, ROUND_TYPES, GAMES, DEFAULT_VIDEOS, roundTypeFor,
+    STORAGE_KEY, FRIENDS, clampLevel, puzzleText, BASIC_SHAPES, EXTRA_SHAPES, ROUND_TYPES, GAMES, DEFAULT_VIDEOS, roundTypeFor,
     defaultState, normaliseState, loadState, saveState,
     extractYouTubeId, parseVideoList, clampInt, accuracy, isMastered, numberMax, shapePool,
     recordAnswer, pickWeighted, makeOptions, makeRound, nextRoundType,
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
     ANIMALS, orderRound, nextInOrder, COLOURS, BUILDS, BUILD_SHAPES, buildOptions, PAIRS_SIZES, memoryDeck, isPair,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
+    LEVEL_SPEC, levelSpec, pairsSize: (roundIndex, level = 1) => atRound(levelSpec(level).pairs, roundIndex), jigGuide: (level = 1) => levelSpec(level).jigGuide,
     speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
     FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire, RACE_LENGTH, RACE_ROUNDS, raceRoundPlan, raceObstacles,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
