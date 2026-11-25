@@ -100,6 +100,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #player iframe{width:100%;height:100%;border:0}
 .timer{position:absolute;left:0;right:0;bottom:0;height:12px;background:#fff2;z-index:2}
 .timer b{display:block;height:100%;background:var(--gold);transition:width 1s linear}
+.tvhint{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:#000a;color:#fff;border-radius:20px;padding:8px 18px;font-size:clamp(18px,3vw,26px);z-index:3;pointer-events:none}
 .tvmsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
 /* Birthday (shows on 25 Nov 2026 only) */
 #birthday{align-items:center;justify-content:center;text-align:center;gap:clamp(6px,2vh,18px);background:radial-gradient(circle at 50% 40%,#fff6d6,#ffc93c 55%,#5fb0ff);overflow:hidden}
@@ -190,7 +191,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 <!-- Reusable art: LEO, star -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <symbol id="leo" viewBox="0 0 200 230">
+    <symbol id="leo" viewBox="0 -16 200 246">
       <g fill="#f28c28">
         <circle cx="100" cy="88" r="78"/>
         <circle cx="38" cy="60" r="26"/><circle cx="162" cy="60" r="26"/><circle cx="30" cy="110" r="26"/><circle cx="170" cy="110" r="26"/>
@@ -226,7 +227,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
       <rect x="398" y="62" width="92" height="80" fill="#ffffff33"/>
       <path d="M410 62v80M422 62v80M434 62v80M446 62v80M458 62v80M470 62v80M482 62v80M398 76h92M398 90h92M398 104h92M398 118h92M398 132h92" stroke="#ffffff88" stroke-width="1.5"/>
       <path d="M398 142V62h92v80" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
-      <use href="#leo" x="22" y="54" width="124" height="143"/>
+      <use href="#leo" x="22" y="44" width="124" height="153"/>
       <g transform="translate(300 160)"><circle r="18" fill="#fff" stroke="#2b2118" stroke-width="3"/><polygon points="0,-7 7,-2 4,6 -4,6 -7,-2" fill="#2b2118"/></g>
       <path d="M180 168h70" stroke="#ffffff99" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 8"/>
     </symbol>
@@ -329,6 +330,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 
 <section id="tv" class="screen" aria-label="TV time">
   <div id="player"></div>
+  <div class="tvhint" id="tvhint" hidden>Tap the video to start it &#9654;</div>
   <div class="timer"><b id="timerBar" style="width:100%"></b></div>
   <div class="tvmsg" id="tvmsg" hidden></div>
 </section>
@@ -507,6 +509,15 @@ function say(text) {
 
 /* ---------- Sound (original jingles, synthesised) ---------- */
 let ac = null;
+// iPhone: let LEO's music play even when the ring/silent switch is on (Safari 17+).
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { console.warn('[LEO] audio session', e); }
+// iPhone only starts Web Audio from a finished tap (touchend/click), not from touchstart/pointerdown.
+function unlockAudio() {
+  const a = audio(); if (!a) return;
+  try { const b = a.createBuffer(1, 1, 22050), src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(0); }
+  catch (e) { console.warn('[LEO] audio unlock failed', e); }
+}
+['touchend', 'click', 'keydown'].forEach((ev) => document.addEventListener(ev, unlockAudio, { passive: true }));
 function audio() {
   try { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; }
   catch (e) { console.warn('[LEO] audio unavailable', e); return null; }
@@ -609,7 +620,7 @@ const ANIMAL_ART = {
   sheep: '<svg viewBox="0 0 100 100"><g fill="#f5f5f5" stroke="#ddd" stroke-width="2"><circle cx="30" cy="30" r="16"/><circle cx="50" cy="22" r="16"/><circle cx="70" cy="30" r="16"/><circle cx="22" cy="52" r="16"/><circle cx="78" cy="52" r="16"/><circle cx="32" cy="74" r="16"/><circle cx="68" cy="74" r="16"/><circle cx="50" cy="80" r="16"/></g><ellipse cx="18" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="82" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="50" cy="54" rx="22" ry="27" fill="#5d5d66"/><circle cx="41" cy="48" r="5" fill="#fff"/><circle cx="59" cy="48" r="5" fill="#fff"/><circle cx="42" cy="49" r="2.5" fill="#2b2118"/><circle cx="60" cy="49" r="2.5" fill="#2b2118"/><path d="M44 68q6 5 12 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
   duck: '<svg viewBox="0 0 100 100"><path d="M50 6q4 8-2 12" fill="none" stroke="#f9a825" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="48" r="36" fill="#ffeb3b"/><circle cx="36" cy="40" r="6" fill="#2b2118"/><circle cx="64" cy="40" r="6" fill="#2b2118"/><circle cx="38" cy="38" r="2" fill="#fff"/><circle cx="66" cy="38" r="2" fill="#fff"/><ellipse cx="50" cy="62" rx="22" ry="9" fill="#ff9800"/><ellipse cx="50" cy="68" rx="18" ry="7" fill="#f57c00"/></svg>',
   frog: '<svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="15" fill="#4caf50"/><circle cx="70" cy="30" r="15" fill="#4caf50"/><ellipse cx="50" cy="60" rx="40" ry="30" fill="#4caf50"/><circle cx="30" cy="28" r="9" fill="#fff"/><circle cx="70" cy="28" r="9" fill="#fff"/><circle cx="31" cy="29" r="5" fill="#2b2118"/><circle cx="71" cy="29" r="5" fill="#2b2118"/><path d="M22 62q28 22 56 0" fill="none" stroke="#1b5e20" stroke-width="4" stroke-linecap="round"/><circle cx="26" cy="54" r="5" fill="#ff8a80" opacity=".6"/><circle cx="74" cy="54" r="5" fill="#ff8a80" opacity=".6"/></svg>',
-  lion: '<svg viewBox="0 0 200 230"><use href="#leo"/></svg>'
+  lion: '<svg viewBox="0 0 200 246"><use href="#leo" width="200" height="246"/></svg>'
 };
 const EAR = '<svg class="ear" viewBox="0 0 100 100"><path d="M20 38h16l22-18v60L36 62H20z" fill="#fff"/><path d="M68 34q10 16 0 32M78 24q18 26 0 52" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';
 const GAME_ICON = { ...GAME_ICON_BASE, animals: ANIMAL_ART.cow };
@@ -858,16 +869,18 @@ async function tuneRound() {
   round = { type: 'simon' }; locked = false;
   $('task').innerHTML = `<div class="pads">${PADS.map((p, i) => `<button class="pad" data-nav data-pad="${i}" style="background:${p.c}" aria-label="Drum ${i + 1}">${NOTE_ICON}</button>`).join('')}</div>`;
   $('task').querySelectorAll('.pad').forEach((b) => b.addEventListener('click', () => tapPad(Number(b.dataset.pad))));
-  await say(roundIndex === 0 ? promptFor(round) : `Ready? ${tune.seq.length} notes this time!`);
-  await playTune();
+  const t = tune;
+  await say(roundIndex === 0 ? promptFor(round) : `Ready? ${t.seq.length} notes this time!`);
+  if (tune === t) await playTune();
 }
 async function playTune() {
-  if (!tune || current !== 'play') return;
-  tune.playing = true; tune.input = [];
+  const t = tune; // the game may be left mid-tune; stop if this tune is no longer current
+  if (!t || current !== 'play') return;
+  t.playing = true; t.input = [];
   await wait(400);
-  for (const i of tune.seq) { if (current !== 'play') return; lightPad(i); await wait(700); }
-  tune.playing = false;
-  if (current !== 'play') return;
+  for (const i of t.seq) { if (current !== 'play' || tune !== t) return; lightPad(i); await wait(700); }
+  t.playing = false;
+  if (current !== 'play' || tune !== t) return;
   if (usingPad) $('task').querySelector('.pad')?.focus();
   say('Your turn!');
 }
@@ -963,7 +976,9 @@ function loadYouTube() {
 }
 async function startTv() {
   const minutes = state.settings.tvMinutes;
-  show('tv'); $('tvmsg').hidden = true;
+  show('tv'); $('tvmsg').hidden = true; $('tvhint').hidden = true;
+  if (yt) { try { yt.destroy(); } catch (e) { console.warn('[LEO] old player', e); } yt = null; }
+  $('player').innerHTML = '<div id="ytslot"></div>';
   tvTotal = minutes * 60000; tvEnd = Date.now() + tvTotal; tvErrors = 0;
   clearInterval(tvTimer);
   tvTimer = setInterval(() => {
@@ -984,12 +999,20 @@ function playNext(YT) {
   const next = C.takeNextVideo(state); state = next.state; save();
   if (!next.videoId) return danceParty();
   if (yt) { yt.loadVideoById(next.videoId); return; }
-  yt = new YT.Player('player', {
+  yt = new YT.Player('ytslot', {
     host: 'https://www.youtube-nocookie.com',
     videoId: next.videoId,
-    playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1 },
+    playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1, origin: location.origin },
     events: {
-      onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED && current === 'tv') playNext(YT); },
+      onReady: (e) => {
+        try { e.target.playVideo(); } catch (err) { console.warn('[LEO] autoplay', err); }
+        // Phones often block autoplay: if it hasn't started, tell him to tap the video.
+        setTimeout(() => { try { if (current === 'tv' && yt && yt.getPlayerState() !== YT.PlayerState.PLAYING) $('tvhint').hidden = false; } catch (err) { console.warn(err); } }, 2500);
+      },
+      onStateChange: (e) => {
+        if (e.data === YT.PlayerState.PLAYING) $('tvhint').hidden = true;
+        if (e.data === YT.PlayerState.ENDED && current === 'tv') playNext(YT);
+      },
       onError: (e) => {
         console.warn('[LEO] video error', e.data);
         tvErrors += 1;
@@ -1000,6 +1023,7 @@ function playNext(YT) {
 }
 let danceLoop = null;
 function danceParty() {
+  $('tvhint').hidden = true;
   if (yt) { try { yt.destroy(); } catch (e) { console.warn(e); } yt = null; }
   $('player').innerHTML = '';
   $('tvmsg').hidden = false;
@@ -1156,7 +1180,8 @@ if (isBirthday()) {
     await say("Hooray! You're four today, Leo! We have the same name! Shall we play?");
     canPlay = true; $('birthdayBtn').textContent = 'Play';
   }
-  $('birthday').addEventListener('pointerdown', () => party(true));
+  $('birthday').addEventListener('click', () => party(true));
+  $('birthday').addEventListener('touchend', () => party(true), { passive: true });
   document.addEventListener('keydown', () => { if (current === 'birthday') party(true); });
   $('birthdayBtn').addEventListener('click', () => { if (canPlay) goHome(); else party(true); });
   setTimeout(() => party(false), 600); // TV/desktop browsers that allow autoplay start singing straight away
