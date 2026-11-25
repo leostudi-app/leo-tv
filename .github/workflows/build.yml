@@ -2,7 +2,7 @@ name: Build LEO TV app
 
 on:
   push:
-    branches: ['**', '!builds']
+    branches: ['fire-tv-app', 'main']
   workflow_dispatch:
 
 permissions:

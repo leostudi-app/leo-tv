@@ -2,6 +2,9 @@ package app.leostudi.leotv;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -16,7 +19,10 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -33,6 +39,9 @@ public class MainActivity extends Activity {
     private WebView web;
     private TextToSpeech tts;
     private volatile boolean ttsReady = false;
+    private volatile String ttsStatus = "starting";
+    private final List<String> enginesToTry = new ArrayList<>();
+    private final List<String[]> pending = new ArrayList<>(); // speech asked for before the engine was ready
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,27 +75,66 @@ public class MainActivity extends Activity {
             }
         });
 
-        tts = new TextToSpeech(this, status -> {
+        startVoice(null); // device default engine first; others are tried if it fails
+
+        // Tell the grown-up whether LEO's voice works on this TV (shown once at start-up).
+        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                Toast.makeText(this, "LEO voice: " + ttsStatus, Toast.LENGTH_LONG).show(), 5000);
+
+        web.loadUrl(APP_URL);
+        web.requestFocus();
+    }
+
+    /** Start text-to-speech with the given engine (null = default); on failure move on to the next installed engine. */
+    private void startVoice(String engine) {
+        ttsStatus = "starting" + (engine == null ? "" : " (" + engine + ")");
+        TextToSpeech.OnInitListener onInit = status -> {
             if (status != TextToSpeech.SUCCESS) {
-                Log.w(TAG, "Text-to-speech unavailable, status " + status);
+                Log.w(TAG, "TTS engine " + engine + " failed: " + status);
+                if (engine == null && tts != null) {
+                    for (TextToSpeech.EngineInfo e : tts.getEngines()) enginesToTry.add(e.name);
+                }
+                if (tts != null) tts.shutdown();
+                if (!enginesToTry.isEmpty()) { startVoice(enginesToTry.remove(0)); return; }
+                ttsStatus = "not available on this TV (no working speech engine)";
                 return;
             }
-            int lang = tts.setLanguage(Locale.UK);
-            if (lang == TextToSpeech.LANG_MISSING_DATA || lang == TextToSpeech.LANG_NOT_SUPPORTED) {
-                tts.setLanguage(Locale.US);
+            String langUsed = "default";
+            for (Locale l : new Locale[]{Locale.UK, Locale.US, Locale.ENGLISH}) {
+                int r = tts.setLanguage(l);
+                if (r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED) { langUsed = l.toString(); break; }
             }
+            // Play through the normal media volume, not the accessibility stream.
+            tts.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build());
             tts.setPitch(1.15f);
             tts.setSpeechRate(0.9f);
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override public void onStart(String id) { }
                 @Override public void onDone(String id) { notifyDone(id); }
-                @Override public void onError(String id) { notifyDone(id); }
+                @Override public void onError(String id) { Log.w(TAG, "utterance error " + id); notifyDone(id); }
             });
+            String name = tts.getDefaultEngine();
+            ttsStatus = "ready (" + (engine != null ? engine : name) + ", " + langUsed + ")";
             ttsReady = true;
-        });
+            synchronized (pending) {
+                for (String[] p : pending) say(p[0], p[1], true);
+                pending.clear();
+            }
+        };
+        tts = engine == null ? new TextToSpeech(this, onInit) : new TextToSpeech(this, onInit, engine);
+    }
 
-        web.loadUrl(APP_URL);
-        web.requestFocus();
+    private void say(String text, String id, boolean queue) {
+        String clipped = text.length() > 400 ? text.substring(0, 400) : text;
+        int mode = queue ? TextToSpeech.QUEUE_ADD : TextToSpeech.QUEUE_FLUSH;
+        int result = tts.speak(clipped, mode, null, id);
+        if (result != TextToSpeech.SUCCESS) {
+            Log.w(TAG, "speak() failed with " + result);
+            ttsStatus = "engine refused to speak (" + result + ")";
+            notifyDone(id);
+        }
     }
 
     private void notifyDone(String id) {
@@ -100,16 +148,19 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public boolean canSpeak() { return ttsReady; }
 
+        /** Plain-English voice status for the grown-ups screen. */
+        @JavascriptInterface
+        public String status() { return ttsStatus; }
+
         @JavascriptInterface
         public void speak(String text, String id, boolean queue) {
-            if (!ttsReady || text == null) { notifyDone(id); return; }
-            String clipped = text.length() > 400 ? text.substring(0, 400) : text;
-            int mode = queue ? TextToSpeech.QUEUE_ADD : TextToSpeech.QUEUE_FLUSH;
-            int result = tts.speak(clipped, mode, null, id);
-            if (result != TextToSpeech.SUCCESS) {
-                Log.w(TAG, "speak() failed with " + result);
-                notifyDone(id);
+            if (text == null) { notifyDone(id); return; }
+            if (!ttsReady) {
+                // Engine still starting: keep only the latest line so it is spoken as soon as it's ready.
+                synchronized (pending) { pending.clear(); pending.add(new String[]{text, id}); }
+                return;
             }
+            say(text, id, queue);
         }
 
         @JavascriptInterface
