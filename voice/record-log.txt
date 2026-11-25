@@ -1,4 +1,15 @@
-E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libspa-0.2-modules_1.6.2-1ubuntu1.2_amd64v3.deb  404  Not Found [IP: 91.189.91.82 443]
-E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libpipewire-0.3-0t64_1.6.2-1ubuntu1.2_amd64v3.deb  404  Not Found [IP: 91.189.91.82 443]
-E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libpipewire-0.3-common_1.6.2-1ubuntu1.2_all.deb  404  Not Found [IP: 91.189.91.82 443]
-E: Unable to fetch some archives, maybe run apt update or try with --fix-missing?
+
+Running kernel seems to be up-to-date.
+
+Restarting services...
+
+Service restarts being deferred:
+ systemctl restart hosted-compute-agent.service
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+voice: en_GB-semaine-medium.onnx/poppy speaker id 3
+recorded 401 of 401 phrases; failed 0
