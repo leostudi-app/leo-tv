@@ -3,8 +3,6 @@ package app.leostudi.leotv;
 import android.app.Activity;
 import android.graphics.Color;
 import android.media.AudioAttributes;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -19,7 +17,6 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,10 +73,6 @@ public class MainActivity extends Activity {
         });
 
         startVoice(null); // device default engine first; others are tried if it fails
-
-        // Tell the grown-up whether LEO's voice works on this TV (shown once at start-up).
-        new Handler(Looper.getMainLooper()).postDelayed(() ->
-                Toast.makeText(this, "LEO voice: " + ttsStatus, Toast.LENGTH_LONG).show(), 5000);
 
         web.loadUrl(APP_URL);
         web.requestFocus();
