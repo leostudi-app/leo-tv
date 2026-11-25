@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>OLIVER – Play &amp; Learn</title>
+<title>SERAPHINA – Play &amp; Learn</title>
 <meta name="theme-color" content="#ffc93c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="OLIVER">
+<meta name="apple-mobile-web-app-title" content="SERAPHINA">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -17,8 +17,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
 <style>
 /* VOICE: warm, bouncy, encouraging — a picture-book friend, never a test.
-   IDEA: a sunny playroom where OLIVER the dinosaur hosts each mini-game like a kids' TV show.
-   PICTURE: OLIVER himself, large, beside one big task; answers are chunky toys to tap.
+   IDEA: a sunny playroom where SERAPHINA the dinosaur hosts each mini-game like a kids' TV show.
+   PICTURE: SERAPHINA herself, large, beside one big task; answers are chunky toys to tap.
    COLOUR and TYPE: lion gold ground, sky blue stage, kit red accent; Baloo 2 rounded display.
    LAYOUT: one task per screen, three huge answers in a row; works portrait, landscape and TV. */
 :root{--gold:#ffc93c;--mane:#f28c28;--sky:#2a7de1;--sky2:#5fb0ff;--red:#e63946;--ink:#2b2118;--paper:#fffaf0;--ok:#2fbf71;
@@ -247,7 +247,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 </head>
 <body>
 
-<!-- Reusable art: OLIVER, star -->
+<!-- Reusable art: SERAPHINA, star -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="leo" viewBox="0 -16 200 246">
@@ -325,7 +325,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
       <path d="M185 145h130" stroke="#fff" stroke-width="4" stroke-dasharray="10 8"/>
       <g fill="#ffc93c"><rect x="207" y="88" width="8" height="30" rx="3"/><rect x="232" y="88" width="8" height="30" rx="3"/><rect x="258" y="88" width="8" height="30" rx="3"/><rect x="284" y="88" width="8" height="30" rx="3"/></g>
       <g fill="#ff9a3c"><ellipse cx="211" cy="80" rx="5" ry="8"/><ellipse cx="236" cy="80" rx="5" ry="8"/><ellipse cx="262" cy="80" rx="5" ry="8"/><ellipse cx="288" cy="80" rx="5" ry="8"/></g>
-      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">OLIVER 4</text>
+      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">SERAPHINA 4</text>
       <rect x="350" y="122" width="44" height="44" rx="4" fill="#2a7de1"/><path d="M372 122v44M350 144h44" stroke="#ffc93c" stroke-width="6"/>
       <rect x="402" y="132" width="36" height="34" rx="4" fill="#e63946"/><path d="M420 132v34M402 149h36" stroke="#fff" stroke-width="5"/>
       <g fill="#8a5cf6"><circle cx="150" cy="150" r="5"/><circle cx="170" cy="100" r="4"/><circle cx="330" cy="70" r="5"/></g>
@@ -363,13 +363,13 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 
 <section id="start" class="screen on" aria-label="Start">
   <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
-  <h1>OLIVER</h1>
+  <h1>SERAPHINA</h1>
   <button class="big" id="startBtn" data-nav>Let's play!</button>
 </section>
 
 <section id="birthday" class="screen" aria-label="Happy birthday">
   <div class="balloons" id="balloons"></div>
-  <h1>Happy 4th Birthday, Oliver!</h1>
+  <h1>Happy 4th Birthday, Seraphina!</h1>
   <div class="bday-scene">
     <svg class="bday-leo wave" aria-hidden="true"><use href="#leo"/></svg>
     <svg class="cake" viewBox="0 0 200 230" aria-label="Birthday cake with a number 4 candle">
@@ -441,12 +441,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
     <label>Prize videos, one YouTube link per line (video 1 plays after game 1, and so on)
       <textarea id="setVideos" data-nav placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
-    <p class="note">Tip: lock the device to OLIVER with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
+    <p class="note">Tip: lock the device to SERAPHINA with Guided Access (iPhone/iPad) or screen pinning (Android) so she can't leave the app.</p>
     <div><h3>Numbers</h3><div class="bars" id="numBars"></div></div>
     <div><h3>Shapes</h3><div class="bars" id="shapeBars"></div></div>
     <p class="note" id="levelNote"></p>
     <p class="note" id="voiceNote"></p>
-    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test OLIVER's voice</button></div>
+    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test SERAPHINA's voice</button></div>
     <p class="note">Settings and videos are saved on this device only, so set them on each phone, tablet or TV.</p>
     <div class="row"><button class="big" type="submit" data-nav>Save</button><button class="big blue" type="button" id="setBack" data-nav>Back</button></div>
     <div class="row"><button type="button" class="note" id="resetBtn" data-nav>Reset progress</button><button type="button" class="note" id="pinChange" data-nav>Change PIN</button></div>
@@ -557,7 +557,7 @@ function pickVoice() {
   } catch (e) { voice = null; }
 }
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-/* In the Fire TV app, OLIVER speaks through the device's own voice engine (window.LeoNative). */
+/* In the Fire TV app, SERAPHINA speaks through the device's own voice engine (window.LeoNative). */
 const nativeVoice = typeof window.LeoNative === 'object' && window.LeoNative !== null;
 let speechSeq = 0;
 const speechPending = new Map();
@@ -638,7 +638,7 @@ function say(text) {
 
 /* ---------- Sound (original jingles, synthesised) ---------- */
 let ac = null;
-// iPhone: let OLIVER's music play even when the ring/silent switch is on (Safari 17+).
+// iPhone: let SERAPHINA's music play even when the ring/silent switch is on (Safari 17+).
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { console.warn('[LEO] audio session', e); }
 // iPhone only starts Web Audio from a finished tap (touchend/click), not from touchstart/pointerdown.
 function unlockAudio() {
@@ -725,7 +725,7 @@ function confetti() {
 }
 
 /* ---------- Game loop ---------- */
-const PRAISE = ['Brilliant!', 'Well done, Oliver!', 'Amazing!', "You're a superstar, Oliver!", 'Fantastic!', 'Yes! Great job!'];
+const PRAISE = ['Brilliant!', 'Well done, Seraphina!', 'Amazing!', "You're a superstar, Seraphina!", 'Fantastic!', 'Yes! Great job!'];
 const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 let round = null, firstTry = true, locked = false, lastType = null, promptText = '';
 let currentGame = null, roundIndex = 0;
@@ -762,10 +762,10 @@ function renderMenu() {
   $('gameTiles').querySelectorAll('.tile').forEach((t) => {
     const g = C.GAMES.find((x) => x.id === t.dataset.game);
     t.addEventListener('click', () => startGame(g.id));
-    t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // OLIVER reads the game names to a non-reader
+    t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // SERAPHINA reads the game names to a non-reader
   });
 }
-function goHome() { renderJars(); show('home'); say('Hello Oliver! Pick a game!'); }
+function goHome() { renderJars(); show('home'); say('Hello Seraphina! Pick a game!'); }
 function startGame(id) {
   currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
@@ -943,11 +943,11 @@ async function dropPiece(slot, btn) {
   // Fill the star jar as the picture comes together.
   state = { ...state, stars: Math.round(jig.placed.length / C.JIGSAW_PIECES * state.settings.starsPerReward) }; save(); renderJars();
   sfx.right();
-  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Oliver!'])); return; }
+  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Seraphina!'])); return; }
   locked = true;
   renderJigsaw();
   confetti(); sfx.fanfare();
-  await say(`You did it, Oliver! ${C.PUZZLES[jig.pic].done}`);
+  await say(`You did it, Seraphina! ${C.PUZZLES[jig.pic].done}`);
   await wait(1200);
   if (current === 'play' && currentGame === 'jigsaw') { state = { ...state, stars: state.settings.starsPerReward }; save(); startReward(); }
 }
@@ -1284,7 +1284,7 @@ async function pickSpot(btn) {
   await funWin(`Boo! You found ${cur.h.hider}!`);
 }
 
-/* ---------- Fire Rescue: drive OLIVER's fire engine to each fire and spray it out ---------- */
+/* ---------- Fire Rescue: drive SERAPHINA's fire engine to each fire and spray it out ---------- */
 const FX = [100, 300, 500, 700, 900]; // centre of each building
 const FY = [175, 300]; // upper and lower window rows
 const BUILD_COLS = [['#ffd6a5', 120], ['#bde0fe', 70], ['#ffc8dd', 140], ['#caffbf', 90], ['#fdffb6', 110]]; // colour, roof height
@@ -1301,7 +1301,7 @@ function fireScene() {
     return `<rect x="${x - 82}" y="${top}" width="164" height="${432 - top}" fill="${col}"/><rect x="${x - 90}" y="${top - 14}" width="180" height="18" rx="6" fill="#0002"/>${wins}`
       + (i === 2 ? `<rect x="${x - 24}" y="370" width="48" height="62" rx="6" fill="#e63946"/>` : `<rect x="${x - 20}" y="374" width="40" height="58" rx="6" fill="#8d5a2b"/>`);
   }).join('');
-  // OLIVER in a yellow helmet, riding an original red fire engine; the hose nozzle sits at (0,-58) relative to the truck.
+  // SERAPHINA in a yellow helmet, riding an original red fire engine; the hose nozzle sits at (0,-58) relative to the truck.
   const truck = `<g class="truck" id="truck" style="transform:translateX(${FX[2]}px)"><g transform="translate(0 6) scale(.85)">
     <rect x="-118" y="-40" width="236" height="86" rx="14" fill="#e63946"/><rect x="-118" y="20" width="236" height="12" fill="#fff"/>
     <rect x="40" y="-112" width="80" height="76" rx="12" fill="#e63946"/><rect x="50" y="-102" width="60" height="44" rx="8" fill="#cfe8ff"/>
@@ -1377,8 +1377,8 @@ async function sprayAt(col) {
 }
 
 /* ---------- Race Day: one-button racing — jump the cones and win ---------- */
-const LANE_Y = [300, 392, 490]; // wheel line of each lane: two rivals, then OLIVER nearest
-const LEO_SCREEN_X = 210; // where OLIVER's car sits on screen; the world scrolls past
+const LANE_Y = [300, 392, 490]; // wheel line of each lane: two rivals, then SERAPHINA nearest
+const LEO_SCREEN_X = 210; // where SERAPHINA's car sits on screen; the world scrolls past
 function raceCar(colour, number, driver) {
   // An original side-on race car, 170 wide, wheels resting on y=64.
   return `<rect x="2" y="12" width="12" height="22" rx="3" fill="#2b2118"/><rect x="-2" y="8" width="26" height="8" rx="3" fill="${colour}"/>`
@@ -1453,7 +1453,7 @@ function raceTick(r, now) {
   const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
   const slow = now < r.slowUntil ? 0.45 : 1;
   r.leo += LEO_SPEED * r.plan.speed * slow * dt;
-  // Rivals stay close. Each cone OLIVER hits lets them get further: 2 hits and blue beats him, 3 and green does too.
+  // Rivals stay close. Each cone SERAPHINA hits lets them get further: 2 hits and blue beats him, 3 and green does too.
   const hits = r.hit.size;
   r.rivals = r.rivals.map((x, i) => {
     const beats = hits >= 2 + i;
@@ -1522,7 +1522,7 @@ function startReward() {
   $('rewardTitle').textContent = game ? `${game.name}: all done!` : 'You earned a surprise!';
   $('rewardArt').innerHTML = BOX;
   $('rewardBtn').textContent = 'Open it!'; $('skipBtn').hidden = true;
-  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Oliver! Open your surprise!');
+  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Seraphina! Open your surprise!');
 }
 $('rewardBtn').addEventListener('click', async () => {
   if (rewardStage === 'box') {
@@ -1684,13 +1684,13 @@ function openSettings() {
 function updateVoiceNote() {
   let msg;
   try {
-    if (clipSet && clipSet.size) msg = `Voice: OLIVER's recorded voice, Poppy (${clipSet.size} phrases)`;
+    if (clipSet && clipSet.size) msg = `Voice: SERAPHINA's recorded voice, Poppy (${clipSet.size} phrases)`;
     else if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
-    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the OLIVER app on TV)';
+    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the SERAPHINA app on TV)';
   } catch (e) { msg = 'Voice: unknown'; console.warn('[LEO] voice status', e); }
   $('voiceNote').textContent = msg;
 }
-$('voiceTest').addEventListener('click', () => { say('Hello Oliver! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
+$('voiceTest').addEventListener('click', () => { say('Hello Seraphina! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
 function updateVideoCount() {
   const n = C.parseVideoList($('setVideos').value).length;
   $('videoCount').textContent = n
@@ -1737,7 +1737,7 @@ renderMenu();
 renderJars();
 
 /* ---------- Birthday surprise: 25 November 2026 only ---------- */
-function isBirthday() { return false; } // Oliver's version: no birthday screen
+function isBirthday() { return false; } // Seraphina's version: no birthday screen
 function playBirthdayTune() {
   // "Happy Birthday to You" (public domain melody), one beat = 0.32s.
   const G = 392, A = 440, B = 494, C5 = 523, D5 = 587, E5 = 659, F5 = 698, G5 = 784;
@@ -1747,8 +1747,8 @@ function playBirthdayTune() {
   const lineStarts = [];
   const phraseStart = [0, 6, 12, 19]; // note index where each sung line begins
   notes.forEach(([f, beats], i) => { if (phraseStart.includes(i)) lineStarts.push(t); tone(f, t, beats * 0.3, 'triangle', 0.22); t += beats * 0.32; });
-  // OLIVER sings along: one spoken line at the start of each musical phrase.
-  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Oliver', 'Happy birthday to you!'];
+  // SERAPHINA sings along: one spoken line at the start of each musical phrase.
+  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Seraphina', 'Happy birthday to you!'];
   lineStarts.forEach((start, i) => setTimeout(() => {
     if (hasClips(lines[i])) { $('bubble').textContent = lines[i]; sayClips(lines[i], true); return; }
     if (nativeVoice) { nativeSpeak(lines[i], true); return; }
