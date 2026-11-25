@@ -45,12 +45,15 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .icon svg{width:36px;height:36px}
 .gear{opacity:.55;width:52px;height:52px}
 /* Start + home */
-#start,#home{align-items:center;justify-content:center;text-align:center;gap:clamp(10px,3vh,28px);background:radial-gradient(circle at 50% 35%,#fff3c4,var(--gold) 60%)}
+#start,#home{align-items:center;justify-content:flex-start;text-align:center;gap:clamp(10px,3vh,28px);background:radial-gradient(circle at 50% 35%,#fff3c4,var(--gold) 60%)}
 .leo-hero{width:min(54vh,70vw);height:auto;filter:drop-shadow(0 14px 0 #0001)}
 .wave{animation:bob 2.4s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-10px) rotate(-2deg)}}
 .row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 #homeJar{visibility:hidden}
+#home{overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}#home::-webkit-scrollbar{display:none}
+/* Centre vertically with auto margins: if the menu is taller than the screen (phones), the top stays reachable instead of being pushed off. */
+#start>:first-child,#home>.menu-head{margin-top:auto}#start>:last-child,#home>:last-child{margin-bottom:auto}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
@@ -60,7 +63,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .tile svg{width:56%;height:auto;max-height:14vh}
 @media (max-width:640px){.games{--cols:3}}
 /* TV and other landscape screens: 3 rows of 5, sized so the whole menu fits without scrolling */
-@media (min-width:641px) and (orientation:landscape){#home{gap:clamp(8px,2vh,20px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{max-height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
+@media (min-width:641px) and (orientation:landscape){#home{gap:clamp(6px,1.4vh,16px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{max-height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
 @media (orientation:landscape) and (max-height:450px){#home{gap:6px}.leo-mini{width:40px}#home h2{font-size:22px}.tile svg{max-height:7.5vh}.tile{padding:4px}#home .big{padding-block:4px;font-size:20px}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
 .ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
