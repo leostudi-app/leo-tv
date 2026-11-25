@@ -54,10 +54,14 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1.3vw,16px);width:100%;max-width:1200px}
+.games{--cols:5;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1000px}
+.games>.tile{flex:0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols))}
 .tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
 .tile svg{width:56%;height:auto;max-height:14vh}
-@media (max-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.games{--cols:3}}
+/* TV and other landscape screens: 3 rows of 5, sized so the whole menu fits without scrolling */
+@media (min-width:641px) and (orientation:landscape){#home{gap:clamp(8px,2vh,20px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{max-height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
+@media (orientation:landscape) and (max-height:450px){#home{gap:6px}.leo-mini{width:40px}#home h2{font-size:22px}.tile svg{max-height:7.5vh}.tile{padding:4px}#home .big{padding-block:4px;font-size:20px}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
 .ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
 /* Play */
@@ -198,6 +202,43 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .card.back svg{width:60%;height:60%}
 .card.matched{opacity:.55;box-shadow:none}
 @media (max-width:640px) and (orientation:portrait){.cards{--c:min(20vw,13vh);grid-template-columns:repeat(min(var(--cols),4),var(--c))}}
+/* Hide & Seek */
+.task.hidetask{width:100%}
+.hscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.hscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.hscene .hider{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.hscene .curtain{transition:transform .5s;transform-origin:503px 278px}.hscene .curtain.open{transform:scaleX(.12)}
+.hspot{position:absolute;background:transparent;border:0;border-radius:24px;padding:0;cursor:pointer}
+.hspot:focus-visible,.hspot.pad:focus{outline:6px solid #fff;box-shadow:0 0 0 12px #ffc93c88}
+.hspot.miss{animation:wobble .4s}
+@media (max-width:640px) and (orientation:portrait){.hscene{width:100%}}
+/* Fire Rescue */
+.task.firetask{width:100%}
+.fscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.fscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.fscene .truck{transition:transform .45s ease-in-out}
+.fscene .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .5s infinite alternate;transition:transform .35s,opacity .35s}
+.fscene .fire.out .flame{animation:none;transform:scale(0);opacity:0}
+.fscene .fire.new{animation:pop .4s}
+@keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.9,1.12)}}
+.fscene .steam{opacity:0}.fscene .fire.out .steam{animation:steam 1s}
+@keyframes steam{0%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.fscene .water{stroke-dasharray:6 14;animation:spray .25s linear infinite}
+@keyframes spray{to{stroke-dashoffset:-20}}
+.fcol{position:absolute;top:0;height:100%;background:transparent;border:0;border-radius:20px;padding:0;cursor:pointer}
+.fcol:focus-visible,.fcol.pad:focus{outline:6px solid #fff;outline-offset:-10px;box-shadow:inset 0 0 0 16px #ffc93c55}
+@media (max-width:640px) and (orientation:portrait){.fscene{width:100%}}
+/* Race Day */
+.task.racetask{width:100%}
+.rscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.rscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.rjump{position:absolute;inset:0;background:transparent;border:0;border-radius:22px;cursor:pointer}
+.rjump:focus-visible,.rjump.pad:focus{outline:6px solid #fff;outline-offset:-8px}
+.rscene .count{font:800 150px system-ui,sans-serif;fill:#fff;stroke:#2b2118;stroke-width:6;paint-order:stroke;text-anchor:middle}
+.rscene .wob{animation:wobble .3s 2}
+.rscene .cue{opacity:0}.rscene .ready .cue{opacity:1;animation:pop .5s infinite}
+.rscene .cue{transform-box:fill-box;transform-origin:50% 50%}
+@media (max-width:640px) and (orientation:portrait){.rscene{width:100%}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -701,7 +742,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Arthur! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -712,6 +753,9 @@ async function newRound() {
   if (currentGame === 'order') return orderGameRound();
   if (currentGame === 'build') return buildRound();
   if (currentGame === 'pairs') return pairsRound();
+  if (currentGame === 'hide') return hideRoundStart();
+  if (currentGame === 'fire') return fireRoundStart();
+  if (currentGame === 'race') return raceRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -735,6 +779,9 @@ function promptFor(r) {
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
+    case 'race': return r.retry ? 'Try again! Jump over the cones!' : roundIndex === 0 ? 'Race day! Jump over the cones and win the race!' : 'Another race! Jump over the cones!';
+    case 'fire': return roundIndex === 0 ? 'Nee naw! Fire! Drive to the fire and spray the water!' : 'Fire! Fire! Put it out!';
+    case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
   }
 }
 
@@ -1108,8 +1155,339 @@ async function flipCard(i) {
   renderPairs(usingPad ? i : null);
 }
 
+/* ---------- Hide & Seek: find the puppy family hiding around the garden ---------- */
+// An original puppy family (floppy ears, warm colours), drawn in a 120x160 box.
+const PUPS = {
+  'Pip': { body: '#f2b25c', ear: '#c7843a', belly: '#fde7c2', extra: '<path d="M36 92q24 12 48 0" stroke="#e63946" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="60" cy="101" r="6" fill="#ffc93c"/>' },
+  'Mum': { body: '#f3dfbd', ear: '#d2a877', belly: '#fff7ea', extra: '<g fill="#fff" stroke="#d9c9e8" stroke-width="1.5"><circle cx="42" cy="93" r="4.5"/><circle cx="51" cy="97" r="4.5"/><circle cx="60" cy="98" r="4.5"/><circle cx="69" cy="97" r="4.5"/><circle cx="78" cy="93" r="4.5"/></g>' },
+  'Dad': { body: '#9a6a43', ear: '#6b4428', belly: '#d9b88f', extra: '<path d="M36 92q24 12 48 0" stroke="#2fbf71" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50 30q10-8 20 0" stroke="#6b4428" stroke-width="5" fill="none" stroke-linecap="round"/>' },
+  'Tilly': { body: '#ecc795', ear: '#b9844f', belly: '#fff3df', extra: '<g fill="#ff7eb6"><path d="M60 20l-16-9v18z"/><path d="M60 20l16-9v18z"/><circle cx="60" cy="20" r="5"/></g>' },
+  'Cousin Bo': { body: '#bdb8b0', ear: '#6f6a63', belly: '#ece9e4', extra: '<g fill="#6f6a63" opacity=".75"><ellipse cx="44" cy="118" rx="9" ry="7"/><ellipse cx="80" cy="128" rx="7" ry="6"/><ellipse cx="78" cy="40" rx="9" ry="7"/></g>' }
+};
+function pup(name) {
+  const c = PUPS[name];
+  return `<path d="M88 118q26-6 22-34" stroke="${c.body}" stroke-width="10" fill="none" stroke-linecap="round"/>`
+    + `<rect x="34" y="132" width="20" height="26" rx="9" fill="${c.body}"/><rect x="66" y="132" width="20" height="26" rx="9" fill="${c.body}"/>`
+    + `<ellipse cx="60" cy="116" rx="34" ry="32" fill="${c.body}"/><ellipse cx="60" cy="122" rx="20" ry="20" fill="${c.belly}"/>`
+    + `<circle cx="60" cy="56" r="38" fill="${c.body}"/>`
+    + `<ellipse cx="25" cy="58" rx="12" ry="27" fill="${c.ear}" transform="rotate(18 25 58)"/><ellipse cx="95" cy="58" rx="12" ry="27" fill="${c.ear}" transform="rotate(-18 95 58)"/>`
+    + `<ellipse cx="60" cy="72" rx="21" ry="15" fill="${c.belly}"/><ellipse cx="60" cy="63" rx="8" ry="6" fill="#2b2118"/>`
+    + `<path d="M52 76q8 8 16 0" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    + `<circle cx="45" cy="48" r="5.5" fill="#2b2118"/><circle cx="75" cy="48" r="5.5" fill="#2b2118"/><circle cx="47" cy="46" r="1.8" fill="#fff"/><circle cx="77" cy="46" r="1.8" fill="#fff"/>`
+    + `<circle cx="38" cy="64" r="5" fill="#ff7eb6" opacity=".35"/><circle cx="82" cy="64" r="5" fill="#ff7eb6" opacity=".35"/>`
+    + c.extra;
+}
+// Where each spot hides a pup: hidden position (fully behind), scale, the direction they peek out, and the tap area.
+const SPOTS = {
+  tree: { x: 76, y: 312, s: 0.9, dx: 104, dy: 0, out: 1.25, hit: [40, 30, 205, 430] },
+  bush: { x: 276, y: 305, s: 0.9, dx: 0, dy: -105, out: 1.1, hit: [205, 270, 250, 192] },
+  chimney: { x: 643, y: 62, s: 0.7, dx: 0, dy: -80, out: 0.85, hit: [620, 20, 130, 200] },
+  window: { x: 506, y: 282, s: 0.62, dx: 72, dy: 0, out: 0.45, hit: [485, 262, 140, 130] }, // the curtain opens when found
+  car: { x: 824, y: 304, s: 0.85, dx: 0, dy: -105, out: 1.1, hit: [752, 245, 246, 232] }
+};
+function pupAt(sp, amount) {
+  return `translate(${sp.x + sp.dx * amount}px,${sp.y + sp.dy * amount}px) scale(${sp.s})`;
+}
+function hideScene(h, amount) {
+  const sp = SPOTS[h.spot];
+  const slot = (id) => (id === h.spot ? `<g clip-path="url(#${id === 'window' ? 'hsWin' : 'hsGround'})"><g class="hider" id="hider" style="transform:${pupAt(sp, amount)}">${pup(h.hider)}</g></g>` : '');
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs>
+    <clipPath id="hsGround"><rect width="1000" height="458"/></clipPath><clipPath id="hsWin"><rect x="503" y="278" width="104" height="94"/></clipPath>
+    <linearGradient id="hsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#hsSky)"/><circle cx="930" cy="70" r="44" fill="#ffd54a"/>
+    <g fill="#fff" opacity=".9"><ellipse cx="330" cy="70" rx="60" ry="22"/><ellipse cx="370" cy="56" rx="40" ry="22"/><ellipse cx="820" cy="150" rx="50" ry="18"/></g>
+    <rect y="440" width="1000" height="120" fill="#7ccf5a"/><rect y="440" width="1000" height="14" fill="#6bbb4c"/>
+    <rect x="470" y="232" width="270" height="226" fill="#fff2d6"/><rect x="470" y="232" width="270" height="226" fill="none" stroke="#e8d3a8" stroke-width="4"/>
+    <rect x="652" y="335" width="62" height="123" rx="8" fill="#e63946"/><circle cx="700" cy="400" r="4.5" fill="#ffc93c"/>
+    <rect x="495" y="270" width="120" height="110" rx="6" fill="#fff"/><rect x="503" y="278" width="104" height="94" fill="#2b4a6b"/>
+    ${slot('window')}
+    <g id="hsCurtain" class="curtain"><path d="M503 278h82v94h-82z" fill="#ff9a3c"/><path d="M585 278q-16 47 0 94" stroke="#e07f24" stroke-width="4" fill="none"/></g>
+    <path d="M503 325h104M555 278v94" stroke="#fff" stroke-width="6"/>
+    ${slot('chimney')}
+    <rect x="640" y="72" width="90" height="170" fill="#b5523b"/><rect x="632" y="64" width="106" height="18" rx="4" fill="#8f3d2b"/>
+    <path d="M450 238 605 100 760 238z" fill="#e63946"/><path d="M450 238h310" stroke="#b72f3a" stroke-width="8" stroke-linecap="round"/>
+    ${slot('tree')}
+    <rect x="70" y="170" width="120" height="288" rx="22" fill="#9a6a43"/><path d="M125 240q-12 50 8 90" stroke="#7c5233" stroke-width="6" fill="none"/>
+    <g fill="#2fbf71"><circle cx="130" cy="135" r="100"/><circle cx="52" cy="180" r="56"/><circle cx="210" cy="178" r="58"/></g>
+    <g fill="#e63946"><circle cx="90" cy="110" r="10"/><circle cx="170" cy="92" r="10"/><circle cx="160" cy="190" r="10"/><circle cx="60" cy="190" r="10"/><circle cx="215" cy="160" r="10"/></g>
+    ${slot('bush')}
+    <g fill="#3fae62"><circle cx="262" cy="378" r="56"/><circle cx="330" cy="374" r="60"/><circle cx="398" cy="378" r="56"/><rect x="208" y="392" width="244" height="70" rx="24"/></g>
+    <g fill="#ff7eb6"><circle cx="255" cy="370" r="8"/><circle cx="335" cy="350" r="8"/><circle cx="405" cy="385" r="8"/><circle cx="300" cy="420" r="8"/><circle cx="370" cy="430" r="8"/></g>
+    ${slot('car')}
+    <path d="M800 392V350q0-32 32-32h86q32 0 32 32v42z" fill="#2a7de1"/><path d="M818 388v-32q0-24 24-24h26v56zM882 332h26q24 0 24 24v32h-50z" fill="#cfe8ff"/>
+    <rect x="760" y="380" width="230" height="76" rx="24" fill="#2a7de1"/><rect x="964" y="396" width="20" height="14" rx="4" fill="#ffd54a"/>
+    <g fill="#2b2118"><circle cx="818" cy="458" r="28"/><circle cx="932" cy="458" r="28"/></g><g fill="#ccc"><circle cx="818" cy="458" r="11"/><circle cx="932" cy="458" r="11"/></g>
+    <g fill="#ffc93c"><circle cx="600" cy="505" r="7"/><circle cx="660" cy="525" r="7"/><circle cx="480" cy="512" r="7"/><circle cx="120" cy="510" r="7"/></g>
+  </svg>`;
+}
+GAME_ICON.hide = `<svg viewBox="0 0 120 104"><g transform="translate(24 6) scale(.6)">${pup('Pip')}</g><g fill="#3fae62"><circle cx="30" cy="84" r="24"/><circle cx="60" cy="74" r="27"/><circle cx="90" cy="84" r="24"/><rect x="8" y="82" width="104" height="22" rx="10"/></g></svg>`;
+let hs = null;
+function hideRoundStart() {
+  const h = C.hideRound(roundIndex, hs && hs.h);
+  hs = { h, amount: h.peek, misses: 0 };
+  round = { type: 'hide', hider: h.hider }; locked = false;
+  const task = $('task');
+  task.classList.add('hidetask');
+  const pct = (v, of) => `${(v / of) * 100}%`;
+  const spots = Object.entries(SPOTS).map(([id, sp]) => `<button class="hspot" data-nav data-spot="${id}" aria-label="${id}" style="left:${pct(sp.hit[0], 1000)};top:${pct(sp.hit[1], 560)};width:${pct(sp.hit[2], 1000)};height:${pct(sp.hit[3], 560)}"></button>`).join('');
+  task.innerHTML = `<div class="hscene">${hideScene(h, hs.amount)}${spots}</div>`;
+  task.querySelectorAll('.hspot').forEach((b) => b.addEventListener('click', () => pickSpot(b)));
+  if (usingPad) task.querySelector('.hspot')?.focus();
+  repeatPrompt();
+}
+async function pickSpot(btn) {
+  if (!hs || locked) return;
+  const cur = hs;
+  if (btn.dataset.spot !== cur.h.spot) {
+    sfx.nearly(); btn.classList.remove('miss'); void btn.offsetWidth; btn.classList.add('miss');
+    cur.misses++;
+    if (cur.misses === 2) { // clue: peek out a bit further
+      cur.amount = Math.max(cur.amount, 0.8);
+      $('hider').style.transform = pupAt(SPOTS[cur.h.spot], cur.amount);
+      say("Here's a clue! Look carefully!");
+    } else say('Not there! Keep looking!');
+    return;
+  }
+  locked = true;
+  const sp = SPOTS[cur.h.spot];
+  if (cur.h.spot === 'window') $('hsCurtain').classList.add('open');
+  $('hider').style.transform = pupAt(sp, sp.out);
+  tone(660, 0, 0.12, 'triangle', 0.25); tone(990, 0.12, 0.2, 'triangle', 0.25);
+  confetti();
+  await wait(450);
+  if (hs !== cur) return;
+  await funWin(`Boo! You found ${cur.h.hider}!`);
+}
+
+/* ---------- Fire Rescue: drive ARTHUR's fire engine to each fire and spray it out ---------- */
+const FX = [100, 300, 500, 700, 900]; // centre of each building
+const FY = [175, 300]; // upper and lower window rows
+const BUILD_COLS = [['#ffd6a5', 120], ['#bde0fe', 70], ['#ffc8dd', 140], ['#caffbf', 90], ['#fdffb6', 110]]; // colour, roof height
+function fireFlame(x, y, id) {
+  return `<g class="fire new" id="${id}"><g class="steam" fill="#fff"><circle cx="${x - 14}" cy="${y - 20}" r="14"/><circle cx="${x + 10}" cy="${y - 30}" r="18"/><circle cx="${x + 2}" cy="${y - 8}" r="12"/></g>`
+    + `<g class="flame"><path d="M${x} ${y + 30}c-34 0-40-30-24-52 4 14 12 16 12 16-2-26 10-44 26-54-4 18 6 28 14 38 10 12 14 24 10 34-4 12-16 18-38 18z" fill="#e63946"/>`
+    + `<path d="M${x} ${y + 30}c-20 0-24-18-14-32 2 8 8 10 8 10 0-16 8-26 16-32-2 12 4 18 8 24 6 8 8 16 4 22-4 6-10 8-22 8z" fill="#ff9a3c"/>`
+    + `<path d="M${x} ${y + 30}c-10 0-12-10-6-18 2 6 6 6 6 6 0-8 4-14 8-16 0 6 2 10 4 14 2 6 2 10-2 12-2 2-6 2-10 2z" fill="#ffd54a"/></g></g>`;
+}
+function fireScene() {
+  const buildings = FX.map((x, i) => {
+    const [col, roof] = BUILD_COLS[i], top = 100 + roof * 0.5;
+    const wins = FY.map((y) => `<rect x="${x - 34}" y="${y - 28}" width="68" height="58" rx="6" fill="#2b4a6b"/><path d="M${x} ${y - 28}v58M${x - 34} ${y}h68" stroke="#fff" stroke-width="5"/><rect x="${x - 38}" y="${y + 28}" width="76" height="8" rx="3" fill="#fff"/>`).join('');
+    return `<rect x="${x - 82}" y="${top}" width="164" height="${432 - top}" fill="${col}"/><rect x="${x - 90}" y="${top - 14}" width="180" height="18" rx="6" fill="#0002"/>${wins}`
+      + (i === 2 ? `<rect x="${x - 24}" y="370" width="48" height="62" rx="6" fill="#e63946"/>` : `<rect x="${x - 20}" y="374" width="40" height="58" rx="6" fill="#8d5a2b"/>`);
+  }).join('');
+  // ARTHUR in a yellow helmet, riding an original red fire engine; the hose nozzle sits at (0,-58) relative to the truck.
+  const truck = `<g class="truck" id="truck" style="transform:translateX(${FX[2]}px)"><g transform="translate(0 6) scale(.85)">
+    <rect x="-118" y="-40" width="236" height="86" rx="14" fill="#e63946"/><rect x="-118" y="20" width="236" height="12" fill="#fff"/>
+    <rect x="40" y="-112" width="80" height="76" rx="12" fill="#e63946"/><rect x="50" y="-102" width="60" height="44" rx="8" fill="#cfe8ff"/>
+    <svg x="40" y="-140" width="80" height="98" viewBox="0 -16 200 246"><use href="#leo"/><path d="M26 52q74-96 148 0z" fill="#ffc93c"/><rect x="14" y="44" width="172" height="16" rx="8" fill="#e0a800"/><circle cx="100" cy="22" r="14" fill="#e63946"/></svg>
+    <g stroke="#ccc" stroke-width="6" stroke-linecap="round"><path d="M-110 -52h136M-110 -66h136"/><path d="M-100 -66v14M-76 -66v14M-52 -66v14M-28 -66v14M-4 -66v14M20 -66v14"/></g>
+    <circle cx="0" cy="-58" r="12" fill="#2a7de1"/><rect x="-92" y="-10" width="40" height="26" rx="5" fill="#ffd54a"/>
+    <circle cx="-72" cy="-50" r="0"/><rect x="-8" y="-104" width="16" height="16" rx="4" fill="#2a7de1"/><circle cx="0" cy="-108" r="9" fill="#5fb0ff" class="siren"/>
+    <g fill="#2b2118"><circle cx="-70" cy="48" r="24"/><circle cx="76" cy="48" r="24"/></g><g fill="#ccc"><circle cx="-70" cy="48" r="9"/><circle cx="76" cy="48" r="9"/></g></g></g>`;
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs><linearGradient id="fsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#fsSky)"/><g fill="#fff" opacity=".9"><ellipse cx="200" cy="60" rx="56" ry="20"/><ellipse cx="780" cy="50" rx="60" ry="20"/></g>
+    ${buildings}<rect y="432" width="1000" height="16" fill="#bbb"/><rect y="448" width="1000" height="112" fill="#555b66"/>
+    <path d="M0 506h1000" stroke="#fff" stroke-width="6" stroke-dasharray="40 30"/>
+    <g id="fires"></g><g id="water"></g><g transform="translate(0 470)">${truck}</g></svg>`;
+}
+GAME_ICON.fire = `<svg viewBox="0 0 120 100"><rect x="8" y="40" width="104" height="40" rx="8" fill="#e63946"/><rect x="78" y="20" width="32" height="26" rx="6" fill="#e63946"/><rect x="84" y="25" width="20" height="13" rx="3" fill="#cfe8ff"/><path d="M14 32h60M14 24h60" stroke="#bbb" stroke-width="4"/><circle cx="34" cy="82" r="11" fill="#2b2118"/><circle cx="90" cy="82" r="11" fill="#2b2118"/><path d="M40 30c-12 0-14-10-8-18 2 5 4 6 4 6 0-9 4-15 9-19-1 7 2 10 5 14 4 4 5 9 4 12-2 4-6 5-14 5z" fill="#ff9a3c" transform="translate(-6 -4)"/></svg>`;
+let fr = null;
+function fireRoundStart() {
+  const plan = C.fireRoundPlan(roundIndex);
+  fr = { plan, col: fr ? fr.col : 2, active: [], spawned: 0, out: 0, last: null, busy: false, id: 0 };
+  round = { type: 'fire' }; locked = false;
+  const task = $('task');
+  task.classList.add('firetask');
+  const cols = FX.map((x, i) => `<button class="fcol" data-nav data-col="${i}" aria-label="building ${i + 1}" style="left:${(x - 100) / 10}%;width:20%"></button>`).join('');
+  task.innerHTML = `<div class="fscene">${fireScene()}${cols}</div>`;
+  $('truck').style.transform = `translateX(${FX[fr.col]}px)`;
+  task.querySelectorAll('.fcol').forEach((b) => {
+    b.addEventListener('click', () => sprayAt(Number(b.dataset.col)));
+    b.addEventListener('focus', () => { if (usingPad) driveTo(Number(b.dataset.col)); });
+  });
+  for (let k = 0; k < plan.atOnce; k++) spawnFire();
+  if (usingPad) task.querySelector(`.fcol[data-col="${fr.col}"]`)?.focus();
+  repeatPrompt();
+}
+function spawnFire() {
+  if (!fr || fr.spawned >= fr.plan.total) return;
+  const spot = C.nextFire(fr.active, fr.last);
+  if (!spot) return;
+  const f = { ...spot, id: `fire${fr.id++}` };
+  fr.active.push(f); fr.spawned++;
+  $('fires').insertAdjacentHTML('beforeend', fireFlame(FX[f.col], FY[f.floor], f.id));
+  tone(180, 0, 0.25, 'sawtooth', 0.08);
+}
+function driveTo(col) {
+  if (!fr || fr.col === col) return;
+  fr.col = col;
+  $('truck').style.transform = `translateX(${FX[col]}px)`;
+  tone(300, 0, 0.12, 'square', 0.06); tone(400, 0.12, 0.12, 'square', 0.06);
+}
+async function sprayAt(col) {
+  if (!fr || locked || fr.busy) return;
+  const cur = fr;
+  const moving = cur.col !== col;
+  driveTo(col);
+  cur.busy = true;
+  if (moving) await wait(450);
+  // Spray the lowest fire in this building, or a splash at the windows if there is none.
+  const target = cur.active.filter((f) => f.col === col).sort((a, b) => b.floor - a.floor)[0];
+  const tx = FX[col], ty = target ? FY[target.floor] + 10 : FY[1];
+  $('water').innerHTML = `<path class="water" d="M${tx} 425Q${tx - 60} ${(425 + ty) / 2 - 40} ${tx} ${ty}" stroke="#5fb0ff" stroke-width="14" fill="none" stroke-linecap="round"/>`;
+  tone(900, 0, 0.5, 'sawtooth', 0.03);
+  await wait(650);
+  if (fr !== cur) return;
+  $('water').innerHTML = '';
+  cur.busy = false;
+  if (!target) { sfx.nearly(); say('No fire there! Look for the flames!'); return; }
+  cur.active = cur.active.filter((f) => f !== target); cur.last = target; cur.out++;
+  const el = $(target.id); el.classList.remove('new'); el.classList.add('out');
+  setTimeout(() => el.remove(), 1100);
+  if (cur.out >= cur.plan.total) { locked = true; confetti(); await funWin('Hooray! All the fires are out!'); return; }
+  sfx.right();
+  say(rand(['Splash! The fire is out!', 'Well done, firefighter!', 'Woosh! Great spraying!']));
+  if (cur.spawned < cur.plan.total) setTimeout(() => { if (fr === cur) { spawnFire(); if (cur.active.length < cur.plan.atOnce) spawnFire(); } }, 900);
+}
+
+/* ---------- Race Day: one-button racing — jump the cones and win ---------- */
+const LANE_Y = [300, 392, 490]; // wheel line of each lane: two rivals, then ARTHUR nearest
+const LEO_SCREEN_X = 210; // where ARTHUR's car sits on screen; the world scrolls past
+function raceCar(colour, number, driver) {
+  // An original side-on race car, 170 wide, wheels resting on y=64.
+  return `<rect x="2" y="12" width="12" height="22" rx="3" fill="#2b2118"/><rect x="-2" y="8" width="26" height="8" rx="3" fill="${colour}"/>`
+    + `<path d="M10 52q0-22 30-24l34-2q14-20 38-20h8q20 2 30 20l12 4q18 6 18 24v4q0 6-8 6H18q-8 0-8-8z" fill="${colour}"/>`
+    + `<path d="M24 46h138" stroke="#fff" stroke-width="5" opacity=".85"/>`
+    + `<circle cx="66" cy="44" r="15" fill="#fff"/><text x="66" y="51" font-size="20" font-weight="800" text-anchor="middle" fill="#2b2118" font-family="system-ui,sans-serif">${number}</text>`
+    + driver
+    + `<g fill="#2b2118"><circle cx="44" cy="64" r="17"/><circle cx="140" cy="64" r="17"/></g><g fill="#ccc"><circle cx="44" cy="64" r="7"/><circle cx="140" cy="64" r="7"/></g>`;
+}
+const LEO_DRIVER = '<svg x="84" y="-34" width="48" height="59" viewBox="0 -16 200 246"><use href="#leo"/><path d="M22 70q78-120 156 0z" fill="#fff"/><path d="M22 70q78-120 156 0" fill="none" stroke="#e63946" stroke-width="14"/><rect x="14" y="62" width="172" height="16" rx="8" fill="#e63946"/></svg>';
+const HELMET = (c) => `<circle cx="108" cy="2" r="17" fill="${c}"/><path d="M96 0h26v8H96z" fill="#2b2118" opacity=".7"/>`;
+const CONE = '<g class="cue"><path d="M0-96l8 16 18 3-13 12 3 18-16-9-16 9 3-18-13-12 18-3z" fill="#ffc93c" stroke="#fff" stroke-width="3"/></g><path d="M-22 0 0-48 22 0z" fill="#ff9a3c"/><path d="M-13-20h26l-4-9h-18z" fill="#fff"/><rect x="-28" y="-6" width="56" height="8" rx="3" fill="#e07f24"/>';
+function raceScene(r) {
+  const cones = r.cones.map((x, i) => `<g id="cone${i}" transform="translate(${x} ${LANE_Y[2]})">${CONE}</g>`).join('');
+  const stand = Array.from({ length: 12 }, (_, i) => `<g transform="translate(${i * 400} 0)"><rect x="0" y="170" width="360" height="70" fill="#8a5cf6"/><rect x="0" y="160" width="360" height="14" fill="#e63946"/>`
+    + Array.from({ length: 14 }, (_, k) => `<circle cx="${14 + k * 25}" cy="${196 + (k % 2) * 18}" r="9" fill="${['#ffc93c', '#ff7eb6', '#5fb0ff', '#fff', '#2fbf71'][(k + i) % 5]}"/>`).join('')
+    + `<path d="M380 160v-60" stroke="#fff" stroke-width="4"/><path d="M380 100l34 10-34 10z" fill="${['#e63946', '#ffc93c', '#2a7de1'][i % 3]}"/></g>`).join('');
+  const finishX = C.RACE_LENGTH + LEO_SCREEN_X + 170;
+  const checks = Array.from({ length: 24 }, (_, k) => `<rect x="${(k % 2) * 18}" y="${250 + k * 12}" width="18" height="12" fill="${(k + Math.floor(k / 2)) % 2 ? '#2b2118' : '#fff'}"/>`).join('');
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs><linearGradient id="rsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#rsSky)"/><circle cx="880" cy="70" r="40" fill="#ffd54a"/>
+    <g id="rsHills"><path d="M0 200q150-110 300 0t300 0 300 0 300 0 300 0 300 0 300 0V260H0z" fill="#9be15d"/></g>
+    <g id="rsStand">${stand}</g>
+    <rect y="240" width="1000" height="320" fill="#7ccf5a"/>
+    <rect y="252" width="1000" height="260" fill="#5b6270"/>
+    <path id="rsLines" d="M0 334h1000M0 424h1000" stroke="#fff" stroke-width="5" stroke-dasharray="50 40"/>
+    <path d="M0 252h1000M0 512h1000" stroke="#fff" stroke-width="6"/>
+    <g id="rsWorld">
+      <g transform="translate(${LEO_SCREEN_X + 170} 0)"><rect x="-4" y="252" width="8" height="250" fill="#fff"/><text x="-30" y="246" font-size="22" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">START</text></g>
+      <g transform="translate(${finishX} 0)">${checks}<rect x="-6" y="120" width="8" height="132" fill="#fff"/><rect x="38" y="120" width="8" height="132" fill="#fff"/><rect x="-6" y="120" width="52" height="34" fill="#2b2118"/><text x="20" y="144" font-size="18" font-weight="800" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif">FINISH</text></g>
+      ${cones}
+    </g>
+    <g id="rsCar1" transform="translate(${LEO_SCREEN_X} ${LANE_Y[0] - 64})">${raceCar('#2a7de1', 7, HELMET('#ffc93c'))}</g>
+    <g id="rsCar2" transform="translate(${LEO_SCREEN_X} ${LANE_Y[1] - 64})">${raceCar('#2fbf71', 2, HELMET('#ff7eb6'))}</g>
+    <g id="rsLeo" transform="translate(${LEO_SCREEN_X} ${LANE_Y[2] - 64})"><g id="rsLeoBody">${raceCar('#e63946', 4, LEO_DRIVER)}</g></g>
+    <text id="rsCount" class="count" x="500" y="200"></text>
+  </svg>`;
+}
+GAME_ICON.race = `<svg viewBox="-6 -40 190 112"><g transform="translate(0 -10)">${raceCar('#e63946', 4, LEO_DRIVER)}</g></svg>`;
+let race = null, raceRetry = false;
+async function raceRoundStart() {
+  const plan = C.raceRoundPlan(roundIndex);
+  const r = { plan, cones: C.raceObstacles(plan.cones), hit: new Set(), leo: 0, rivals: [0, 0], jumpT: -1, slowUntil: 0, running: false, done: false, last: 0 };
+  race = r; round = { type: 'race', retry: raceRetry }; raceRetry = false; locked = false;
+  const task = $('task');
+  task.classList.add('racetask');
+  task.innerHTML = `<div class="rscene">${raceScene(r)}<button class="rjump" id="rjump" data-nav aria-label="Jump"></button></div>`;
+  $('rjump').addEventListener('click', raceJump);
+  if (usingPad) $('rjump').focus();
+  raceDraw(r);
+  await repeatPrompt();
+  if (race !== r || current !== 'play') return;
+  for (const n of ['3', '2', '1', 'GO!']) {
+    $('rsCount').textContent = n; tone(n === 'GO!' ? 880 : 440, 0, n === 'GO!' ? 0.4 : 0.2, 'square', 0.12);
+    await wait(650);
+    if (race !== r || current !== 'play') return;
+  }
+  $('rsCount').textContent = '';
+  r.running = true; r.last = performance.now();
+  requestAnimationFrame((t) => raceTick(r, t));
+}
+function raceJump() {
+  const r = race;
+  if (!r || r.done) return;
+  if (!r.running) { repeatPrompt(); return; }
+  if (r.jumpT >= 0) return; // already in the air
+  r.jumpT = 0; tone(520, 0, 0.15, 'triangle', 0.2); tone(780, 0.08, 0.15, 'triangle', 0.2);
+}
+const JUMP_TIME = 1.0, JUMP_HEIGHT = 130, LEO_SPEED = 430;
+function raceTick(r, now) {
+  if (race !== r || current !== 'play' || r.done) return;
+  const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
+  const slow = now < r.slowUntil ? 0.45 : 1;
+  r.leo += LEO_SPEED * r.plan.speed * slow * dt;
+  // Rivals stay close. Each cone ARTHUR hits lets them get further: 2 hits and blue beats him, 3 and green does too.
+  const hits = r.hit.size;
+  r.rivals = r.rivals.map((x, i) => {
+    const beats = hits >= 2 + i;
+    const want = r.leo + (beats ? 150 - i * 40 : -(70 + i * 50));
+    const v = LEO_SPEED * r.plan.speed * (1 + Math.max(-0.45, Math.min(0.45, (want - x) / 400)));
+    return x + v * dt;
+  });
+  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) r.jumpT = -1; }
+  const air = r.jumpT >= 0 ? Math.sin((r.jumpT / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0;
+  // A cone is hit if it passes under the car while the wheels are near the ground.
+  r.cones.forEach((x, i) => {
+    const sx = x - r.leo; // cone position relative to the car's front-left
+    // Jump cue: the cone bounces with a star over it while it's the right moment to jump.
+    const cue = !r.hit.has(i) && sx > LEO_SCREEN_X + 170 && sx < LEO_SCREEN_X + 440;
+    const el = $(`cone${i}`);
+    if (cue !== el.classList.contains('ready')) el.classList.toggle('ready', cue);
+    if (!r.hit.has(i) && sx > LEO_SCREEN_X + 40 && sx < LEO_SCREEN_X + 140 && air < 25) {
+      r.hit.add(i); r.slowUntil = now + 1000; sfx.nearly();
+      $(`cone${i}`).setAttribute('opacity', '.35');
+      const body = $('rsLeoBody'); body.classList.remove('wob'); void body.getBBox(); body.classList.add('wob');
+      say('Oops! Jump over the cones!');
+    }
+  });
+  r.air = air;
+  raceDraw(r);
+  if (r.leo >= C.RACE_LENGTH) { raceFinish(r); return; }
+  requestAnimationFrame((t) => raceTick(r, t));
+}
+function raceDraw(r) {
+  const cam = r.leo;
+  $('rsWorld').setAttribute('transform', `translate(${-cam} 0)`);
+  $('rsStand').setAttribute('transform', `translate(${-((cam * 0.5) % 400)} 0)`);
+  $('rsHills').setAttribute('transform', `translate(${-((cam * 0.2) % 600)} 0)`);
+  $('rsLines').setAttribute('stroke-dashoffset', String(cam % 90));
+  $('rsLeo').setAttribute('transform', `translate(${LEO_SCREEN_X} ${LANE_Y[2] - 64 - (r.air || 0)})`);
+  r.rivals.forEach((x, i) => $(`rsCar${i + 1}`).setAttribute('transform', `translate(${LEO_SCREEN_X + (x - r.leo)} ${LANE_Y[i] - 64 * 0.82}) scale(.82)`)); // rivals are further away
+}
+async function raceFinish(r) {
+  r.done = true; r.running = false; locked = true;
+  const place = 1 + r.rivals.filter((x) => x >= r.leo).length;
+  $('rsCount').textContent = ['1st!', '2nd', '3rd'][place - 1];
+  if (place === 1) {
+    confetti(); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.1, 0.3));
+    await wait(400);
+    if (race !== r) return;
+    await funWin('You won the race!');
+    return;
+  }
+  // Not a win: no star, same race again.
+  sfx.nearly();
+  await say(place === 2 ? 'Ooh, you came second! So close! Let\'s race again!' : 'Ooh, you came third! Jump over the cones! Let\'s race again!');
+  await wait(1200);
+  if (race !== r || current !== 'play') return;
+  raceRetry = true;
+  newRound();
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ race: race ? { place: race.done ? 1 + race.rivals.filter((x) => x >= race.leo).length : null, leo: Math.round(race.leo), rivals: race.rivals.map(Math.round), cones: race.cones, hits: race.hit.size, running: race.running, air: race.jumpT >= 0, done: race.done } : null, fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';
