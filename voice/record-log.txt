@@ -1,16 +1,4 @@
-
-Running kernel seems to be up-to-date.
-
-Restarting services...
-
-Service restarts being deferred:
- systemctl restart hosted-compute-agent.service
-
-No containers need to be restarted.
-
-No user sessions are running outdated binaries.
-
-No VM guests are running outdated hypervisor (qemu) binaries on this host.
-[0;93m2026-11-25 12:29:45.049088325 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
-voice: en_GB-semaine-medium.onnx/poppy speaker id 3
-recorded 401 of 401 phrases; failed 0
+E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libspa-0.2-modules_1.6.2-1ubuntu1.2_amd64v3.deb  404  Not Found [IP: 91.189.91.82 443]
+E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libpipewire-0.3-0t64_1.6.2-1ubuntu1.2_amd64v3.deb  404  Not Found [IP: 91.189.91.82 443]
+E: Failed to fetch https://security.ubuntu.com/ubuntu/pool/main/p/pipewire/libpipewire-0.3-common_1.6.2-1ubuntu1.2_all.deb  404  Not Found [IP: 91.189.91.82 443]
+E: Unable to fetch some archives, maybe run apt update or try with --fix-missing?
