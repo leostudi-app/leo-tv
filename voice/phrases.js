@@ -45,6 +45,9 @@ for (const colour of Object.keys(C.COLOURS)) for (const shape of C.BUILD_SHAPES)
 // Memory pairs
 add('Find the matching pairs! Turn over two cards.', 'Here are more cards!', 'Not a match. Try again!', 'You found all the pairs!');
 for (const p of ['dogs', 'cats', 'pigs', 'cows', 'sheep', 'ducks', 'frogs', 'lions']) add(`Two ${p}!`);
+// Hide & Seek
+for (const h of C.HIDERS) add(`Hide and seek! Can you find ${h}?`, `Can you find ${h}?`, `Boo! You found ${h}!`);
+add('Not there! Keep looking!', "Here's a clue! Look carefully!");
 // Rewards, video, friends
 add('Wow! You finished the game, Leo! Open your surprise!', 'Watch your video, or skip it?', "Let's dance!",
   'Here are all your friends!', 'Play games to find new friends!');

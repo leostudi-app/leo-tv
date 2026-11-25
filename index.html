@@ -54,10 +54,11 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1.3vw,16px);width:100%;max-width:1200px}
+.games{--cols:7;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1260px}
+.games>.tile{flex:0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols))}
 .tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
 .tile svg{width:56%;height:auto;max-height:14vh}
-@media (max-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.games{--cols:3}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
 .ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
 /* Play */
@@ -198,6 +199,16 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .card.back svg{width:60%;height:60%}
 .card.matched{opacity:.55;box-shadow:none}
 @media (max-width:640px) and (orientation:portrait){.cards{--c:min(20vw,13vh);grid-template-columns:repeat(min(var(--cols),4),var(--c))}}
+/* Hide & Seek */
+.task.hidetask{width:100%}
+.hscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.hscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.hscene .hider{transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.hscene .curtain{transition:transform .5s;transform-origin:503px 278px}.hscene .curtain.open{transform:scaleX(.12)}
+.hspot{position:absolute;background:transparent;border:0;border-radius:24px;padding:0;cursor:pointer}
+.hspot:focus-visible,.hspot.pad:focus{outline:6px solid #fff;box-shadow:0 0 0 12px #ffc93c88}
+.hspot.miss{animation:wobble .4s}
+@media (max-width:640px) and (orientation:portrait){.hscene{width:100%}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -701,7 +712,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; $('task').classList.remove('hidetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -712,6 +723,7 @@ async function newRound() {
   if (currentGame === 'order') return orderGameRound();
   if (currentGame === 'build') return buildRound();
   if (currentGame === 'pairs') return pairsRound();
+  if (currentGame === 'hide') return hideRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -735,6 +747,7 @@ function promptFor(r) {
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
+    case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
   }
 }
 
@@ -1108,8 +1121,112 @@ async function flipCard(i) {
   renderPairs(usingPad ? i : null);
 }
 
+/* ---------- Hide & Seek: find the puppy family hiding around the garden ---------- */
+// An original puppy family (floppy ears, warm colours), drawn in a 120x160 box.
+const PUPS = {
+  'Pip': { body: '#f2b25c', ear: '#c7843a', belly: '#fde7c2', extra: '<path d="M36 92q24 12 48 0" stroke="#e63946" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="60" cy="101" r="6" fill="#ffc93c"/>' },
+  'Mum': { body: '#f3dfbd', ear: '#d2a877', belly: '#fff7ea', extra: '<g fill="#fff" stroke="#d9c9e8" stroke-width="1.5"><circle cx="42" cy="93" r="4.5"/><circle cx="51" cy="97" r="4.5"/><circle cx="60" cy="98" r="4.5"/><circle cx="69" cy="97" r="4.5"/><circle cx="78" cy="93" r="4.5"/></g>' },
+  'Dad': { body: '#9a6a43', ear: '#6b4428', belly: '#d9b88f', extra: '<path d="M36 92q24 12 48 0" stroke="#2fbf71" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M50 30q10-8 20 0" stroke="#6b4428" stroke-width="5" fill="none" stroke-linecap="round"/>' },
+  'Tilly': { body: '#ecc795', ear: '#b9844f', belly: '#fff3df', extra: '<g fill="#ff7eb6"><path d="M60 20l-16-9v18z"/><path d="M60 20l16-9v18z"/><circle cx="60" cy="20" r="5"/></g>' },
+  'Cousin Bo': { body: '#bdb8b0', ear: '#6f6a63', belly: '#ece9e4', extra: '<g fill="#6f6a63" opacity=".75"><ellipse cx="44" cy="118" rx="9" ry="7"/><ellipse cx="80" cy="128" rx="7" ry="6"/><ellipse cx="78" cy="40" rx="9" ry="7"/></g>' }
+};
+function pup(name) {
+  const c = PUPS[name];
+  return `<path d="M88 118q26-6 22-34" stroke="${c.body}" stroke-width="10" fill="none" stroke-linecap="round"/>`
+    + `<rect x="34" y="132" width="20" height="26" rx="9" fill="${c.body}"/><rect x="66" y="132" width="20" height="26" rx="9" fill="${c.body}"/>`
+    + `<ellipse cx="60" cy="116" rx="34" ry="32" fill="${c.body}"/><ellipse cx="60" cy="122" rx="20" ry="20" fill="${c.belly}"/>`
+    + `<circle cx="60" cy="56" r="38" fill="${c.body}"/>`
+    + `<ellipse cx="25" cy="58" rx="12" ry="27" fill="${c.ear}" transform="rotate(18 25 58)"/><ellipse cx="95" cy="58" rx="12" ry="27" fill="${c.ear}" transform="rotate(-18 95 58)"/>`
+    + `<ellipse cx="60" cy="72" rx="21" ry="15" fill="${c.belly}"/><ellipse cx="60" cy="63" rx="8" ry="6" fill="#2b2118"/>`
+    + `<path d="M52 76q8 8 16 0" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    + `<circle cx="45" cy="48" r="5.5" fill="#2b2118"/><circle cx="75" cy="48" r="5.5" fill="#2b2118"/><circle cx="47" cy="46" r="1.8" fill="#fff"/><circle cx="77" cy="46" r="1.8" fill="#fff"/>`
+    + `<circle cx="38" cy="64" r="5" fill="#ff7eb6" opacity=".35"/><circle cx="82" cy="64" r="5" fill="#ff7eb6" opacity=".35"/>`
+    + c.extra;
+}
+// Where each spot hides a pup: hidden position (fully behind), scale, the direction they peek out, and the tap area.
+const SPOTS = {
+  tree: { x: 76, y: 312, s: 0.9, dx: 104, dy: 0, out: 1.25, hit: [40, 30, 205, 430] },
+  bush: { x: 276, y: 305, s: 0.9, dx: 0, dy: -105, out: 1.1, hit: [205, 270, 250, 192] },
+  chimney: { x: 643, y: 62, s: 0.7, dx: 0, dy: -80, out: 0.85, hit: [620, 20, 130, 200] },
+  window: { x: 506, y: 282, s: 0.62, dx: 72, dy: 0, out: 0.45, hit: [485, 262, 140, 130] }, // the curtain opens when found
+  car: { x: 824, y: 304, s: 0.85, dx: 0, dy: -105, out: 1.1, hit: [752, 245, 246, 232] }
+};
+function pupAt(sp, amount) {
+  return `translate(${sp.x + sp.dx * amount}px,${sp.y + sp.dy * amount}px) scale(${sp.s})`;
+}
+function hideScene(h, amount) {
+  const sp = SPOTS[h.spot];
+  const slot = (id) => (id === h.spot ? `<g clip-path="url(#${id === 'window' ? 'hsWin' : 'hsGround'})"><g class="hider" id="hider" style="transform:${pupAt(sp, amount)}">${pup(h.hider)}</g></g>` : '');
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs>
+    <clipPath id="hsGround"><rect width="1000" height="458"/></clipPath><clipPath id="hsWin"><rect x="503" y="278" width="104" height="94"/></clipPath>
+    <linearGradient id="hsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#hsSky)"/><circle cx="930" cy="70" r="44" fill="#ffd54a"/>
+    <g fill="#fff" opacity=".9"><ellipse cx="330" cy="70" rx="60" ry="22"/><ellipse cx="370" cy="56" rx="40" ry="22"/><ellipse cx="820" cy="150" rx="50" ry="18"/></g>
+    <rect y="440" width="1000" height="120" fill="#7ccf5a"/><rect y="440" width="1000" height="14" fill="#6bbb4c"/>
+    <rect x="470" y="232" width="270" height="226" fill="#fff2d6"/><rect x="470" y="232" width="270" height="226" fill="none" stroke="#e8d3a8" stroke-width="4"/>
+    <rect x="652" y="335" width="62" height="123" rx="8" fill="#e63946"/><circle cx="700" cy="400" r="4.5" fill="#ffc93c"/>
+    <rect x="495" y="270" width="120" height="110" rx="6" fill="#fff"/><rect x="503" y="278" width="104" height="94" fill="#2b4a6b"/>
+    ${slot('window')}
+    <g id="hsCurtain" class="curtain"><path d="M503 278h82v94h-82z" fill="#ff9a3c"/><path d="M585 278q-16 47 0 94" stroke="#e07f24" stroke-width="4" fill="none"/></g>
+    <path d="M503 325h104M555 278v94" stroke="#fff" stroke-width="6"/>
+    ${slot('chimney')}
+    <rect x="640" y="72" width="90" height="170" fill="#b5523b"/><rect x="632" y="64" width="106" height="18" rx="4" fill="#8f3d2b"/>
+    <path d="M450 238 605 100 760 238z" fill="#e63946"/><path d="M450 238h310" stroke="#b72f3a" stroke-width="8" stroke-linecap="round"/>
+    ${slot('tree')}
+    <rect x="70" y="170" width="120" height="288" rx="22" fill="#9a6a43"/><path d="M125 240q-12 50 8 90" stroke="#7c5233" stroke-width="6" fill="none"/>
+    <g fill="#2fbf71"><circle cx="130" cy="135" r="100"/><circle cx="52" cy="180" r="56"/><circle cx="210" cy="178" r="58"/></g>
+    <g fill="#e63946"><circle cx="90" cy="110" r="10"/><circle cx="170" cy="92" r="10"/><circle cx="160" cy="190" r="10"/><circle cx="60" cy="190" r="10"/><circle cx="215" cy="160" r="10"/></g>
+    ${slot('bush')}
+    <g fill="#3fae62"><circle cx="262" cy="378" r="56"/><circle cx="330" cy="374" r="60"/><circle cx="398" cy="378" r="56"/><rect x="208" y="392" width="244" height="70" rx="24"/></g>
+    <g fill="#ff7eb6"><circle cx="255" cy="370" r="8"/><circle cx="335" cy="350" r="8"/><circle cx="405" cy="385" r="8"/><circle cx="300" cy="420" r="8"/><circle cx="370" cy="430" r="8"/></g>
+    ${slot('car')}
+    <path d="M800 392V350q0-32 32-32h86q32 0 32 32v42z" fill="#2a7de1"/><path d="M818 388v-32q0-24 24-24h26v56zM882 332h26q24 0 24 24v32h-50z" fill="#cfe8ff"/>
+    <rect x="760" y="380" width="230" height="76" rx="24" fill="#2a7de1"/><rect x="964" y="396" width="20" height="14" rx="4" fill="#ffd54a"/>
+    <g fill="#2b2118"><circle cx="818" cy="458" r="28"/><circle cx="932" cy="458" r="28"/></g><g fill="#ccc"><circle cx="818" cy="458" r="11"/><circle cx="932" cy="458" r="11"/></g>
+    <g fill="#ffc93c"><circle cx="600" cy="505" r="7"/><circle cx="660" cy="525" r="7"/><circle cx="480" cy="512" r="7"/><circle cx="120" cy="510" r="7"/></g>
+  </svg>`;
+}
+GAME_ICON.hide = `<svg viewBox="0 0 120 104"><g transform="translate(24 6) scale(.6)">${pup('Pip')}</g><g fill="#3fae62"><circle cx="30" cy="84" r="24"/><circle cx="60" cy="74" r="27"/><circle cx="90" cy="84" r="24"/><rect x="8" y="82" width="104" height="22" rx="10"/></g></svg>`;
+let hs = null;
+function hideRoundStart() {
+  const h = C.hideRound(roundIndex, hs && hs.h);
+  hs = { h, amount: h.peek, misses: 0 };
+  round = { type: 'hide', hider: h.hider }; locked = false;
+  const task = $('task');
+  task.classList.add('hidetask');
+  const pct = (v, of) => `${(v / of) * 100}%`;
+  const spots = Object.entries(SPOTS).map(([id, sp]) => `<button class="hspot" data-nav data-spot="${id}" aria-label="${id}" style="left:${pct(sp.hit[0], 1000)};top:${pct(sp.hit[1], 560)};width:${pct(sp.hit[2], 1000)};height:${pct(sp.hit[3], 560)}"></button>`).join('');
+  task.innerHTML = `<div class="hscene">${hideScene(h, hs.amount)}${spots}</div>`;
+  task.querySelectorAll('.hspot').forEach((b) => b.addEventListener('click', () => pickSpot(b)));
+  if (usingPad) task.querySelector('.hspot')?.focus();
+  repeatPrompt();
+}
+async function pickSpot(btn) {
+  if (!hs || locked) return;
+  const cur = hs;
+  if (btn.dataset.spot !== cur.h.spot) {
+    sfx.nearly(); btn.classList.remove('miss'); void btn.offsetWidth; btn.classList.add('miss');
+    cur.misses++;
+    if (cur.misses === 2) { // clue: peek out a bit further
+      cur.amount = Math.max(cur.amount, 0.8);
+      $('hider').style.transform = pupAt(SPOTS[cur.h.spot], cur.amount);
+      say("Here's a clue! Look carefully!");
+    } else say('Not there! Keep looking!');
+    return;
+  }
+  locked = true;
+  const sp = SPOTS[cur.h.spot];
+  if (cur.h.spot === 'window') $('hsCurtain').classList.add('open');
+  $('hider').style.transform = pupAt(sp, sp.out);
+  tone(660, 0, 0.12, 'triangle', 0.25); tone(990, 0.12, 0.2, 'triangle', 0.25);
+  confetti();
+  await wait(450);
+  if (hs !== cur) return;
+  await funWin(`Boo! You found ${cur.h.hider}!`);
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';

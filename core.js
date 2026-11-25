@@ -36,7 +36,8 @@
     { id: 'animals', name: 'Animal Sounds', types: ['animal'] },
     { id: 'order', name: 'Number Order', types: ['order'] },
     { id: 'build', name: 'Shape Builder', types: ['build'] }, // one colour per layer
-    { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] }
+    { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] },
+    { id: 'hide', name: 'Hide & Seek', types: ['hide'] } // find the puppy family
   ];
 
   // Shape Builder: each picture is built layer by layer; every layer is one shape in one colour.
@@ -410,6 +411,21 @@
     return i !== j && deck[i] !== undefined && deck[i] === deck[j];
   }
 
+  // Hide & Seek: an original puppy family hides around the garden, showing less of themselves each round.
+  const HIDERS = ['Pip', 'Mum', 'Dad', 'Tilly', 'Cousin Bo'];
+  const HIDE_SPOTS = ['tree', 'bush', 'chimney', 'window', 'car'];
+  const HIDE_PEEK = [0.6, 0.5, 0.42, 0.34, 0.28]; // share of the peek still showing, round by round
+
+  /** Who hides where this round: never the same spot or hider twice running. */
+  function hideRound(roundIndex, prev = null, rng = Math.random) {
+    const pick = (list, not) => { const pool = list.filter((x) => x !== not); return pool[Math.floor(rng() * pool.length)]; };
+    return {
+      hider: pick(HIDERS, prev && prev.hider),
+      spot: pick(HIDE_SPOTS, prev && prev.spot),
+      peek: HIDE_PEEK[Math.min(Math.max(0, roundIndex), HIDE_PEEK.length - 1)]
+    };
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -478,7 +494,7 @@
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
     ANIMALS, orderRound, nextInOrder, COLOURS, BUILDS, BUILD_SHAPES, buildOptions, PAIRS_SIZES, memoryDeck, isPair,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
-    speechParts, clipKey, ORDER_LENGTHS,
+    speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });
