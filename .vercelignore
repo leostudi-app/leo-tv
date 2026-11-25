@@ -1,0 +1,6 @@
+clips/preview
+clips/fetch-log.txt
+tests
+voice/*.py
+voice/samples
+voice/*.txt

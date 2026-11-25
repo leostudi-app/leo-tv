@@ -348,3 +348,21 @@ test('kids: each web address opens the right child, with birthdays only on the d
   assert.equal(K.ordinal(1), '1st'); assert.equal(K.ordinal(12), '12th'); assert.equal(K.ordinal(22), '22nd');
   assert.equal(K.kid('charlie').level, 3);
 });
+
+test('reward wheel: slices, no repeats, dress up and world progress', () => {
+  assert.deepEqual(C.wheelSlices().map((t) => t.id), ['celebrate', 'toybox', 'dressup', 'dance', 'world']);
+  const all = C.wheelSlices({ hasClips: true, hasVideo: true });
+  assert.equal(all.length, 7);
+  for (let k = 0; k < 100; k++) assert.notEqual(all[C.pickTreat(all, 'dance')].id, 'dance');
+  const owned = []; let item;
+  while ((item = C.nextWardrobeItem(owned))) owned.push(item.id);
+  assert.equal(owned.length, C.WARDROBE.length);
+  let wear = { hat: null, face: null };
+  wear = C.toggleWear(wear, 'crown'); wear = C.toggleWear(wear, 'shades'); wear = C.toggleWear(wear, 'cap');
+  assert.deepEqual(wear, { hat: 'cap', face: 'shades' });
+  assert.deepEqual(C.toggleWear(wear, 'cap'), { hat: null, face: 'shades' });
+  assert.deepEqual(C.worldProgress(0), { zone: 0, placed: 0, zonesDone: 0, worlds: 0, score: 0 });
+  assert.equal(C.worldProgress(7).zone, 1); assert.equal(C.worldProgress(7).placed, 1); assert.equal(C.worldProgress(7).score, 120);
+  assert.equal(C.worldProgress(C.WORLD_SIZE).worlds, 1); assert.equal(C.worldProgress(C.WORLD_SIZE).zone, 0);
+  assert.equal(C.defaultState().world, 0); assert.deepEqual(C.defaultState().wear, { hat: null, face: null });
+});

@@ -69,6 +69,13 @@ add('Nee naw! Fire! Drive to the fire and spray the water!', 'Fire! Fire! Put it
 // Race Day
 add('Race day! Jump over the cones and win the race!', 'Another race! Jump over the cones!', 'Oops! Jump over the cones!', 'You won the race!', 'Try again! Jump over the cones!',
   "Ooh, you came second! So close! Let's race again!", "Ooh, you came third! Jump over the cones! Let's race again!");
+// Reward wheel and treats
+add(...C.TREATS.map((t) => t.say), 'Spin the wheel!', 'Watch me moonwalk!', 'Watch me skate!', 'Watch me stomp!', 'Watch me twirl!',
+  'Pick a toy!', 'Pick what to wear!', 'Looking good!', 'Look at this!', 'A new piece for your world!', 'Your world is complete!',
+  'Dance with me, one, two, three!', 'Clap your hands and spin around!');
+for (const w of C.WARDROBE) add(`You won a ${w.name}!`);
+for (const z of C.ZONES) add(`You finished the ${z.name}!`, `Next: the ${z.name}!`);
+named((n) => [`Hey, hey, it's ${n}!`, `${n}, you're a superstar!`]);
 // Rewards, video, friends
 add('Watch your video, or skip it?', "Let's dance!",
   'Here are all your friends!', 'Play games to find new friends!');

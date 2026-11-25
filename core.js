@@ -165,6 +165,10 @@
       nextVideo: 0,
       nextPuzzle: 0,
       stats: { numbers: {}, shapes: {}, animals: {} }, // item -> { right, tries }
+      wardrobe: [], // dress-up items won (ids from WARDROBE)
+      wear: { hat: null, face: null }, // what the host is wearing
+      world: 0, // world pieces collected, all time
+      lastTreat: null, // the wheel never lands on the same reward twice running
       history: { numbers: [], shapes: [], animals: [] } // rolling first-try results (true/false)
     };
   }
@@ -540,6 +544,67 @@
     return offsets.map((o, i) => Math.round(first + o + gap * i));
   }
 
+  /*
+   * Reward wheel: after each game a spin picks one treat. 'clip' needs funny clips available and
+   * 'video' needs a grown-up's prize video, so those slices only appear when they can play.
+   */
+  const TREATS = [
+    { id: 'celebrate', name: 'Celebration', say: "It's a celebration!" },
+    { id: 'toybox', name: 'Toy box', say: "It's toy time!" },
+    { id: 'dressup', name: 'Dress up', say: "It's dress up time!" },
+    { id: 'clip', name: 'Funny clip', say: "It's a funny clip!" },
+    { id: 'dance', name: 'Dance party', say: "It's a dance party!" },
+    { id: 'world', name: 'My world', say: "It's a new piece for your world!" },
+    { id: 'video', name: 'My video', say: "It's your video!" }
+  ];
+  function wheelSlices({ hasClips = false, hasVideo = false } = {}) {
+    return TREATS.filter((t) => (t.id !== 'clip' || hasClips) && (t.id !== 'video' || hasVideo));
+  }
+  /** Index of the slice the wheel lands on: never the same treat as last time. */
+  function pickTreat(slices, last = null, rng = Math.random) {
+    const choices = slices.map((t, i) => i).filter((i) => slices[i].id !== last);
+    const pool = choices.length ? choices : slices.map((t, i) => i);
+    return pool[Math.floor(rng() * pool.length)];
+  }
+
+  // Dress up: one hat and one pair of glasses can be worn at a time.
+  const WARDROBE = [
+    { id: 'party', slot: 'hat', name: 'party hat' }, { id: 'crown', slot: 'hat', name: 'crown' },
+    { id: 'cap', slot: 'hat', name: 'cap' }, { id: 'wizard', slot: 'hat', name: 'wizard hat' },
+    { id: 'cowboy', slot: 'hat', name: 'cowboy hat' }, { id: 'tophat', slot: 'hat', name: 'top hat' },
+    { id: 'shades', slot: 'face', name: 'pair of sunglasses' }, { id: 'stars', slot: 'face', name: 'pair of star glasses' },
+    { id: 'hearts', slot: 'face', name: 'pair of heart glasses' }
+  ];
+  /** A new item to win (one not owned yet), or null once everything is won. */
+  function nextWardrobeItem(owned, rng = Math.random) {
+    const left = WARDROBE.filter((w) => !owned.includes(w.id));
+    return left.length ? left[Math.floor(rng() * left.length)] : null;
+  }
+  /** Wearing an item swaps out whatever was in its slot; wearing it again takes it off. */
+  function toggleWear(wear, itemId) {
+    const item = WARDROBE.find((w) => w.id === itemId);
+    if (!item) return wear;
+    return { ...wear, [item.slot]: wear[item.slot] === itemId ? null : itemId };
+  }
+
+  // My world: each zone fills up piece by piece; when every zone is full a fresh world begins.
+  const ZONES = [
+    { id: 'garden', name: 'Garden', pieces: ['sun', 'tree', 'flowers', 'pond', 'swing', 'butterflies'] },
+    { id: 'farm', name: 'Farm', pieces: ['barn', 'haystack', 'tractor', 'cow', 'sheep', 'windmill'] },
+    { id: 'seaside', name: 'Seaside', pieces: ['lighthouse', 'sandcastle', 'umbrella', 'boat', 'crab', 'seagulls'] },
+    { id: 'space', name: 'Space', pieces: ['stars', 'moon', 'planet', 'rocket', 'astronaut', 'alien'] }
+  ];
+  const WORLD_SIZE = ZONES.reduce((n, z) => n + z.pieces.length, 0);
+  /** Where a world stands after `count` pieces: current zone, pieces shown in it, and the score. */
+  function worldProgress(count) {
+    const n = Math.max(0, Math.floor(count || 0));
+    const round = Math.floor(n / WORLD_SIZE), inWorld = n % WORLD_SIZE;
+    let left = inWorld, zone = 0;
+    while (zone < ZONES.length - 1 && left >= ZONES[zone].pieces.length) { left -= ZONES[zone].pieces.length; zone++; }
+    const zonesDone = ZONES.slice(0, zone).length + round * ZONES.length;
+    return { zone, placed: left, zonesDone, worlds: round, score: n * 10 + zonesDone * 50 };
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -611,6 +676,7 @@
     LEVEL_SPEC, levelSpec, pairsSize: (roundIndex, level = 1) => atRound(levelSpec(level).pairs, roundIndex), jigGuide: (level = 1) => levelSpec(level).jigGuide,
     speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
     FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire, RACE_LENGTH, RACE_ROUNDS, raceRoundPlan, raceObstacles,
+    TREATS, wheelSlices, pickTreat, WARDROBE, nextWardrobeItem, toggleWear, ZONES, WORLD_SIZE, worldProgress,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });

@@ -1,12 +1,52 @@
 [
-  { "id": 4838262, "title": "Dog in a shower cap" },
-  { "id": 7515918, "title": "Dog in red sunglasses" },
-  { "id": 7515910, "title": "Dog in red sunglasses 2" },
-  { "id": 27644782, "title": "Dog driving a car" },
-  { "id": 5263686, "title": "Dog rolling on his back" },
-  { "id": 6864596, "title": "Cat chasing a toy" },
-  { "id": 19224529, "title": "Cat standing on its back legs" },
-  { "id": 26508236, "title": "Cat chasing a laser light" },
-  { "id": 20493517, "title": "Cat in a stripy shirt" },
-  { "id": 36383997, "title": "Cat splashing in a bird bath" }
+ {
+  "id": 4838262,
+  "title": "Dog in a shower cap",
+  "ok": true
+ },
+ {
+  "id": 7515918,
+  "title": "Dog in red sunglasses",
+  "ok": true
+ },
+ {
+  "id": 7515910,
+  "title": "Dog in red sunglasses 2",
+  "ok": true
+ },
+ {
+  "id": 27644782,
+  "title": "Dog driving a car",
+  "ok": true
+ },
+ {
+  "id": 5263686,
+  "title": "Dog rolling on his back",
+  "ok": true
+ },
+ {
+  "id": 6864596,
+  "title": "Cat chasing a toy",
+  "ok": true
+ },
+ {
+  "id": 19224529,
+  "title": "Cat standing on its back legs",
+  "ok": true
+ },
+ {
+  "id": 26508236,
+  "title": "Cat chasing a laser light",
+  "ok": true
+ },
+ {
+  "id": 20493517,
+  "title": "Cat in a stripy shirt",
+  "ok": true
+ },
+ {
+  "id": 36383997,
+  "title": "Cat splashing in a bird bath",
+  "ok": true
+ }
 ]

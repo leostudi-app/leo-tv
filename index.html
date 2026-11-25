@@ -257,6 +257,71 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .rscene .cue{opacity:0}.rscene .ready .cue{opacity:1;animation:pop .5s infinite}
 .rscene .cue{transform-box:fill-box;transform-origin:50% 50%}
 @media (max-width:640px) and (orientation:portrait){.rscene{width:100%}}
+/* Reward wheel and treats */
+.wheelwrap{width:min(62vh,80vw);margin:auto}.wheel{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 0 #0002)}
+#treat{background:linear-gradient(#5fb0ff,#2a7de1);gap:10px}
+.treattop{display:flex;align-items:center;gap:12px;color:#fff}.treattop h2{color:#fff;text-shadow:0 3px 0 #0003;font-size:clamp(22px,4.5vh,40px)}
+.treattime:empty{display:none}.treattime{font-size:clamp(22px,4vh,36px);font-weight:800;background:#fff3;border-radius:14px;padding:4px 14px;font-variant-numeric:tabular-nums}
+.treatstage{flex:1;position:relative;border-radius:24px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:0}
+.treatstage .lights{position:absolute;inset:0;pointer-events:none}
+.treatstage .lights i{position:absolute;top:-20%;width:22%;height:140%;background:linear-gradient(#fff6,#fff0);transform-origin:50% 0;animation:sweep 3s ease-in-out infinite alternate}
+.treatstage .lights i:nth-child(1){left:5%;background:linear-gradient(#ff7eb680,#0000)}.treatstage .lights i:nth-child(2){left:30%;animation-delay:-1s;background:linear-gradient(#ffc93c80,#0000)}
+.treatstage .lights i:nth-child(3){left:55%;animation-delay:-2s;background:linear-gradient(#5fb0ff80,#0000)}.treatstage .lights i:nth-child(4){left:78%;animation-delay:-.5s;background:linear-gradient(#7ad66b80,#0000)}
+@keyframes sweep{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+.sparkles i{position:absolute;width:14px;height:14px;background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:twinkle 1.6s ease-in-out infinite}
+.sparkles i:nth-child(1){left:12%;top:20%}.sparkles i:nth-child(2){left:80%;top:15%;animation-delay:-.4s}.sparkles i:nth-child(3){left:25%;top:70%;animation-delay:-.8s}
+.sparkles i:nth-child(4){left:70%;top:60%;animation-delay:-1.2s}.sparkles i:nth-child(5){left:50%;top:10%;animation-delay:-.6s}.sparkles i:nth-child(6){left:90%;top:75%;animation-delay:-1s}
+@keyframes twinkle{50%{transform:scale(1.8) rotate(45deg);opacity:.3}}
+/* Celebrations */
+.cel{background:radial-gradient(circle at 50% 20%,#8a5cf6,#2b1d5c)}
+.cel-skate{background:linear-gradient(#cfe8ff,#eaf6ff 55%,#bfe0ff)}.cel-stomp{background:linear-gradient(#9fd8ff,#bfe8a8 60%,#7ccf5a)}.cel-twirl{background:radial-gradient(circle at 50% 30%,#ffe3f1,#ffb3d1)}
+.celfloor{position:absolute;left:0;right:0;bottom:0;height:24%;background:repeating-linear-gradient(90deg,#ffffff22 0 60px,#ffffff08 60px 120px)}
+.cel-skate .celfloor{height:44%;left:6%;right:6%;bottom:6%;border-radius:50%;background:radial-gradient(#fff,#d6ecff);box-shadow:inset 0 0 0 6px #fff}
+.mover{position:absolute;bottom:8%;left:40%;width:min(26vh,30vw)}.mover svg{width:100%;height:auto;display:block}
+.cel-moonwalk .mover{animation:moonwalk 8s linear infinite}.cel-moonwalk .bob{animation:mwbob .5s ease-in-out infinite alternate}
+@keyframes moonwalk{0%{left:68%;transform:scaleX(1)}46%{left:6%;transform:scaleX(1)}50%{left:6%;transform:scaleX(-1)}96%{left:68%;transform:scaleX(-1)}100%{left:68%;transform:scaleX(1)}}
+@keyframes mwbob{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-10px) rotate(4deg)}}
+.cel-skate .mover{left:calc(50% - min(13vh,15vw));bottom:18%;animation:skate 5s linear infinite}.cel-skate .bob{transform:rotate(14deg);animation:glide 1s ease-in-out infinite alternate}
+@keyframes skate{from{transform:rotate(0) translateX(min(30vh,32vw)) rotate(0)}to{transform:rotate(-360deg) translateX(min(30vh,32vw)) rotate(360deg)}}
+@keyframes glide{from{transform:rotate(14deg)}to{transform:rotate(22deg) translateY(-6px)}}
+.cel-stomp .mover{left:calc(50% - min(13vh,15vw));animation:stomp 1.2s ease-in infinite}.cel-stomp{animation:shake 1.2s infinite}
+@keyframes stomp{0%,100%{transform:translateY(0) scale(1.1,.9)}40%{transform:translateY(-34%) scale(.95,1.05)}50%{transform:translateY(-38%) rotate(180deg)}60%{transform:translateY(-34%) rotate(360deg)}}
+@keyframes shake{0%,4%{transform:translate(0)}2%{transform:translate(-6px,4px)}}
+.cel-twirl .mover{left:calc(50% - min(13vh,15vw));animation:float 2s ease-in-out infinite alternate}.cel-twirl .bob{animation:twirl 1.4s linear infinite}
+@keyframes twirl{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}@keyframes float{from{transform:translateY(0)}to{transform:translateY(-14%)}}
+/* Toy box */
+.toys{flex-direction:column;gap:12px;background:#ffffff26}.toypick .big{padding:10px 18px;font-size:clamp(18px,2.6vw,26px)}
+.toyarea{flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0}
+.piano{display:flex;gap:8px;height:80%;width:94%}.key{flex:1;border-radius:0 0 18px 18px;box-shadow:0 8px 0 #0003;border:0}.key.hit{animation:press .3s}
+@keyframes press{50%{transform:translateY(10px);filter:brightness(1.3)}}
+.sky{position:relative;width:96%;height:94%;border-radius:20px;background:linear-gradient(#0b1033,#2b1d5c);overflow:hidden;cursor:pointer}
+.launch{position:absolute;left:50%;bottom:16px;transform:translateX(-50%)}
+.firework{position:absolute;width:0;height:0}.firework i{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--c);animation:burst 1.2s ease-out forwards;transform:rotate(var(--a)) translateY(0)}
+@keyframes burst{to{transform:rotate(var(--a)) translateY(-120px);opacity:0}}
+.bubbles{display:grid;grid-template-columns:repeat(5,1fr);gap:4vh 4vw;width:90%}
+.bubble{aspect-ratio:1;border-radius:50%;border:4px solid #fff;background:radial-gradient(circle at 30% 30%,#fff,hsl(var(--h,200) 90% 70% / .6));animation:bob 2s ease-in-out infinite alternate;animation-delay:var(--d)}
+.bubble.pop{animation:popb .5s forwards}@keyframes popb{to{transform:scale(1.6);opacity:0}}@keyframes bob{to{transform:translateY(-14px)}}
+/* Dress up */
+.dress{gap:4%;background:#ffffff26;padding:2%}.dresshost{width:min(46vh,34vw)}.dresshost svg{width:100%;height:auto}
+.dressside{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:50%}.dressside h2{color:#fff;text-shadow:0 3px 0 #0003;text-align:center}
+.wardrobe{display:grid;grid-template-columns:repeat(3,min(15vh,11vw));gap:12px}
+.wear{aspect-ratio:1;background:#fff;border-radius:18px;border:0;box-shadow:0 6px 0 #0003;padding:8%}.wear svg{width:100%;height:100%}
+.wear.on{box-shadow:0 0 0 6px #ffc93c,0 6px 0 #0003}.wear.new{animation:pop .6s 2}
+/* Funny clip */
+.clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.clip video{width:100%;height:100%;object-fit:contain}
+/* Dance party */
+.disco{background:radial-gradient(circle at 50% 30%,#ff7eb6,#8a5cf6 60%,#2b1d5c)}
+.banner{position:absolute;top:6%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:clamp(28px,min(10vh,11vw),96px);font-weight:800;color:#fff;text-shadow:0 6px 0 #0004;animation:pop .6s infinite alternate}
+.dancer{position:absolute;bottom:6%;width:min(34vh,30vw);animation:dance .6s ease-in-out infinite alternate}.dancer svg{width:100%;height:auto}
+@keyframes dance{from{transform:rotate(-10deg) translateY(0)}to{transform:rotate(10deg) translateY(-8%)}}
+/* My world */
+.world,.worldview{flex-direction:column;gap:10px}.worldview{display:flex;align-items:center}
+.worldbox{width:min(100%,calc((100vh - 230px) * 1.786));border-radius:20px;overflow:hidden;box-shadow:0 8px 0 #0002}.worldsvg{width:100%;height:auto;display:block}
+.newpiece{animation:newpiece 1.2s ease-out}@keyframes newpiece{0%{transform:translateY(-60px);opacity:0}60%{transform:translateY(8px);opacity:1}100%{transform:none}}
+.worldinfo{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;color:#fff;font-size:clamp(18px,3vh,28px);text-shadow:0 2px 0 #0003}
+.worldinfo .score{background:#ffc93c;color:#2b2118;border-radius:14px;padding:4px 14px;font-weight:800;text-shadow:none}
+#stickers .worldinfo{color:var(--ink);text-shadow:none}
+@media (max-width:640px) and (orientation:portrait){#treatSkip{font-size:18px;padding:8px 14px}.mover{width:40vw}.cel-skate .mover,.cel-stomp .mover,.cel-twirl .mover{left:calc(50% - 20vw)}.dancer{width:46vw}.dress{flex-direction:column}.dresshost{width:40vw}.dressside{max-width:100%}.wardrobe{grid-template-columns:repeat(3,22vw)}.treattop h2{font-size:20px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -470,6 +535,11 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
   <div class="tvmsg" id="tvmsg" hidden></div>
 </section>
 
+<section id="treat" class="screen" aria-label="Your reward">
+  <div class="treattop"><h2 id="treatTitle"></h2><span class="spacer"></span><span class="treattime" id="treatTime"></span><button class="big blue" id="treatSkip" data-nav>Skip &#9197;</button></div>
+  <div class="treatstage" id="treatStage"></div>
+</section>
+
 <section id="tvdone" class="screen" aria-label="TV finished">
   <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
   <h2 id="tvdoneTitle">TV time is finished!</h2>
@@ -477,8 +547,9 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 </section>
 
 <section id="stickers" class="screen" aria-label="My friends">
-  <div class="top"><button class="icon" id="stickersHome" data-nav aria-label="Home"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></button><h2>My friends</h2></div>
+  <div class="top"><button class="icon" id="stickersHome" data-nav aria-label="Home"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></button><h2>My friends</h2><span class="spacer"></span><button class="big blue" id="worldBtn" data-nav>My world</button></div>
   <div class="grid" id="stickerGrid"></div>
+  <div class="worldview" id="worldView" hidden></div>
 </section>
 
 <section id="parent" class="screen" aria-label="Grown-ups">
@@ -518,12 +589,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 const C = window.LeoCore;
 const K = window.KID, N = K.name; // this child's name, used in everything said and shown
 const LV = () => state.settings.level; // difficulty: 1 Little, 2 Middle, 3 Big
-document.getElementById('leo').innerHTML = document.getElementById('host-' + K.host).innerHTML;
 document.getElementById('startName').textContent = K.NAME;
 document.getElementById('pronoun').textContent = K.pronoun;
 const $ = (id) => document.getElementById(id);
 let state = C.loadState(safeStorage(), K.storageKey, K.level);
 const save = () => C.saveState(safeStorage(), state, K.storageKey);
+document.getElementById('leo').innerHTML = document.getElementById('host-' + K.host).innerHTML; // replaced by dressHost() once the rewards code loads
 
 function safeStorage() { try { return window.localStorage; } catch (e) { return null; } }
 function rand(list) { return list[Math.floor(Math.random() * list.length)]; }
@@ -575,6 +646,7 @@ document.addEventListener('keydown', (e) => {
 function back() {
   if (current === 'play' || current === 'stickers' || current === 'reward' || current === 'tvdone' || current === 'parent') goHome();
   else if (current === 'tv') finishTv();
+  else if (current === 'treat') finishTreat();
 }
 // Called by the Fire TV app: Back button returns "exit" only from the top-level screens.
 window.__leoBack = () => { if (['home', 'start', 'birthday'].includes(current)) return 'exit'; back(); return 'ok'; };
@@ -825,7 +897,7 @@ function renderMenu() {
     t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // LEO reads the game names to a non-reader
   });
 }
-function goHome() { renderJars(); show('home'); say(`Hello ${N}! Pick a game!`); }
+function goHome() { if (typeof endTreatTimers === 'function' && treat) { endTreatTimers(); treat = null; } renderJars(); show('home'); say(`Hello ${N}! Pick a game!`); }
 function startGame(id) {
   currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
@@ -1598,12 +1670,12 @@ $('rewardBtn').addEventListener('click', async () => {
     rewardStage = 'friend';
     $('rewardArt').innerHTML = `<div class="friend">${friendSvg(r.friend)}</div>`;
     $('rewardTitle').textContent = `You found ${r.friend.name}!`;
-    const hasVideo = !!C.videoForGame(state, currentGame);
-    $('rewardBtn').textContent = hasVideo ? 'Watch my video \u25B6' : 'Dance party!';
-    $('skipBtn').hidden = false; // choice: watch the whole video, or skip straight back to the games
+    $('rewardBtn').textContent = 'Spin the wheel! \u21BB';
+    $('skipBtn').hidden = false; // or skip straight back to the games
     confetti(); sfx.fanfare();
-    await say(`You found ${r.friend.name}! ${r.friend.name} is your new friend! ${hasVideo ? 'Watch your video, or skip it?' : ''}`);
-  } else startTv();
+    await say(`You found ${r.friend.name}! ${r.friend.name} is your new friend!`);
+  } else if (rewardStage === 'friend') showWheel();
+  else spinWheel();
 });
 $('skipBtn').addEventListener('click', goHome);
 
@@ -1700,8 +1772,314 @@ function finishTv() {
 }
 $('tvSkip').addEventListener('click', finishTv);
 
+/* ---------- Reward wheel: spin for one of six treats (plus the grown-ups' video, when set) ---------- */
+const TREAT_COLOURS = ['#e63946', '#2a7de1', '#ffc93c', '#2fbf71', '#8a5cf6', '#ff9a3c', '#ff7eb6'];
+const TREAT_ICON = {
+  celebrate: '<path d="M-14 12 0-18 14 12z" fill="#fff"/><circle cx="0" cy="-22" r="5" fill="#fff"/>',
+  toybox: '<rect x="-16" y="-6" width="32" height="20" rx="3" fill="#fff"/><path d="M-18-6h36l-4-8h-28z" fill="#fff"/>',
+  dressup: '<path d="M-16 8h32l-4-18q-12-10-24 0z" fill="#fff"/><rect x="-20" y="6" width="40" height="6" rx="3" fill="#fff"/>',
+  clip: '<rect x="-16" y="-12" width="32" height="24" rx="4" fill="#fff"/><path d="M-5-6v12l10-6z" fill="#2b2118"/>',
+  dance: '<path d="M-6 10V-14l16-4v20" stroke="#fff" stroke-width="4" fill="none"/><circle cx="-10" cy="10" r="6" fill="#fff"/><circle cx="6" cy="6" r="6" fill="#fff"/>',
+  world: '<circle r="15" fill="#fff"/><path d="M-10-6q8 2 6 10t10 6M4-14q-2 8 8 8" stroke="#2fbf71" stroke-width="4" fill="none"/>',
+  video: '<rect x="-18" y="-12" width="36" height="24" rx="6" fill="#fff"/><path d="M-5-7v14l11-7z" fill="#e63946"/>'
+};
+let clipList = [];
+fetch('clips/list.json').then((r) => (r.ok ? r.json() : [])).then((l) => { clipList = Array.isArray(l) ? l.filter((c) => c && c.ok) : []; })
+  .catch((e) => console.warn('[LEO] no funny clips', e));
+let wheel = null;
+function wheelSvg(slices) {
+  const n = slices.length, R = 150, seg = 360 / n;
+  const pt = (a, r) => [Math.sin((a * Math.PI) / 180) * r, -Math.cos((a * Math.PI) / 180) * r];
+  const parts = slices.map((t, i) => {
+    const [x1, y1] = pt(i * seg, R), [x2, y2] = pt((i + 1) * seg, R), [ix, iy] = pt((i + 0.5) * seg, R * 0.62);
+    return `<path d="M0 0L${x1.toFixed(1)} ${y1.toFixed(1)}A${R} ${R} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}z" fill="${TREAT_COLOURS[i % TREAT_COLOURS.length]}" stroke="#fff" stroke-width="4"/>`
+      + `<g transform="translate(${ix.toFixed(1)} ${iy.toFixed(1)}) rotate(${(i + 0.5) * seg}) scale(1.6)">${TREAT_ICON[t.id]}</g>`; // pictures only: little ones can't read the names
+  }).join('');
+  return `<div class="wheelwrap"><svg viewBox="-160 -175 320 340" class="wheel"><g id="wheelSpin">${parts}<circle r="22" fill="#fff" stroke="#2b2118" stroke-width="4"/></g><path d="M-16-172h32L0-140z" fill="#2b2118"/></svg></div>`;
+}
+function showWheel() {
+  const slices = C.wheelSlices({ hasClips: clipList.length > 0, hasVideo: !!C.videoForGame(state, currentGame) });
+  wheel = { slices, spun: false };
+  rewardStage = 'wheel';
+  $('rewardTitle').textContent = 'Spin the wheel!';
+  $('rewardArt').innerHTML = wheelSvg(slices);
+  $('rewardBtn').textContent = 'Spin! ↻'; $('skipBtn').hidden = false;
+  if (usingPad) $('rewardBtn').focus();
+  say('Spin the wheel!');
+}
+async function spinWheel() {
+  if (!wheel || wheel.spun) return;
+  wheel.spun = true;
+  const w = wheel, n = w.slices.length, pick = C.pickTreat(w.slices, state.lastTreat), seg = 360 / n;
+  const land = 360 * 5 + (360 - (pick + 0.5) * seg) + (Math.random() - 0.5) * seg * 0.6; // five turns, then stop on the slice
+  const g = $('wheelSpin');
+  g.style.transition = 'transform 4s cubic-bezier(.15,.85,.25,1)'; g.style.transform = `rotate(${land}deg)`;
+  $('rewardBtn').textContent = 'Spinning…';
+  for (let t = 0; t < 22; t++) setTimeout(() => tone(900, 0, 0.04, 'square', 0.05), 4000 * (1 - Math.pow(1 - t / 22, 2.2)));
+  await wait(4200);
+  if (wheel !== w || current !== 'reward') return;
+  const treat = w.slices[pick];
+  state = { ...state, lastTreat: treat.id }; save();
+  sfx.fanfare(); confetti();
+  $('rewardTitle').textContent = `${treat.name}!`;
+  await say(treat.say);
+  if (wheel !== w || current !== 'reward') return;
+  startTreat(treat.id);
+}
+
+/* ---------- Treat screen: shared countdown, music and Skip ---------- */
+let treat = null;
+function startTreat(id) {
+  if (id === 'video') { startTv(); return; }
+  endTreatTimers();
+  treat = { id, timers: [], loops: [] };
+  show('treat');
+  $('treatStage').className = 'treatstage'; $('treatStage').innerHTML = '';
+  $('treatTime').textContent = ''; $('treatTitle').textContent = '';
+  ({ celebrate: celebrateTreat, toybox: toyboxTreat, dressup: dressupTreat, clip: clipTreat, dance: danceTreat, world: worldTreat })[id]();
+  if (usingPad) $('treatStage').querySelector('[data-nav]')?.focus() || $('treatSkip').focus();
+}
+function treatCountdown(seconds, onEnd) {
+  const t = treat, end = Date.now() + seconds * 1000;
+  const tick = () => {
+    if (treat !== t) return;
+    const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+    $('treatTime').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+    if (left <= 0) { (onEnd || finishTreat)(); return; }
+    t.timers.push(setTimeout(tick, 250));
+  };
+  tick();
+}
+function treatMusic(notes, beat = 0.3, type = 'triangle', drum = true) {
+  const t = treat; let i = 0;
+  t.loops.push(setInterval(() => {
+    if (treat !== t) return;
+    const f = notes[i % notes.length]; if (f) tone(f, 0, beat * 0.8, type, 0.09);
+    if (drum && i % 2 === 0) sfx.drum();
+    i++;
+  }, beat * 1000));
+}
+function endTreatTimers() {
+  if (!treat) return;
+  treat.timers.forEach(clearTimeout); treat.loops.forEach(clearInterval);
+  const v = $('treatStage').querySelector('video'); if (v) { try { v.pause(); } catch (e) { console.warn('[LEO] clip stop', e); } }
+}
+function finishTreat() {
+  endTreatTimers(); treat = null;
+  if (current === 'treat') goHome();
+}
+$('treatSkip').addEventListener('click', finishTreat);
+const hostSvg = (cls = '') => `<svg class="${cls}" viewBox="0 -16 200 246" aria-hidden="true"><use href="#leo"/></svg>`;
+
+/* 1. Celebration: the host's own move for 30 seconds */
+const CELEBRATE = {
+  lion: { move: 'moonwalk', say: 'Watch me moonwalk!', title: 'Moonwalk!' },
+  penguin: { move: 'skate', say: 'Watch me skate!', title: 'Ice skating!' },
+  dino: { move: 'stomp', say: 'Watch me stomp!', title: 'Dino stomp!' },
+  princess: { move: 'twirl', say: 'Watch me twirl!', title: 'Twirl time!' }
+};
+function celebrateTreat() {
+  const c = CELEBRATE[K.host] || CELEBRATE.lion;
+  $('treatTitle').textContent = c.title;
+  $('treatStage').classList.add('cel', `cel-${c.move}`);
+  $('treatStage').innerHTML = `<div class="celfloor"></div><div class="lights"><i></i><i></i><i></i><i></i></div><div class="mover"><div class="bob">${hostSvg()}</div></div><div class="sparkles"><i></i><i></i><i></i><i></i><i></i><i></i></div>`;
+  treatMusic([523, 659, 784, 659, 587, 698, 880, 698], 0.28, 'triangle', true);
+  treatCountdown(30);
+  say(c.say);
+}
+
+/* 2. Toy box: two minutes with a piano, fireworks or bubbles */
+const PIANO = [262, 294, 330, 349, 392, 440, 494, 523];
+function toyboxTreat() {
+  $('treatTitle').textContent = 'Toy box';
+  $('treatStage').classList.add('toys');
+  $('treatStage').innerHTML = `<div class="row toypick">${[['piano', 'Piano'], ['fireworks', 'Fireworks'], ['bubbles', 'Bubbles']].map(([id, n]) => `<button class="big ${id === 'piano' ? '' : 'blue'}" data-nav data-toy="${id}">${n}</button>`).join('')}</div><div class="toyarea" id="toyArea"></div>`;
+  $('treatStage').querySelectorAll('[data-toy]').forEach((b) => b.addEventListener('click', () => {
+    $('treatStage').querySelectorAll('[data-toy]').forEach((x) => x.classList.toggle('blue', x !== b));
+    openToy(b.dataset.toy);
+  }));
+  openToy('piano');
+  treatCountdown(120);
+  say('Pick a toy!');
+}
+function openToy(id) {
+  const area = $('toyArea');
+  if (id === 'piano') {
+    area.innerHTML = `<div class="piano">${PIANO.map((f, i) => `<button class="key" data-nav data-i="${i}" style="background:${TREAT_COLOURS[i % TREAT_COLOURS.length]}"></button>`).join('')}</div>`;
+    area.querySelectorAll('.key').forEach((k) => k.addEventListener('click', () => {
+      tone(PIANO[k.dataset.i], 0, 0.5, 'triangle', 0.25); k.classList.remove('hit'); void k.offsetWidth; k.classList.add('hit');
+    }));
+  } else if (id === 'fireworks') {
+    area.innerHTML = '<div class="sky" id="sky"><button class="big launch" data-nav id="launch">Launch! 🚀</button></div>';
+    const boom = (x, y) => {
+      const c = TREAT_COLOURS[Math.floor(Math.random() * TREAT_COLOURS.length)];
+      const fw = document.createElement('div'); fw.className = 'firework'; fw.style.cssText = `left:${x}%;top:${y}%;--c:${c}`;
+      fw.innerHTML = Array.from({ length: 14 }, (_, i) => `<i style="--a:${i * (360 / 14)}deg"></i>`).join('');
+      $('sky').appendChild(fw); setTimeout(() => fw.remove(), 1300);
+      tone(180 + Math.random() * 80, 0, 0.3, 'sawtooth', 0.06); tone(700 + Math.random() * 400, 0.05, 0.25, 'triangle', 0.08);
+    };
+    $('launch').addEventListener('click', (e) => { e.stopPropagation(); boom(10 + Math.random() * 80, 10 + Math.random() * 50); });
+    $('sky').addEventListener('click', (e) => { const r = $('sky').getBoundingClientRect(); boom(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100); });
+  } else {
+    area.innerHTML = `<div class="bubbles">${Array.from({ length: 10 }, (_, i) => `<button class="bubble" data-nav style="--d:${(i % 5) * 0.4}s"></button>`).join('')}</div>`;
+    area.querySelectorAll('.bubble').forEach((b) => b.addEventListener('click', () => {
+      if (b.classList.contains('pop')) return;
+      b.classList.add('pop'); tone(600 + Math.random() * 500, 0, 0.12, 'sine', 0.2);
+      setTimeout(() => { b.classList.remove('pop'); b.style.setProperty('--h', `${Math.floor(Math.random() * 360)}`); }, 700);
+    }));
+  }
+  if (usingPad) area.querySelector('[data-nav]')?.focus();
+}
+
+/* 3. Dress up: win a new hat or glasses, then choose what to wear */
+const HOST_FIT = { lion: { brim: 30, eyes: 84 }, dino: { brim: 34, eyes: 80 }, princess: { brim: 40, eyes: 94 }, penguin: { brim: 34, eyes: 88 } };
+const WEAR_ART = { // hats drawn with the brim at y=40; glasses with the eyes at y=84
+  party: '<path d="M72 40 100-10 128 40z" fill="#8a5cf6"/><circle cx="100" cy="-10" r="8" fill="#ffc93c"/><g fill="#ffc93c"><circle cx="92" cy="24" r="4"/><circle cx="108" cy="10" r="4"/><circle cx="106" cy="32" r="4"/></g>',
+  crown: '<path d="M60 42V8l14 14 13-22 13 22 13-22 13 22 14-14v34z" fill="#ffc93c" stroke="#e0a800" stroke-width="3" stroke-linejoin="round"/><circle cx="100" cy="30" r="5" fill="#e63946"/><circle cx="76" cy="32" r="4" fill="#2a7de1"/><circle cx="124" cy="32" r="4" fill="#2a7de1"/>',
+  cap: '<path d="M54 42q46-62 92 0z" fill="#e63946"/><path d="M140 40q34-2 44 8-20 4-46 0z" fill="#b72f3a"/><circle cx="100" cy="6" r="5" fill="#fff"/>',
+  wizard: '<path d="M70 40 104-14 132 40z" fill="#2a7de1"/><ellipse cx="100" cy="40" rx="52" ry="9" fill="#1c5fb8"/><g fill="#ffc93c"><circle cx="102" cy="10" r="4"/><circle cx="114" cy="28" r="3"/><circle cx="90" cy="30" r="3"/></g>',
+  cowboy: '<ellipse cx="100" cy="40" rx="66" ry="11" fill="#8d5a2b"/><path d="M68 40q2-40 32-38 30-2 32 38z" fill="#a66a35"/><path d="M70 30h60" stroke="#5c3a1a" stroke-width="6"/>',
+  tophat: '<rect x="70" y="-6" width="60" height="44" rx="4" fill="#2b2118"/><rect x="54" y="34" width="92" height="10" rx="5" fill="#2b2118"/><rect x="70" y="24" width="60" height="8" fill="#e63946"/>',
+  shades: '<g fill="#2b2118"><rect x="58" y="72" width="38" height="24" rx="10"/><rect x="104" y="72" width="38" height="24" rx="10"/></g><path d="M96 80h8M58 78l-16-4M142 78l16-4" stroke="#2b2118" stroke-width="4"/><path d="M64 78h10M110 78h10" stroke="#fff" stroke-width="3" opacity=".6"/>',
+  stars: '<g fill="#ff7eb6" stroke="#c2185b" stroke-width="2"><path d="M78 64l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2z"/><path d="M122 64l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2z"/></g><path d="M96 82h8" stroke="#c2185b" stroke-width="4"/>',
+  hearts: '<g fill="#e63946" opacity=".92"><path d="M78 100 60 84q-8-10 2-18 8-6 16 4 8-10 16-4 10 8 2 18z"/><path d="M122 100l-18-16q-8-10 2-18 8-6 16 4 8-10 16-4 10 8 2 18z"/></g><path d="M94 80h12" stroke="#2b2118" stroke-width="4"/>'
+};
+/** The host as they look now: their character plus whatever they're wearing. */
+function dressHost() {
+  const fit = HOST_FIT[K.host] || HOST_FIT.lion, wear = state.wear || {};
+  const hat = wear.hat && WEAR_ART[wear.hat] ? `<g transform="translate(0 ${fit.brim - 40})">${WEAR_ART[wear.hat]}</g>` : '';
+  const face = wear.face && WEAR_ART[wear.face] ? `<g transform="translate(0 ${fit.eyes - 84})">${WEAR_ART[wear.face]}</g>` : '';
+  document.getElementById('leo').innerHTML = document.getElementById('host-' + K.host).innerHTML + face + hat;
+}
+function dressupTreat() {
+  $('treatTitle').textContent = 'Dress up';
+  const item = C.nextWardrobeItem(state.wardrobe || []);
+  if (item) {
+    state = { ...state, wardrobe: (state.wardrobe || []).concat(item.id), wear: C.toggleWear({ ...state.wear, [item.slot]: null }, item.id) };
+    save(); dressHost();
+  }
+  renderWardrobe(item);
+  say(item ? `You won a ${item.name}! Pick what to wear!` : 'Pick what to wear!');
+}
+function renderWardrobe(newItem) {
+  const owned = state.wardrobe || [];
+  const thumbs = C.WARDROBE.filter((w) => owned.includes(w.id)).map((w) => {
+    const on = state.wear[w.slot] === w.id;
+    const art = w.slot === 'hat' ? `<svg viewBox="40 -30 120 80">${WEAR_ART[w.id]}</svg>` : `<svg viewBox="40 56 120 56">${WEAR_ART[w.id]}</svg>`;
+    return `<button class="wear${on ? ' on' : ''}${newItem && newItem.id === w.id ? ' new' : ''}" data-nav data-w="${w.id}" aria-label="${w.name}">${art}</button>`;
+  }).join('');
+  $('treatStage').classList.add('dress');
+  $('treatStage').innerHTML = `<div class="dresshost">${hostSvg('wave')}</div><div class="dressside"><h2>${newItem ? `New: ${newItem.name.replace(/^pair of /, '')}!` : 'Your dressing-up box'}</h2><div class="wardrobe">${thumbs}</div><button class="big" data-nav id="dressDone">Looking good!</button></div>`;
+  $('treatStage').querySelectorAll('.wear').forEach((b) => b.addEventListener('click', () => {
+    state = { ...state, wear: C.toggleWear(state.wear, b.dataset.w) }; save(); dressHost();
+    tone(700, 0, 0.12, 'triangle', 0.2);
+    const id = b.dataset.w; renderWardrobe(null);
+    $('treatStage').querySelector(`.wear[data-w="${id}"]`)?.focus();
+  }));
+  $('dressDone').addEventListener('click', async () => { confetti(); await say('Looking good!'); finishTreat(); });
+}
+
+/* 4. Funny clip: a short, silly animal video with music */
+function clipTreat() {
+  const pool = clipList.slice();
+  const play = () => {
+    if (!pool.length) { $('treatStage').innerHTML = ''; danceTreat(); return; }
+    const c = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+    $('treatTitle').textContent = c.title;
+    $('treatStage').classList.add('clip');
+    $('treatStage').innerHTML = `<video src="clips/${c.id}.mp4" autoplay muted playsinline></video>`;
+    const v = $('treatStage').querySelector('video');
+    v.addEventListener('error', play, { once: true }); // missing or broken: try another
+    v.addEventListener('ended', finishTreat);
+    v.play().catch(() => {});
+  };
+  play();
+  treatMusic([392, 0, 523, 0, 440, 494, 523, 0], 0.25, 'square', false);
+  treatCountdown(22);
+  say('Look at this!');
+}
+
+/* 5. Dance party with their own jingle */
+function danceTreat() {
+  $('treatTitle').textContent = 'Dance party!';
+  $('treatStage').classList.add('disco');
+  $('treatStage').innerHTML = `<div class="lights"><i></i><i></i><i></i><i></i></div><div class="banner">${K.NAME}!</div><div class="dancer">${hostSvg()}</div><div class="sparkles"><i></i><i></i><i></i><i></i><i></i><i></i></div>`;
+  const lines = [`Hey, hey, it's ${N}!`, 'Dance with me, one, two, three!', 'Clap your hands and spin around!', `${N}, you're a superstar!`];
+  treatMusic([523, 523, 659, 523, 784, 740, 659, 0, 523, 523, 659, 523, 880, 784, 659, 0], 0.26, 'square', true);
+  lines.concat(lines).forEach((l, i) => treat.timers.push(setTimeout(() => say(l), 1200 + i * 3400)));
+  treat.timers.push(setInterval(confetti, 6000));
+  treatCountdown(30);
+}
+
+/* 6. My world: add the next piece, zone by zone, with a score */
+const WORLD_BG = {
+  garden: '<rect width="1000" height="560" fill="#9fd8ff"/><rect y="380" width="1000" height="180" fill="#7ccf5a"/>',
+  farm: '<rect width="1000" height="560" fill="#bfe6ff"/><rect y="360" width="1000" height="200" fill="#a8d86b"/><path d="M0 420h1000M0 470h1000M0 520h1000" stroke="#94c459" stroke-width="10"/>',
+  seaside: '<rect width="1000" height="560" fill="#aee2ff"/><rect y="300" width="1000" height="110" fill="#2a7de1"/><path d="M0 330q25-10 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0" stroke="#7cc4ff" stroke-width="5" fill="none"/><rect y="400" width="1000" height="160" fill="#f6d98b"/>',
+  space: '<rect width="1000" height="560" fill="#1b1f4a"/><g fill="#fff" opacity=".5"><circle cx="80" cy="60" r="2"/><circle cx="340" cy="40" r="2"/><circle cx="560" cy="90" r="2"/><circle cx="760" cy="300" r="2"/><circle cx="930" cy="250" r="2"/><circle cx="120" cy="480" r="2"/><circle cx="640" cy="500" r="2"/></g>'
+};
+const WORLD_ART = {
+  sun: '<circle cx="870" cy="90" r="50" fill="#ffd54a"/><g stroke="#ffd54a" stroke-width="8" stroke-linecap="round"><path d="M870 18v-14M870 176v-14M798 90h-14M956 90h-14M820 40l-10-10M930 150l10 10M920 40l10-10M820 140l-10 10"/></g>',
+  tree: '<rect x="150" y="250" width="40" height="160" rx="10" fill="#8d5a2b"/><circle cx="170" cy="220" r="80" fill="#2fbf71"/><g fill="#e63946"><circle cx="140" cy="200" r="9"/><circle cx="196" cy="186" r="9"/><circle cx="176" cy="250" r="9"/></g>',
+  flowers: '<g>' + [300, 360, 420, 480].map((x, i) => `<path d="M${x} 470v-40" stroke="#2f8a3a" stroke-width="5"/><circle cx="${x}" cy="425" r="16" fill="${['#ff7eb6', '#ffc93c', '#8a5cf6', '#e63946'][i]}"/><circle cx="${x}" cy="425" r="6" fill="#fff6c4"/>`).join('') + '</g>',
+  pond: '<ellipse cx="640" cy="470" rx="120" ry="40" fill="#5fb0ff"/><ellipse cx="610" cy="460" rx="22" ry="8" fill="#2fbf71"/><path d="M600 456q10-8 20 0" stroke="#fff" stroke-width="3" fill="none"/>',
+  swing: '<path d="M760 420 800 250 840 420M840 420 880 250 920 420M800 250h80" stroke="#8d5a2b" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M825 252v110M855 252v110" stroke="#555" stroke-width="3"/><rect x="815" y="360" width="50" height="10" rx="4" fill="#e63946"/>',
+  butterflies: '<g fill="#ff9a3c"><path d="M480 180q-30-30-34 0 4 24 34 0zM480 180q30-30 34 0-4 24-34 0z"/></g><g fill="#8a5cf6"><path d="M560 230q-20-20-24 0 4 16 24 0zM560 230q20-20 24 0-4 16-24 0z"/></g>',
+  barn: '<rect x="120" y="250" width="180" height="150" fill="#e63946"/><path d="M110 254 210 180 310 254z" fill="#b72f3a"/><rect x="180" y="320" width="60" height="80" fill="#fff"/><path d="M180 320l60 80M240 320l-60 80" stroke="#e63946" stroke-width="6"/>',
+  haystack: '<path d="M340 440q50-100 100 0z" fill="#ffc93c"/><path d="M360 420l20-40M400 430l10-50M430 430l-10-40" stroke="#e0a800" stroke-width="4"/>',
+  tractor: '<rect x="500" y="360" width="110" height="50" rx="8" fill="#2fbf71"/><rect x="570" y="320" width="50" height="45" rx="6" fill="#2fbf71"/><rect x="578" y="328" width="34" height="24" fill="#cfe8ff"/><circle cx="530" cy="420" r="26" fill="#2b2118"/><circle cx="600" cy="425" r="20" fill="#2b2118"/>',
+  cow: '<ellipse cx="740" cy="420" rx="55" ry="32" fill="#fff"/><circle cx="790" cy="400" r="22" fill="#fff"/><ellipse cx="800" cy="410" rx="12" ry="9" fill="#ffb3c6"/><circle cx="725" cy="410" r="12" fill="#2b2118"/><path d="M705 448v20M770 448v20" stroke="#2b2118" stroke-width="7"/>',
+  sheep: '<g fill="#fff"><circle cx="880" cy="430" r="22"/><circle cx="905" cy="420" r="22"/><circle cx="930" cy="432" r="20"/><circle cx="900" cy="445" r="22"/></g><circle cx="950" cy="420" r="13" fill="#555"/><path d="M885 462v14M920 462v14" stroke="#555" stroke-width="6"/>',
+  windmill: '<path d="M430 360 450 200h20l20 160z" fill="#ffd6a5"/><g transform="translate(460 200)" fill="#8d5a2b"><rect x="-6" y="-90" width="12" height="90"/><rect x="-6" y="0" width="12" height="90" transform="rotate(90)"/><rect x="-6" y="0" width="12" height="90" transform="rotate(180)"/><rect x="-6" y="0" width="12" height="90" transform="rotate(270)"/></g>',
+  lighthouse: '<path d="M90 400 110 180h40l20 220z" fill="#fff"/><path d="M100 300h60M96 350h68M104 240h52" stroke="#e63946" stroke-width="18"/><rect x="104" y="150" width="52" height="32" fill="#ffd54a"/><path d="M100 150l30-24 30 24z" fill="#e63946"/>',
+  sandcastle: '<g fill="#e0b85c"><rect x="290" y="420" width="120" height="50"/><rect x="290" y="390" width="30" height="40"/><rect x="380" y="390" width="30" height="40"/><rect x="335" y="370" width="30" height="60"/></g><path d="M350 370v-30l20 8-20 8" stroke="#2b2118" stroke-width="3" fill="#e63946"/>',
+  umbrella: '<path d="M520 480V370" stroke="#555" stroke-width="6"/><path d="M450 380q70-80 140 0z" fill="#e63946"/><path d="M475 380q45-70 90 0" fill="#fff"/><path d="M497 380q23-60 46 0" fill="#e63946"/>',
+  boat: '<path d="M660 360h140l-24 32h-92z" fill="#8d5a2b"/><path d="M730 360V270l50 80z" fill="#fff"/><path d="M726 360v-96" stroke="#555" stroke-width="5"/>',
+  crab: '<ellipse cx="860" cy="490" rx="34" ry="20" fill="#e63946"/><circle cx="850" cy="468" r="6" fill="#fff"/><circle cx="870" cy="468" r="6" fill="#fff"/><path d="M826 486q-20-20-6-30M894 486q20-20 6-30M832 500l-18 12M888 500l18 12" stroke="#e63946" stroke-width="6" fill="none"/>',
+  seagulls: '<path d="M420 150q15-15 30 0 15-15 30 0M520 110q12-12 24 0 12-12 24 0" stroke="#fff" stroke-width="5" fill="none"/>',
+  stars: '<g fill="#ffd54a">' + [[200, 110], [260, 70], [330, 140], [150, 170]].map(([x, y]) => `<path d="M${x} ${y - 14}l4 10 11 1-8 7 2 11-9-6-9 6 2-11-8-7 11-1z"/>`).join('') + '</g>',
+  moon: '<circle cx="870" cy="110" r="56" fill="#f3f0d8"/><circle cx="850" cy="96" r="10" fill="#dcd8b8"/><circle cx="890" cy="130" r="14" fill="#dcd8b8"/>',
+  planet: '<circle cx="620" cy="200" r="58" fill="#ff9a3c"/><ellipse cx="620" cy="200" rx="100" ry="20" fill="none" stroke="#ffd6a5" stroke-width="8"/>',
+  rocket: '<path d="M220 420V300q0-60 40-90 40 30 40 90v120z" fill="#fff"/><circle cx="260" cy="300" r="16" fill="#5fb0ff"/><path d="M220 380l-30 50h30zM300 380l30 50h-30z" fill="#e63946"/><path d="M240 420h40l-20 40z" fill="#ff9a3c"/>',
+  astronaut: '<circle cx="460" cy="330" r="38" fill="#fff"/><rect x="438" y="314" width="44" height="26" rx="12" fill="#2a7de1"/><rect x="430" y="362" width="60" height="70" rx="20" fill="#fff"/><path d="M430 380l-24 26M490 380l24 26" stroke="#fff" stroke-width="16" stroke-linecap="round"/>',
+  alien: '<ellipse cx="780" cy="440" rx="44" ry="50" fill="#7ad66b"/><circle cx="780" cy="420" r="18" fill="#fff"/><circle cx="780" cy="420" r="8" fill="#2b2118"/><path d="M762 456q18 14 36 0" stroke="#2b2118" stroke-width="4" fill="none"/><path d="M766 392l-12-30M794 392l12-30" stroke="#7ad66b" stroke-width="6"/><circle cx="754" cy="360" r="7" fill="#ff7eb6"/><circle cx="806" cy="360" r="7" fill="#ff7eb6"/>'
+};
+function worldScene(count, fresh) {
+  const p = C.worldProgress(count), z = C.ZONES[p.zone];
+  const pieces = z.pieces.slice(0, p.placed).map((id, i) => `<g class="${fresh && i === p.placed - 1 ? 'newpiece' : ''}">${WORLD_ART[id]}</g>`).join('');
+  return { p, z, svg: `<svg viewBox="0 0 1000 560" class="worldsvg">${WORLD_BG[z.id]}${pieces}</svg>` };
+}
+function worldTreat() {
+  const before = C.worldProgress(state.world || 0);
+  state = { ...state, world: (state.world || 0) + 1 }; save();
+  let { p, z } = worldScene(state.world, true);
+  // A finished zone shows complete before moving on to the next.
+  const finishedZone = p.placed === 0;
+  const show = finishedZone ? { p: { ...before, placed: C.ZONES[before.zone].pieces.length, score: p.score }, z: C.ZONES[before.zone] } : { p, z };
+  const pieces = show.z.pieces.slice(0, show.p.placed).map((id, i) => `<g class="${i === show.p.placed - 1 ? 'newpiece' : ''}">${WORLD_ART[id]}</g>`).join('');
+  $('treatTitle').textContent = `My world: ${show.z.name}`;
+  $('treatStage').classList.add('world');
+  $('treatStage').innerHTML = `<div class="worldbox"><svg viewBox="0 0 1000 560" class="worldsvg">${WORLD_BG[show.z.id]}${pieces}</svg></div>`
+    + `<div class="worldinfo"><b>${show.z.name}: ${show.p.placed} of ${show.z.pieces.length}</b><span class="score">⭐ Score ${p.score}</span><button class="big" data-nav id="worldDone">Brilliant!</button></div>`;
+  $('worldDone').addEventListener('click', finishTreat);
+  sfx.fanfare();
+  say(finishedZone ? `You finished the ${show.z.name}! ${p.zone === 0 ? 'Your world is complete!' : `Next: the ${C.ZONES[p.zone].name}!`}` : 'A new piece for your world!');
+}
+/** View the world any time from the My friends screen. */
+function showWorld() {
+  const { p, z, svg } = worldScene(state.world || 0, false);
+  return `<div class="worldbox">${svg}</div><div class="worldinfo"><b>${z.name}: ${p.placed} of ${z.pieces.length}</b><span class="score">⭐ Score ${p.score}</span></div>`;
+}
+
 /* ---------- Stickers ---------- */
+$('worldBtn').addEventListener('click', () => {
+  const open = $('worldView').hidden;
+  $('worldView').hidden = !open; $('stickerGrid').hidden = open;
+  $('worldBtn').textContent = open ? 'My friends' : 'My world';
+  if (open) $('worldView').innerHTML = showWorld();
+});
 function renderStickers() {
+  $('worldView').hidden = true; $('stickerGrid').hidden = false; $('worldBtn').textContent = 'My world';
   const owned = new Set(state.friends);
   $('stickerGrid').innerHTML = C.FRIENDS.map((f, i) => owned.has(i)
     ? `<div class="card">${friendSvg(f)}<b>${f.name}</b></div>`
@@ -1816,6 +2194,7 @@ $('homeBtn').addEventListener('click', goHome);
 $('playLeo').addEventListener('click', repeatPrompt);
 $('tvdoneBtn').addEventListener('click', goHome); // kept for older flows
 renderMenu();
+dressHost(); // the host wears what they last chose
 renderJars();
 
 /* ---------- Birthday surprise: 25 November 2026 only ---------- */
