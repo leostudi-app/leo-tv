@@ -54,9 +54,9 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1.6vw,20px);width:100%;max-width:1000px}
-.tile{background:#fff;border-radius:28px;padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(15px,2.1vw,24px);font-weight:800;line-height:1.1}
-.tile svg{width:60%;height:auto;max-height:15vh}
+.games{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,18px);width:100%;max-width:1100px}
+.tile{background:#fff;border-radius:24px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.8vw,22px);font-weight:800;line-height:1.1}
+.tile svg{width:56%;height:auto;max-height:14vh}
 @media (max-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
 .ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
@@ -173,6 +173,15 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .pad svg{width:46%;height:auto}
 .pad.lit{filter:brightness(1.3) saturate(1.2);transform:scale(1.12);box-shadow:0 0 0 8px #fff,0 10px 0 #0003}
 .pad:disabled{opacity:1}
+/* Number order */
+.order{--o:min(12vw,17vh);display:flex;flex-direction:column;align-items:center;gap:clamp(12px,3vh,28px)}
+.oslots,.otray{display:flex;gap:clamp(8px,1.6vw,16px);justify-content:center;flex-wrap:wrap}
+.oslot{width:var(--o);height:var(--o);border-radius:22px;outline:4px dashed #fff;outline-offset:-4px;display:grid;place-items:center;font-size:calc(var(--o) * .6);font-weight:800;color:#fff;background:#ffffff22}
+.oslot.filled{outline:none;animation:pop .4s;text-shadow:0 3px 0 #0003}
+.onum{width:var(--o);height:var(--o);border-radius:50% 50% 46% 46%/55% 55% 45% 45%;font-size:calc(var(--o) * .6);font-weight:800;color:#fff;text-shadow:0 3px 0 #0003;box-shadow:0 8px 0 #0003}
+.onum.wrong{animation:wobble .4s}.onum.hint{animation:glow 1s 3}
+@media (max-width:640px) and (orientation:portrait){.order{--o:min(17vw,12vh)}}
+.ear{width:clamp(90px,16vw,150px)!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -346,7 +355,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
   <form id="settingsView" class="panel" hidden>
     <h2>Grown-ups</h2>
     <label>Rounds per game (prize at the end) <input id="setStars" type="number" min="3" max="10" inputmode="numeric"></label>
-    <label>TV time (minutes) <input id="setMinutes" type="number" min="5" max="30" inputmode="numeric"></label>
+    <label>TV time (minutes) <input id="setMinutes" type="number" min="2" max="30" inputmode="numeric"></label>
     <label>Approved videos (one YouTube link per line)
       <textarea id="setVideos" placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
@@ -580,7 +589,7 @@ const PRAISE = ['Brilliant!', 'Well done, Leo!', 'Amazing!', "You're a superstar
 const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 let round = null, firstTry = true, locked = false, lastType = null, promptText = '';
 let currentGame = null, roundIndex = 0;
-const GAME_ICON = {
+const GAME_ICON_BASE = {
   balloons: '<svg viewBox="0 0 100 120"><ellipse cx="50" cy="46" rx="38" ry="44" fill="#e63946"/><path d="M46 89h8l-4 7z" fill="#e63946"/><path d="M50 96q-8 12 0 22" stroke="#2b2118" stroke-width="3" fill="none"/><text x="50" y="62" font-size="44" font-weight="800" text-anchor="middle" fill="#fff">3</text></svg>',
   goal: THING.ball,
   count: '<svg viewBox="0 0 120 120"><path d="M20 70l30-50M100 70 70 20" stroke="#7a3b16" stroke-width="6" stroke-linecap="round"/><ellipse cx="60" cy="58" rx="46" ry="14" fill="#fff" stroke="#0002" stroke-width="2"/><path d="M14 58v34c0 8 20 16 46 16s46-8 46-16V58c0 8-20 14-46 14S14 66 14 58z" fill="#e63946"/><path d="M14 66l15 34 15-30 16 32 16-32 15 30 15-34" fill="none" stroke="#fff" stroke-width="4"/></svg>',
@@ -588,9 +597,23 @@ const GAME_ICON = {
   puzzle: '<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="8" fill="#0001" stroke="#2a7de1" stroke-width="5" stroke-dasharray="10 7"/><circle cx="50" cy="50" r="24" fill="#ffc93c" stroke="#0002" stroke-width="2"/></svg>',
   jigsaw: '<svg viewBox="0 0 100 100"><path d="M12 22h22a9 9 0 1 1 18 0h22v22a9 9 0 1 0 0 18v22H52a9 9 0 1 0-18 0H12V62a9 9 0 1 1 0-18z" fill="#2fbf71" stroke="#0002" stroke-width="3"/></svg>',
   penalty: `<svg viewBox="0 0 120 100"><path d="M8 70V12h104v58" fill="#ffffff22" stroke="#2b2118" stroke-width="5" stroke-linejoin="round"/><path d="M24 12v58M40 12v58M56 12v58M72 12v58M88 12v58M104 12v58M8 26h104M8 40h104M8 54h104" stroke="#0003" stroke-width="1.5"/><g transform="translate(86 76)"><circle r="16" fill="#fff" stroke="#2b2118" stroke-width="3"/><polygon points="0,-6 6,-2 4,5 -4,5 -6,-2" fill="#2b2118"/></g></svg>`,
-  tune: '<svg viewBox="0 0 100 100"><circle cx="28" cy="30" r="18" fill="#e63946"/><circle cx="72" cy="30" r="18" fill="#2a7de1"/><circle cx="28" cy="72" r="18" fill="#ffc93c"/><circle cx="72" cy="72" r="18" fill="#2fbf71"/></svg>'
+  tune: '<svg viewBox="0 0 100 100"><circle cx="28" cy="30" r="18" fill="#e63946"/><circle cx="72" cy="30" r="18" fill="#2a7de1"/><circle cx="28" cy="72" r="18" fill="#ffc93c"/><circle cx="72" cy="72" r="18" fill="#2fbf71"/></svg>',
+  order: '<svg viewBox="0 0 120 70"><g font-size="40" font-weight="800" text-anchor="middle" fill="#fff"><circle cx="20" cy="35" r="18" fill="#e63946"/><text x="20" y="49">1</text><circle cx="60" cy="35" r="18" fill="#2fbf71"/><text x="60" y="49">2</text><circle cx="100" cy="35" r="18" fill="#2a7de1"/><text x="100" y="49">3</text></g></svg>'
 };
 const BALLOON_COLOURS = ['#e63946', '#ff9a3c', '#2fbf71', '#8a5cf6', '#ff5fa2'];
+const ANIMAL_ART = {
+  dog: '<svg viewBox="0 0 100 100"><ellipse cx="18" cy="46" rx="13" ry="26" fill="#7a4a24"/><ellipse cx="82" cy="46" rx="13" ry="26" fill="#7a4a24"/><circle cx="50" cy="50" r="34" fill="#c98a4b"/><ellipse cx="50" cy="66" rx="20" ry="15" fill="#f3dcc0"/><ellipse cx="50" cy="58" rx="8" ry="6" fill="#2b2118"/><circle cx="38" cy="42" r="5" fill="#2b2118"/><circle cx="62" cy="42" r="5" fill="#2b2118"/><path d="M42 72q8 6 16 0" fill="none" stroke="#2b2118" stroke-width="3" stroke-linecap="round"/><path d="M48 74q2 10 8 6" fill="#ff7e9a"/></svg>',
+  cat: '<svg viewBox="0 0 100 100"><path d="M18 46 22 10l26 20zM82 46 78 10 52 30z" fill="#9aa0aa"/><path d="M24 36 26 20l12 10zM76 36 74 20 62 30z" fill="#ffb3c6"/><circle cx="50" cy="54" r="34" fill="#9aa0aa"/><ellipse cx="37" cy="48" rx="6" ry="8" fill="#7bd36b"/><ellipse cx="63" cy="48" rx="6" ry="8" fill="#7bd36b"/><ellipse cx="37" cy="48" rx="2" ry="7" fill="#2b2118"/><ellipse cx="63" cy="48" rx="2" ry="7" fill="#2b2118"/><path d="M45 62h10l-5 6z" fill="#ff7e9a"/><path d="M50 68q-6 6-10 2M50 68q6 6 10 2" fill="none" stroke="#2b2118" stroke-width="2.5" stroke-linecap="round"/><path d="M12 60h22M12 68l22-4M88 60H66M88 68l-22-4" stroke="#fff" stroke-width="2"/></svg>',
+  pig: '<svg viewBox="0 0 100 100"><path d="M20 34 24 12l18 14zM80 34 76 12 58 26z" fill="#f48fb1"/><circle cx="50" cy="52" r="36" fill="#f8bbd0"/><ellipse cx="50" cy="62" rx="17" ry="12" fill="#f48fb1"/><ellipse cx="44" cy="62" rx="3.5" ry="5" fill="#c2185b"/><ellipse cx="56" cy="62" rx="3.5" ry="5" fill="#c2185b"/><circle cx="36" cy="42" r="5" fill="#2b2118"/><circle cx="64" cy="42" r="5" fill="#2b2118"/><path d="M42 80q8 4 16 0" fill="none" stroke="#c2185b" stroke-width="3" stroke-linecap="round"/></svg>',
+  cow: '<svg viewBox="0 0 100 100"><path d="M24 26q-10-14-4-20 4 10 12 14zM76 26q10-14 4-20-4 10-12 14z" fill="#e8dcc0"/><ellipse cx="14" cy="40" rx="12" ry="7" fill="#fff" stroke="#2b2118" stroke-width="2"/><ellipse cx="86" cy="40" rx="12" ry="7" fill="#fff" stroke="#2b2118" stroke-width="2"/><ellipse cx="50" cy="48" rx="32" ry="34" fill="#fff" stroke="#2b2118" stroke-width="2"/><path d="M26 30q10-6 16 4t-6 16q-12-2-10-20z" fill="#2b2118"/><path d="M70 50q10-4 10 8-6 6-12 0z" fill="#2b2118"/><ellipse cx="50" cy="70" rx="24" ry="15" fill="#f8bbd0"/><ellipse cx="42" cy="70" rx="4" ry="5" fill="#c2185b"/><ellipse cx="58" cy="70" rx="4" ry="5" fill="#c2185b"/><circle cx="38" cy="44" r="5" fill="#2b2118"/><circle cx="62" cy="44" r="5" fill="#fff"/><circle cx="62" cy="44" r="5" fill="#2b2118"/></svg>',
+  sheep: '<svg viewBox="0 0 100 100"><g fill="#f5f5f5" stroke="#ddd" stroke-width="2"><circle cx="30" cy="30" r="16"/><circle cx="50" cy="22" r="16"/><circle cx="70" cy="30" r="16"/><circle cx="22" cy="52" r="16"/><circle cx="78" cy="52" r="16"/><circle cx="32" cy="74" r="16"/><circle cx="68" cy="74" r="16"/><circle cx="50" cy="80" r="16"/></g><ellipse cx="18" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="82" cy="48" rx="10" ry="6" fill="#5d5d66"/><ellipse cx="50" cy="54" rx="22" ry="27" fill="#5d5d66"/><circle cx="41" cy="48" r="5" fill="#fff"/><circle cx="59" cy="48" r="5" fill="#fff"/><circle cx="42" cy="49" r="2.5" fill="#2b2118"/><circle cx="60" cy="49" r="2.5" fill="#2b2118"/><path d="M44 68q6 5 12 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
+  duck: '<svg viewBox="0 0 100 100"><path d="M50 6q4 8-2 12" fill="none" stroke="#f9a825" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="48" r="36" fill="#ffeb3b"/><circle cx="36" cy="40" r="6" fill="#2b2118"/><circle cx="64" cy="40" r="6" fill="#2b2118"/><circle cx="38" cy="38" r="2" fill="#fff"/><circle cx="66" cy="38" r="2" fill="#fff"/><ellipse cx="50" cy="62" rx="22" ry="9" fill="#ff9800"/><ellipse cx="50" cy="68" rx="18" ry="7" fill="#f57c00"/></svg>',
+  frog: '<svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="15" fill="#4caf50"/><circle cx="70" cy="30" r="15" fill="#4caf50"/><ellipse cx="50" cy="60" rx="40" ry="30" fill="#4caf50"/><circle cx="30" cy="28" r="9" fill="#fff"/><circle cx="70" cy="28" r="9" fill="#fff"/><circle cx="31" cy="29" r="5" fill="#2b2118"/><circle cx="71" cy="29" r="5" fill="#2b2118"/><path d="M22 62q28 22 56 0" fill="none" stroke="#1b5e20" stroke-width="4" stroke-linecap="round"/><circle cx="26" cy="54" r="5" fill="#ff8a80" opacity=".6"/><circle cx="74" cy="54" r="5" fill="#ff8a80" opacity=".6"/></svg>',
+  lion: '<svg viewBox="0 0 200 230"><use href="#leo"/></svg>'
+};
+const EAR = '<svg class="ear" viewBox="0 0 100 100"><path d="M20 38h16l22-18v60L36 62H20z" fill="#fff"/><path d="M68 34q10 16 0 32M78 24q18 26 0 52" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';
+const GAME_ICON = { ...GAME_ICON_BASE, animals: ANIMAL_ART.cow };
+
 
 function renderMenu() {
   $('gameTiles').innerHTML = C.GAMES.map((g) => `<button class="tile" data-nav data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
@@ -602,7 +625,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -610,6 +633,7 @@ async function newRound() {
   if (currentGame === 'jigsaw') return startJigsaw();
   if (currentGame === 'penalty') return penaltyRound();
   if (currentGame === 'tune') return tuneRound();
+  if (currentGame === 'order') return orderGameRound();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -628,6 +652,8 @@ function promptFor(r) {
     case 'jigsaw': return `Let's make a picture of ${C.PUZZLES[r.pic].name}! Pick a piece, then find where it goes.`;
     case 'penalty': return 'Penalty time! Pick where to shoot!';
     case 'simon': return 'Listen to my tune, then copy me!';
+    case 'animal': return `Listen! ${r.sound} Which animal says that?`;
+    case 'order': return `Put the numbers in order! Start with number ${r.numbers[0]}.`;
   }
 }
 
@@ -637,12 +663,15 @@ function renderRound() {
   if (r.type === 'countIt') showHtml = Array.from({ length: r.target }, () => THING[r.thing]).join('');
   if (r.type === 'drumCount') showHtml = DRUM + '<button class="again" id="againBtn" data-nav>Play again</button>';
   if (r.type === 'shapeFit') showHtml = `<div class="hole">${shapeSvg(r.target, 'hole')}</div>`;
+  if (r.type === 'animal') showHtml = EAR + '<button class="again" id="againBtn" data-nav>Hear it again</button>';
   if (r.skill === 'numbers') {
     answers = r.options.map((n) => r.type === 'goal'
       ? `<button class="ans goal" data-nav data-v="${n}"><span>${n}</span>${GOAL}</button>`
       : r.type === 'findNumber'
         ? `<button class="ans balloon" data-nav data-v="${n}" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</button>`
         : `<button class="ans" data-nav data-v="${n}">${n}</button>`).join('');
+  } else if (r.type === 'animal') {
+    answers = r.options.map((a) => `<button class="ans" data-nav data-v="${a}" aria-label="${a}">${ANIMAL_ART[a]}</button>`).join('');
   } else {
     // Same colour for every option in "fits" rounds so he matches by shape, not colour.
     answers = r.options.map((s) => `<button class="ans" data-nav data-v="${s}">${shapeSvg(s, 'fill', r.type === 'shapeFit' ? '#ffc93c' : undefined)}</button>`).join('');
@@ -650,7 +679,7 @@ function renderRound() {
   const pitch = r.type === 'goal' ? `<div class="pitch"><div class="answers">${answers}</div><div id="ball">${THING.ball}</div></div>` : `<div class="answers">${answers}</div>`;
   $('task').innerHTML = `<div class="show">${showHtml}</div>${pitch}`;
   $('task').querySelectorAll('.ans').forEach((b) => b.addEventListener('click', () => answer(b)));
-  const again = $('againBtn'); if (again) again.addEventListener('click', playDrum);
+  const again = $('againBtn'); if (again) again.addEventListener('click', r.type === 'animal' ? repeatPrompt : playDrum);
   if (usingPad) $('task').querySelector('.ans')?.focus();
 }
 
@@ -695,6 +724,7 @@ async function answer(btn) {
   if (round.type === 'countIt' || round.type === 'drumCount') praise = `${Array.from({ length: round.target }, (_, i) => i + 1).join(', ')}. ${NUM_WORD[round.target]}! ${praise}`;
   if (round.type === 'goal') praise = `Goal! Number ${round.target}! ${praise}`;
   if (round.type === 'shapeFit') praise = `Yes! The ${round.target} fits! ${praise}`;
+  if (round.type === 'animal') praise = `Yes! The ${round.target} says ${round.sound} ${praise}`;
   await say(praise);
   if (res.rewardReady) startReward(); else newRound();
 }
@@ -856,8 +886,45 @@ async function tapPad(i) {
   if (res === 'done') { locked = true; await wait(350); confetti(); await funWin(`You copied my tune! ${rand(PRAISE)}`); }
 }
 
+/* ---------- Number order: tap the numbers smallest first ---------- */
+let ord = null;
+function orderGameRound() {
+  const r = C.orderRound(roundIndex, state);
+  ord = { ...r, placed: [], misses: 0 };
+  round = { type: 'order', numbers: r.numbers }; locked = false; firstTry = true;
+  renderOrder();
+  repeatPrompt();
+}
+function renderOrder() {
+  const slots = ord.numbers.map((n, i) => i < ord.placed.length
+    ? `<div class="oslot filled" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</div>`
+    : '<div class="oslot"></div>').join('');
+  const tray = ord.shuffled.filter((n) => !ord.placed.includes(n))
+    .map((n) => `<button class="onum" data-nav data-n="${n}" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</button>`).join('');
+  $('task').innerHTML = `<div class="order"><div class="oslots">${slots}</div><div class="otray">${tray}</div></div>`;
+  $('task').querySelectorAll('.onum').forEach((b) => b.addEventListener('click', () => tapNumber(Number(b.dataset.n), b)));
+  if (usingPad) $('task').querySelector('.onum')?.focus();
+}
+async function tapNumber(n, btn) {
+  if (locked) return;
+  const want = C.nextInOrder(ord.numbers, ord.placed);
+  if (n !== want) {
+    sfx.nearly(); ord.misses++; firstTry = false;
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+    if (ord.misses >= 2) { $('task').querySelector(`.onum[data-n="${want}"]`)?.classList.add('hint'); say(`Look for number ${want}!`); }
+    else say(ord.placed.length ? `That's ${n}. What comes after ${ord.placed[ord.placed.length - 1]}?` : `That's ${n}. Find number ${want} first!`);
+    return;
+  }
+  ord.placed.push(n); ord.misses = 0; firstTry = true;
+  tone(440 + ord.placed.length * 110, 0, 0.2, 'triangle', 0.25);
+  renderOrder();
+  if (C.nextInOrder(ord.numbers, ord.placed) !== null) { say(NUM_WORD[n] || String(n)); return; }
+  locked = true; confetti();
+  await funWin(`${ord.numbers.join(', ')}! ${rand(PRAISE)}`);
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';
@@ -1011,7 +1078,7 @@ $('setVideos').addEventListener('input', updateVideoCount);
 $('settingsView').addEventListener('submit', (e) => {
   e.preventDefault();
   state.settings.starsPerReward = C.clampInt($('setStars').value, 3, 10, 5);
-  state.settings.tvMinutes = C.clampInt($('setMinutes').value, 5, 30, 10);
+  state.settings.tvMinutes = C.clampInt($('setMinutes').value, 2, 30, 4);
   state.settings.videoIds = C.parseVideoList($('setVideos').value);
   state.nextVideo = 0;
   save(); goHome();

@@ -14,7 +14,7 @@
   const EXTRA_SHAPES = ['heart', 'rectangle', 'diamond', 'oval'];
   const ROUND_TYPES = ['findNumber', 'countIt', 'findShape', 'shapeFit', 'drumCount', 'goal'];
 
-  // The five games on the menu; each cycles through its round types.
+  // The games on the menu; each cycles through its round types.
   const GAMES = [
     { id: 'balloons', name: 'Number Balloons', types: ['findNumber'] },
     { id: 'goal', name: 'Score a Goal', types: ['goal'] },
@@ -23,8 +23,17 @@
     { id: 'puzzle', name: 'Shape Puzzle', types: ['shapeFit'] },
     { id: 'jigsaw', name: 'Jigsaw', types: ['jigsaw'] }, // one 10-piece picture per game
     { id: 'penalty', name: 'Penalty Shootout', types: ['penalty'] }, // just for fun
-    { id: 'tune', name: 'Copy My Tune', types: ['simon'] } // memory + music
+    { id: 'tune', name: 'Copy My Tune', types: ['simon'] }, // memory + music
+    { id: 'animals', name: 'Animal Sounds', types: ['animal'] },
+    { id: 'order', name: 'Number Order', types: ['order'] }
   ];
+
+  // LEO makes each noise himself; art for every animal lives in index.html.
+  const ANIMALS = {
+    dog: 'Woof! Woof!', cat: 'Meow!', pig: 'Oink! Oink!', cow: 'Moooo!',
+    sheep: 'Baa! Baa!', duck: 'Quack! Quack!', frog: 'Ribbit! Ribbit!', lion: 'Roar!'
+  };
+  const ORDER_LENGTHS = [3, 3, 4, 4, 5];
 
   const SIMON_PADS = 4;
   const SIMON_LENGTHS = [2, 2, 3, 3, 4]; // grows gently across a game
@@ -68,8 +77,8 @@
       friends: [], // indexes into FRIENDS
       nextVideo: 0,
       nextPuzzle: 0,
-      stats: { numbers: {}, shapes: {} }, // item -> { right, tries }
-      history: { numbers: [], shapes: [] } // rolling first-try results (true/false)
+      stats: { numbers: {}, shapes: {}, animals: {} }, // item -> { right, tries }
+      history: { numbers: [], shapes: [], animals: [] } // rolling first-try results (true/false)
     };
   }
 
@@ -222,6 +231,11 @@
         const target = pickWeighted(pool, state.stats.shapes, rng);
         return { type, skill: 'shapes', target, options: makeOptions(target, pool, 3, rng) };
       }
+      case 'animal': {
+        const pool = Object.keys(ANIMALS);
+        const target = pickWeighted(pool, state.stats.animals || {}, rng);
+        return { type, skill: 'animals', target, sound: ANIMALS[target], options: makeOptions(target, pool, 3, rng) };
+      }
       default:
         throw new Error(`Unknown round type: ${type}`);
     }
@@ -301,6 +315,25 @@
     return others[Math.floor(rng() * others.length) % others.length];
   }
 
+  /**
+   * Number Order round: consecutive numbers to put smallest-first, shown shuffled.
+   * Starts at 1 until numbers are mastered, then can start anywhere up to 10.
+   */
+  function orderRound(roundIndex, state, rng = Math.random) {
+    const len = ORDER_LENGTHS[Math.min(Math.max(roundIndex, 0), ORDER_LENGTHS.length - 1)];
+    const top = numberMax(state);
+    const start = top > 5 ? 1 + Math.floor(rng() * (top - len + 1)) : 1;
+    const numbers = range(start, start + len - 1);
+    let shuffled = shuffle(numbers, rng);
+    if (shuffled.every((v, i) => v === numbers[i])) shuffled = numbers.slice(1).concat(numbers[0]);
+    return { numbers, shuffled };
+  }
+
+  /** The number that should be tapped next, or null when the row is complete. */
+  function nextInOrder(numbers, placed) {
+    return placed.length < numbers.length ? numbers[placed.length] : null;
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -340,6 +373,7 @@
     extractYouTubeId, parseVideoList, clampInt, accuracy, isMastered, numberMax, shapePool,
     recordAnswer, pickWeighted, makeOptions, makeRound, nextRoundType,
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
+    ANIMALS, orderRound, nextInOrder,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
     addStar, claimReward, takeNextVideo, isValidPin, checkPin
   };
