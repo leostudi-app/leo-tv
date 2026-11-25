@@ -776,7 +776,7 @@ function promptFor(r) {
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
-    case 'race': return roundIndex === 0 ? 'Race day! Jump over the cones and win the race!' : 'Another race! Jump over the cones!';
+    case 'race': return r.retry ? 'Try again! Jump over the cones!' : roundIndex === 0 ? 'Race day! Jump over the cones and win the race!' : 'Another race! Jump over the cones!';
     case 'fire': return roundIndex === 0 ? 'Nee naw! Fire! Drive to the fire and spray the water!' : 'Fire! Fire! Put it out!';
     case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
   }
@@ -1390,11 +1390,11 @@ function raceScene(r) {
   </svg>`;
 }
 GAME_ICON.race = `<svg viewBox="-6 -40 190 112"><g transform="translate(0 -10)">${raceCar('#e63946', 4, LEO_DRIVER)}</g></svg>`;
-let race = null;
+let race = null, raceRetry = false;
 async function raceRoundStart() {
   const plan = C.raceRoundPlan(roundIndex);
   const r = { plan, cones: C.raceObstacles(plan.cones), hit: new Set(), leo: 0, rivals: [0, 0], jumpT: -1, slowUntil: 0, running: false, done: false, last: 0 };
-  race = r; round = { type: 'race' }; locked = false;
+  race = r; round = { type: 'race', retry: raceRetry }; raceRetry = false; locked = false;
   const task = $('task');
   task.classList.add('racetask');
   task.innerHTML = `<div class="rscene">${raceScene(r)}<button class="rjump" id="rjump" data-nav aria-label="Jump"></button></div>`;
@@ -1425,14 +1425,13 @@ function raceTick(r, now) {
   const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
   const slow = now < r.slowUntil ? 0.45 : 1;
   r.leo += LEO_SPEED * r.plan.speed * slow * dt;
-  // Rivals keep it close but LEO always gets to win: they ease off if they get ahead, and never pass him near the end.
+  // Rivals stay close. Each cone LEO hits lets them get further: 2 hits and blue beats him, 3 and green does too.
+  const hits = r.hit.size;
   r.rivals = r.rivals.map((x, i) => {
-    const base = LEO_SPEED * r.plan.speed * (0.9 - i * 0.05);
-    const ahead = x - r.leo;
-    let v = base * (ahead > 120 ? 0.6 : ahead < -350 ? 1.25 : 1);
-    let nx = x + v * dt;
-    if (nx > C.RACE_LENGTH - 260) nx = Math.min(nx, r.leo - 50 - i * 40);
-    return nx;
+    const beats = hits >= 2 + i;
+    const want = r.leo + (beats ? 150 - i * 40 : -(70 + i * 50));
+    const v = LEO_SPEED * r.plan.speed * (1 + Math.max(-0.45, Math.min(0.45, (want - x) / 400)));
+    return x + v * dt;
   });
   if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) r.jumpT = -1; }
   const air = r.jumpT >= 0 ? Math.sin((r.jumpT / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0;
@@ -1466,15 +1465,26 @@ function raceDraw(r) {
 }
 async function raceFinish(r) {
   r.done = true; r.running = false; locked = true;
-  $('rsCount').textContent = '1st!';
-  confetti(); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.1, 0.3));
-  await wait(400);
-  if (race !== r) return;
-  await funWin('You won the race!');
+  const place = 1 + r.rivals.filter((x) => x >= r.leo).length;
+  $('rsCount').textContent = ['1st!', '2nd', '3rd'][place - 1];
+  if (place === 1) {
+    confetti(); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.1, 0.3));
+    await wait(400);
+    if (race !== r) return;
+    await funWin('You won the race!');
+    return;
+  }
+  // Not a win: no star, same race again.
+  sfx.nearly();
+  await say(place === 2 ? 'Ooh, you came second! So close! Let\'s race again!' : 'Ooh, you came third! Jump over the cones! Let\'s race again!');
+  await wait(1200);
+  if (race !== r || current !== 'play') return;
+  raceRetry = true;
+  newRound();
 }
 
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ race: race ? { leo: Math.round(race.leo), rivals: race.rivals.map(Math.round), cones: race.cones, hits: race.hit.size, running: race.running, air: race.jumpT >= 0, done: race.done } : null, fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ race: race ? { place: race.done ? 1 + race.rivals.filter((x) => x >= race.leo).length : null, leo: Math.round(race.leo), rivals: race.rivals.map(Math.round), cones: race.cones, hits: race.hit.size, running: race.running, air: race.jumpT >= 0, done: race.done } : null, fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';
