@@ -408,7 +408,7 @@ let current = 'start';
 function show(id) {
   document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id));
   current = id;
-  const first = $(id).querySelector('[data-nav]:not([disabled])');
+  const first = $(id).querySelector('[data-start]') || $(id).querySelector('[data-nav]:not([disabled])');
   if (first && usingPad) first.focus();
 }
 let usingPad = false;
@@ -421,7 +421,7 @@ function moveFocus(dir) {
   const items = navItems();
   if (!items.length) return;
   const cur = items.includes(document.activeElement) ? document.activeElement : null;
-  if (!cur) { items[0].focus(); return; }
+  if (!cur) { ($(current).querySelector('[data-start]') || items[0]).focus(); return; }
   const a = cur.getBoundingClientRect();
   const ax = a.left + a.width / 2, ay = a.top + a.height / 2;
   let best = null, bestScore = Infinity;
@@ -692,7 +692,7 @@ const GAME_ICON = { ...GAME_ICON_BASE, animals: ANIMAL_ART.cow };
 
 
 function renderMenu() {
-  $('gameTiles').innerHTML = C.GAMES.map((g) => `<button class="tile" data-nav data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
+  $('gameTiles').innerHTML = C.GAMES.map((g, i) => `<button class="tile" data-nav${i === 0 ? ' data-start' : ''} data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
   $('gameTiles').querySelectorAll('.tile').forEach((t) => {
     const g = C.GAMES.find((x) => x.id === t.dataset.game);
     t.addEventListener('click', () => startGame(g.id));
