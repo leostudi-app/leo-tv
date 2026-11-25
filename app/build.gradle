@@ -7,11 +7,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId 'app.leostudi.arthurtv'
+        applicationId 'app.leostudi.olivertv'
         minSdk 22          // Fire OS 5 and newer
         targetSdk 34
-        versionCode 4
-        versionName '1.3'
+        versionCode 1
+        versionName '1.0'
     }
 
     // One fixed key so new builds install over old ones without uninstalling.

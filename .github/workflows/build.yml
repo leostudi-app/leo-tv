@@ -1,8 +1,8 @@
-name: Build ARTHUR TV app
+name: Build OLIVER TV app
 
 on:
   push:
-    branches: ['arthur-tv']
+    branches: ['oliver-tv']
   workflow_dispatch:
 
 permissions:
@@ -37,7 +37,7 @@ jobs:
           mkdir -p /tmp/out
           cp build.log /tmp/out/build.log || echo "no log" > /tmp/out/build.log
           echo "${{ steps.build.outcome }} ${GITHUB_SHA::7} $(date -u +%FT%TZ)" > /tmp/out/status.txt
-          if [ -f app/build/outputs/apk/release/app-release.apk ]; then cp app/build/outputs/apk/release/app-release.apk /tmp/out/arthur-tv.apk; fi
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then cp app/build/outputs/apk/release/app-release.apk /tmp/out/oliver-tv.apk; fi
           git config user.name "leo-build"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout --orphan builds-tmp
@@ -46,15 +46,15 @@ jobs:
           cp /tmp/out/* .
           git add -A
           git commit -m "Build ${GITHUB_SHA::7}: ${{ steps.build.outcome }}"
-          git push -f origin HEAD:builds-arthur
+          git push -f origin HEAD:builds-oliver
 
       - name: Publish release
         if: steps.build.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete arthur-latest --yes --cleanup-tag || true
-          gh release create arthur-latest /tmp/out/arthur-tv.apk --title "ARTHUR TV (latest)" --notes "Built from ${GITHUB_SHA::7}" --target "$GITHUB_SHA"
+          gh release delete oliver-latest --yes --cleanup-tag || true
+          gh release create oliver-latest /tmp/out/oliver-tv.apk --title "OLIVER TV (latest)" --notes "Built from ${GITHUB_SHA::7}" --target "$GITHUB_SHA"
 
       - name: Fail if build failed
         if: steps.build.outcome != 'success'
