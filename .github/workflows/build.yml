@@ -42,6 +42,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout --orphan builds-tmp
           git rm -rf . -q
+          git clean -fdxq
           cp /tmp/out/* .
           git add -A
           git commit -m "Build ${GITHUB_SHA::7}: ${{ steps.build.outcome }}"
