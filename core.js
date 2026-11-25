@@ -449,14 +449,15 @@
 
   // Race Day: one-button racing. Jump the cones in ARTHUR's lane; races get longer and busier.
   const RACE_LENGTH = 4200; // track units from start line to finish
-  const RACE_ROUNDS = [{ cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }, { cones: 6, speed: 1.15 }, { cones: 7, speed: 1.2 }];
+  // Cones stay well apart (a full jump plus time to get ready) so it's fair with a TV remote's small delay.
+  const RACE_ROUNDS = [{ cones: 3, speed: 1 }, { cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }];
 
   function raceRoundPlan(roundIndex) {
     return RACE_ROUNDS[Math.min(Math.max(0, roundIndex), RACE_ROUNDS.length - 1)];
   }
 
   /** Cone positions along the track: sorted, clear of the start and finish, and at least `gap` apart. */
-  function raceObstacles(count, length = RACE_LENGTH, rng = Math.random, gap = 420) {
+  function raceObstacles(count, length = RACE_LENGTH, rng = Math.random, gap = 750) {
     const first = 800, last = length - 350;
     const slack = Math.max(0, (last - first) - gap * (count - 1));
     const offsets = Array.from({ length: count }, () => rng() * slack).sort((a, b) => a - b);

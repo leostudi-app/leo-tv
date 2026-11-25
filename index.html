@@ -1419,10 +1419,10 @@ function raceJump() {
   const r = race;
   if (!r || r.done) return;
   if (!r.running) { repeatPrompt(); return; }
-  if (r.jumpT >= 0) return; // already in the air
+  if (r.jumpT >= 0) { if (r.jumpT > JUMP_TIME - 0.35) r.queued = true; return; } // pressed just before landing: jump again on landing
   r.jumpT = 0; tone(520, 0, 0.15, 'triangle', 0.2); tone(780, 0.08, 0.15, 'triangle', 0.2);
 }
-const JUMP_TIME = 1.0, JUMP_HEIGHT = 130, LEO_SPEED = 430;
+const JUMP_TIME = 1.1, JUMP_HEIGHT = 135, LEO_SPEED = 430;
 function raceTick(r, now) {
   if (race !== r || current !== 'play' || r.done) return;
   const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
@@ -1436,7 +1436,7 @@ function raceTick(r, now) {
     const v = LEO_SPEED * r.plan.speed * (1 + Math.max(-0.45, Math.min(0.45, (want - x) / 400)));
     return x + v * dt;
   });
-  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) r.jumpT = -1; }
+  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) { r.jumpT = r.queued ? 0 : -1; r.queued = false; } }
   const air = r.jumpT >= 0 ? Math.sin((r.jumpT / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0;
   // A cone is hit if it passes under the car while the wheels are near the ground.
   r.cones.forEach((x, i) => {

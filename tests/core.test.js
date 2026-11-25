@@ -298,7 +298,7 @@ test('race day: cones sit between start and finish, well spaced, and races get b
     const plan = C.raceRoundPlan(r), cones = C.raceObstacles(plan.cones);
     assert.equal(cones.length, plan.cones);
     assert.ok(cones[0] >= 800 && cones[cones.length - 1] <= C.RACE_LENGTH - 350);
-    for (let i = 1; i < cones.length; i++) assert.ok(cones[i] - cones[i - 1] >= 420);
+    for (let i = 1; i < cones.length; i++) assert.ok(cones[i] - cones[i - 1] >= 750);
   }
   assert.ok(C.raceRoundPlan(4).cones > C.raceRoundPlan(0).cones);
 });
