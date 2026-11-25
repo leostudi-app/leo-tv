@@ -306,7 +306,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 
 <section id="home" class="screen" aria-label="Home">
   <div class="top"><div class="jar" id="homeJar"></div><span class="spacer"></span>
-    <button class="icon gear" id="gear" aria-label="Grown-ups (hold)"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L15 3.5h-4L10.6 6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg></button></div>
+    <button class="icon gear" id="gear" data-nav aria-label="Grown-ups (hold)"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L15 3.5h-4L10.6 6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg></button></div>
   <div class="menu-head"><svg class="leo-mini wave" aria-hidden="true"><use href="#leo"/></svg><h2>Pick a game!</h2></div>
   <div class="games" id="gameTiles"></div>
   <button class="big blue" id="stickerBtn" data-nav>My friends</button>
@@ -351,20 +351,23 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
     <p class="note" id="pinHint">Enter your 4-digit PIN.</p>
     <div class="dots" id="pinDots"></div>
     <div class="pin" id="pinPad"></div>
-    <button class="big blue" id="pinBack">Back</button>
+    <button class="big blue" id="pinBack" data-nav>Back</button>
   </div>
   <form id="settingsView" class="panel" hidden>
     <h2>Grown-ups</h2>
-    <label>Rounds per game (prize at the end) <input id="setStars" type="number" min="3" max="10" inputmode="numeric"></label>
+    <label>Rounds per game (prize at the end) <input id="setStars" data-nav type="number" min="3" max="10" inputmode="numeric"></label>
     <label>Prize videos, one YouTube link per line (video 1 plays after game 1, and so on)
-      <textarea id="setVideos" placeholder="https://www.youtube.com/watch?v=..."></textarea>
+      <textarea id="setVideos" data-nav placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
     <p class="note">Tip: lock the device to LEO with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
     <div><h3>Numbers</h3><div class="bars" id="numBars"></div></div>
     <div><h3>Shapes</h3><div class="bars" id="shapeBars"></div></div>
     <p class="note" id="levelNote"></p>
-    <div class="row"><button class="big" type="submit">Save</button><button class="big blue" type="button" id="setBack">Back</button></div>
-    <div class="row"><button type="button" class="note" id="resetBtn">Reset progress</button><button type="button" class="note" id="pinChange">Change PIN</button></div>
+    <p class="note" id="voiceNote"></p>
+    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test LEO's voice</button></div>
+    <p class="note">Settings and videos are saved on this device only, so set them on each phone, tablet or TV.</p>
+    <div class="row"><button class="big" type="submit" data-nav>Save</button><button class="big blue" type="button" id="setBack" data-nav>Back</button></div>
+    <div class="row"><button type="button" class="note" id="resetBtn" data-nav>Reset progress</button><button type="button" class="note" id="pinChange" data-nav>Change PIN</button></div>
   </form>
 </section>
 
@@ -421,7 +424,7 @@ function moveFocus(dir) {
 function activate() { const el = document.activeElement; if (el && el.matches('[data-nav]')) el.click(); }
 
 document.addEventListener('keydown', (e) => {
-  if (current === 'parent' && e.target.matches('input,textarea')) return;
+  if (current === 'parent' && e.target.matches('textarea') && e.key !== 'Escape') return; // let grown-ups type links
   const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
   if (map[e.key]) { e.preventDefault(); moveFocus(map[e.key]); }
   else if (e.key === 'Enter' || e.key === ' ') { if (!document.activeElement.matches('[data-nav]')) { e.preventDefault(); moveFocus('right'); } }
@@ -1060,7 +1063,7 @@ function openParent() {
 }
 function drawPin() {
   $('pinDots').textContent = '●'.repeat(pinEntry.length) + '○'.repeat(4 - pinEntry.length);
-  $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map((k) => k === '' ? '<span></span>' : `<button type="button" data-k="${k}">${k}</button>`).join('');
+  $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map((k) => k === '' ? '<span></span>' : `<button type="button" data-nav data-k="${k}">${k}</button>`).join('');
 }
 $('pinPad').addEventListener('click', (e) => {
   const k = e.target.closest('button')?.dataset.k; if (k === undefined) return;
@@ -1085,11 +1088,20 @@ function openSettings() {
   $('pinView').hidden = true; $('settingsView').hidden = false;
   $('setStars').value = state.settings.starsPerReward;
   $('setVideos').value = state.settings.videoIds.map((id) => `https://www.youtube.com/watch?v=${id}`).join('\n');
-  updateVideoCount();
+  updateVideoCount(); updateVoiceNote();
   $('numBars').innerHTML = bars([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], state.stats.numbers, (n) => `Number ${n}`);
   $('shapeBars').innerHTML = bars(C.BASIC_SHAPES.concat(C.EXTRA_SHAPES), state.stats.shapes, (s) => s[0].toUpperCase() + s.slice(1));
   $('levelNote').textContent = `Now practising numbers 1–${C.numberMax(state)} and ${C.shapePool(state).length} shapes. Friends found: ${state.friends.length} of ${C.FRIENDS.length}. Percentages show first-try answers.`;
 }
+function updateVoiceNote() {
+  let msg;
+  try {
+    if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
+    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the LEO app on TV)';
+  } catch (e) { msg = 'Voice: unknown'; console.warn('[LEO] voice status', e); }
+  $('voiceNote').textContent = msg;
+}
+$('voiceTest').addEventListener('click', () => { say('Hello Leo! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
 function updateVideoCount() {
   const n = C.parseVideoList($('setVideos').value).length;
   $('videoCount').textContent = n
@@ -1121,6 +1133,8 @@ $('pinChange').addEventListener('click', () => { state.settings.pin = null; save
 /* Hold the gear for 2 seconds so little fingers don't wander in. */
 let holdTimer = null;
 $('gear').addEventListener('pointerdown', () => { holdTimer = setTimeout(openParent, 2000); });
+// On the TV remote there is no 'hold', so OK opens it; the PIN still keeps little hands out.
+$('gear').addEventListener('click', () => { if (usingPad) openParent(); });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => $('gear').addEventListener(ev, () => clearTimeout(holdTimer)));
 
 /* ---------- Wiring ---------- */
