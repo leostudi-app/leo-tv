@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 public class MainActivity extends Activity {
     private static final String TAG = "LeoTV";
-    private static final String APP_URL = "https://oliver-play-learn.vercel.app/?tv=1";
+    private static final String APP_URL = "https://charlie-play-learn.vercel.app/?tv=1";
 
     private WebView web;
     private TextToSpeech tts;
@@ -195,8 +195,8 @@ public class MainActivity extends Activity {
     private static String offlinePage() {
         return "<html><body style=\"margin:0;background:#ffc93c;font-family:sans-serif;display:flex;"
                 + "align-items:center;justify-content:center;height:100vh;text-align:center;color:#2b2118\">"
-                + "<div><h1 style=\"font-size:48px\">OLIVER can't connect</h1>"
-                + "<p style=\"font-size:24px\">Check the internet, then press Back and open OLIVER again.</p></div>"
+                + "<div><h1 style=\"font-size:48px\">CHARLIE can't connect</h1>"
+                + "<p style=\"font-size:24px\">Check the internet, then press Back and open CHARLIE again.</p></div>"
                 + "</body></html>";
     }
 
