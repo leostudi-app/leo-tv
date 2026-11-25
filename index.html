@@ -98,8 +98,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #tv{background:#111;color:#fff;padding:0}
 #player{position:absolute;inset:0}
 #player iframe{width:100%;height:100%;border:0}
-.timer{position:absolute;left:0;right:0;bottom:0;height:12px;background:#fff2;z-index:2}
-.timer b{display:block;height:100%;background:var(--gold);transition:width 1s linear}
+.tvskip{position:absolute;right:16px;bottom:16px;z-index:4;background:#000b;color:#fff;border-radius:24px;padding:10px 22px;font-size:clamp(18px,3vw,26px);font-weight:800}
 .tvhint{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:#000a;color:#fff;border-radius:20px;padding:8px 18px;font-size:clamp(18px,3vw,26px);z-index:3;pointer-events:none}
 .tvmsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
 /* Birthday (shows on 25 Nov 2026 only) */
@@ -325,13 +324,13 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 <section id="reward" class="screen" aria-label="Surprise">
   <h2 id="rewardTitle">You earned a surprise!</h2>
   <div id="rewardArt"></div>
-  <button class="big" id="rewardBtn" data-nav>Open it!</button>
+  <div class="row"><button class="big" id="rewardBtn" data-nav>Open it!</button><button class="big blue" id="skipBtn" data-nav hidden>Skip</button></div>
 </section>
 
 <section id="tv" class="screen" aria-label="TV time">
   <div id="player"></div>
   <div class="tvhint" id="tvhint" hidden>Tap the video to start it &#9654;</div>
-  <div class="timer"><b id="timerBar" style="width:100%"></b></div>
+  <button class="tvskip" id="tvSkip" data-nav>Skip &#9197;</button>
   <div class="tvmsg" id="tvmsg" hidden></div>
 </section>
 
@@ -357,8 +356,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
   <form id="settingsView" class="panel" hidden>
     <h2>Grown-ups</h2>
     <label>Rounds per game (prize at the end) <input id="setStars" type="number" min="3" max="10" inputmode="numeric"></label>
-    <label>TV time (minutes) <input id="setMinutes" type="number" min="2" max="30" inputmode="numeric"></label>
-    <label>Approved videos (one YouTube link per line)
+    <label>Prize videos, one YouTube link per line (video 1 plays after game 1, and so on)
       <textarea id="setVideos" placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
     <p class="note">Tip: lock the device to LEO with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
@@ -946,7 +944,7 @@ function startReward() {
   const game = C.GAMES.find((g) => g.id === currentGame);
   $('rewardTitle').textContent = game ? `${game.name}: all done!` : 'You earned a surprise!';
   $('rewardArt').innerHTML = BOX;
-  $('rewardBtn').textContent = 'Open it!';
+  $('rewardBtn').textContent = 'Open it!'; $('skipBtn').hidden = true;
   show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Leo! Open your surprise!');
 }
 $('rewardBtn').addEventListener('click', async () => {
@@ -955,14 +953,17 @@ $('rewardBtn').addEventListener('click', async () => {
     rewardStage = 'friend';
     $('rewardArt').innerHTML = `<div class="friend">${friendSvg(r.friend)}</div>`;
     $('rewardTitle').textContent = `You found ${r.friend.name}!`;
-    $('rewardBtn').textContent = state.settings.videoIds.length ? 'TV time!' : 'Dance party!';
+    const hasVideo = !!C.videoForGame(state, currentGame);
+    $('rewardBtn').textContent = hasVideo ? 'Watch my video \u25B6' : 'Dance party!';
+    $('skipBtn').hidden = false; // choice: watch the whole video, or skip straight back to the games
     confetti(); sfx.fanfare();
-    await say(`You found ${r.friend.name}! ${r.friend.name} is your new friend!`);
+    await say(`You found ${r.friend.name}! ${r.friend.name} is your new friend! ${hasVideo ? 'Watch your video, or skip it?' : ''}`);
   } else startTv();
 });
+$('skipBtn').addEventListener('click', goHome);
 
-/* ---------- TV time (approved YouTube videos only) ---------- */
-let yt = null, ytReady = null, tvTimer = null, tvEnd = 0, tvTotal = 1, tvErrors = 0;
+/* ---------- Prize video: each game has its own; watch it all or skip ---------- */
+let yt = null, ytReady = null, tvErrors = 0, danceLoop = null, danceTimer = null;
 function loadYouTube() {
   if (ytReady) return ytReady;
   ytReady = new Promise((resolve, reject) => {
@@ -974,34 +975,32 @@ function loadYouTube() {
   });
   return ytReady;
 }
+function stopPlayer() {
+  clearInterval(danceLoop); clearTimeout(danceTimer);
+  if (yt) { try { yt.pauseVideo(); yt.destroy(); } catch (e) { console.warn('[LEO] could not stop player', e); } yt = null; }
+  $('player').innerHTML = '';
+}
 async function startTv() {
-  const minutes = state.settings.tvMinutes;
   show('tv'); $('tvmsg').hidden = true; $('tvhint').hidden = true;
-  if (yt) { try { yt.destroy(); } catch (e) { console.warn('[LEO] old player', e); } yt = null; }
-  $('player').innerHTML = '<div id="ytslot"></div>';
-  tvTotal = minutes * 60000; tvEnd = Date.now() + tvTotal; tvErrors = 0;
-  clearInterval(tvTimer);
-  tvTimer = setInterval(() => {
-    const left = tvEnd - Date.now();
-    $('timerBar').style.width = `${Math.max(0, (100 * left) / tvTotal)}%`;
-    if (left <= 0) finishTv();
-  }, 1000);
-  if (!state.settings.videoIds.length) return danceParty();
+  stopPlayer();
+  tvErrors = 0;
+  if (usingPad) $('tvSkip').focus(); // OK on the remote skips; Back also goes home
+  if (!C.videoForGame(state, currentGame)) return danceParty();
   try {
     const YT = await loadYouTube();
-    playNext(YT);
+    if (current === 'tv') playVideo(YT);
   } catch (err) {
     console.warn('[LEO] TV fallback', err);
     danceParty();
   }
 }
-function playNext(YT) {
-  const next = C.takeNextVideo(state); state = next.state; save();
-  if (!next.videoId) return danceParty();
-  if (yt) { yt.loadVideoById(next.videoId); return; }
+function playVideo(YT) {
+  const videoId = C.videoForGame(state, currentGame, tvErrors);
+  if (yt) { try { yt.destroy(); } catch (e) { console.warn('[LEO] old player', e); } yt = null; }
+  $('player').innerHTML = '<div id="ytslot"></div>';
   yt = new YT.Player('ytslot', {
     host: 'https://www.youtube-nocookie.com',
-    videoId: next.videoId,
+    videoId,
     playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1, origin: location.origin },
     events: {
       onReady: (e) => {
@@ -1011,38 +1010,36 @@ function playNext(YT) {
       },
       onStateChange: (e) => {
         if (e.data === YT.PlayerState.PLAYING) $('tvhint').hidden = true;
-        if (e.data === YT.PlayerState.ENDED && current === 'tv') playNext(YT);
+        if (e.data === YT.PlayerState.ENDED && current === 'tv') finishTv(); // whole video watched: back to the games
       },
       onError: (e) => {
         console.warn('[LEO] video error', e.data);
-        tvErrors += 1;
-        if (tvErrors >= state.settings.videoIds.length) danceParty(); else playNext(YT); // skip videos that block embedding
+        tvErrors += 1; // this one won't play here: try the next video in the list, then dance instead
+        if (tvErrors >= state.settings.videoIds.length) danceParty(); else playVideo(YT);
       }
     }
   });
 }
-let danceLoop = null;
 function danceParty() {
   $('tvhint').hidden = true;
-  if (yt) { try { yt.destroy(); } catch (e) { console.warn(e); } yt = null; }
-  $('player').innerHTML = '';
+  stopPlayer();
   $('tvmsg').hidden = false;
   $('tvmsg').innerHTML = '<div class="row" style="flex-direction:column;align-items:center"><svg class="leo-hero wave" style="animation-duration:.6s"><use href="#leo"/></svg><h2>Dance party!</h2><button class="big" id="danceDone" data-nav>All done!</button></div>';
   $('danceDone').addEventListener('click', finishTv);
   if (usingPad) $('danceDone').focus();
-  tvTotal = 30000; tvEnd = Date.now() + tvTotal; // a short boogie when no shows are set up
   const tune = [523, 587, 659, 523, 659, 698, 784, 659];
-  let i = 0; clearInterval(danceLoop);
+  let i = 0;
   danceLoop = setInterval(() => { tone(tune[i % tune.length], 0, 0.25, 'square', 0.1); if (i % 2 === 0) sfx.drum(); i++; }, 300);
+  danceTimer = setTimeout(finishTv, 30000); // a short boogie when no video is set up
   say("Let's dance!");
 }
 function finishTv() {
-  clearInterval(tvTimer); clearInterval(danceLoop);
-  if (yt) { try { yt.pauseVideo(); yt.destroy(); } catch (e) { console.warn('[LEO] could not stop player', e); } yt = null; }
-  $('player').innerHTML = '';
+  stopPlayer();
+  $('tvhint').hidden = true;
   if (current !== 'tv') return;
-  show('tvdone'); say('TV time is finished! Shall we play some more?');
+  goHome();
 }
+$('tvSkip').addEventListener('click', finishTv);
 
 /* ---------- Stickers ---------- */
 function renderStickers() {
@@ -1087,7 +1084,6 @@ function bars(items, stats, label) {
 function openSettings() {
   $('pinView').hidden = true; $('settingsView').hidden = false;
   $('setStars').value = state.settings.starsPerReward;
-  $('setMinutes').value = state.settings.tvMinutes;
   $('setVideos').value = state.settings.videoIds.map((id) => `https://www.youtube.com/watch?v=${id}`).join('\n');
   updateVideoCount();
   $('numBars').innerHTML = bars([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], state.stats.numbers, (n) => `Number ${n}`);
@@ -1096,13 +1092,14 @@ function openSettings() {
 }
 function updateVideoCount() {
   const n = C.parseVideoList($('setVideos').value).length;
-  $('videoCount').textContent = n ? `${n} video${n === 1 ? '' : 's'} recognised.` : 'No videos yet: rewards will be a dance party.';
+  $('videoCount').textContent = n
+    ? `${n} video${n === 1 ? '' : 's'} recognised. ` + C.GAMES.map((g, i) => `${g.name}: video ${(i % n) + 1}`).join(' · ')
+    : 'No videos yet: rewards will be a dance party.';
 }
 $('setVideos').addEventListener('input', updateVideoCount);
 $('settingsView').addEventListener('submit', (e) => {
   e.preventDefault();
   state.settings.starsPerReward = C.clampInt($('setStars').value, 3, 10, 5);
-  state.settings.tvMinutes = C.clampInt($('setMinutes').value, 2, 30, 4);
   state.settings.videoIds = C.parseVideoList($('setVideos').value);
   state.nextVideo = 0;
   save(); goHome();
@@ -1132,7 +1129,7 @@ $('stickerBtn').addEventListener('click', () => { renderStickers(); show('sticke
 $('stickersHome').addEventListener('click', goHome);
 $('homeBtn').addEventListener('click', goHome);
 $('playLeo').addEventListener('click', repeatPrompt);
-$('tvdoneBtn').addEventListener('click', goHome);
+$('tvdoneBtn').addEventListener('click', goHome); // kept for older flows
 renderMenu();
 renderJars();
 

@@ -368,6 +368,19 @@
     return { state: { ...state, nextVideo: (i + 1) % ids.length }, videoId: ids[i] };
   }
 
+  /**
+   * Each game has its own prize video: the Nth video in the grown-ups list goes with the Nth game
+   * (wrapping round if there are fewer videos than games). `attempt` moves on to the next video
+   * when one refuses to play. Returns null when no videos are set.
+   */
+  function videoForGame(state, gameId, attempt = 0) {
+    const ids = state.settings.videoIds;
+    if (!ids.length) return null;
+    const g = GAMES.findIndex((x) => x.id === gameId);
+    const i = ((g < 0 ? 0 : g) + attempt) % ids.length;
+    return ids[i];
+  }
+
   function isValidPin(pin) {
     return typeof pin === 'string' && /^\d{4}$/.test(pin);
   }
@@ -384,6 +397,6 @@
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
     ANIMALS, orderRound, nextInOrder,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
-    addStar, claimReward, takeNextVideo, isValidPin, checkPin
+    addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });

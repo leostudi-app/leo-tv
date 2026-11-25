@@ -220,3 +220,14 @@ test('number order: consecutive, shuffled, growing; starts at 1 until mastered',
   assert.equal(C.nextInOrder([3, 4, 5], [3]), 4);
   assert.equal(C.nextInOrder([3, 4, 5], [3, 4, 5]), null);
 });
+
+test('each game has its own video, wrapping and skipping on errors', () => {
+  const s = C.defaultState();
+  s.settings.videoIds = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'];
+  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9']);
+  assert.equal(C.videoForGame(s, 'order', 1), 'v0'); // next one along when a video won't play
+  s.settings.videoIds = ['a', 'b', 'c'];
+  assert.equal(C.videoForGame(s, 'tune'), 'b'); // game 8 of 10 wraps round 3 videos
+  s.settings.videoIds = [];
+  assert.equal(C.videoForGame(s, 'balloons'), null);
+});
