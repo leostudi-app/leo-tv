@@ -1235,7 +1235,7 @@ if (isBirthday()) {
     const len = playBirthdayTune();
     await wait(len + 400);
     confetti();
-    await say("Hooray! You're four today, Leo! We have the same name! Shall we play?");
+    await say("Let's play!");
     canPlay = true; $('birthdayBtn').textContent = 'Play';
   }
   $('birthday').addEventListener('click', () => party(true));

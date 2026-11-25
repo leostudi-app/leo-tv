@@ -40,7 +40,7 @@ add('Wow! You finished the game, Leo! Open your surprise!', 'Watch your video, o
   'Here are all your friends!', 'Play games to find new friends!');
 for (const f of C.FRIENDS) add(`You found ${f.name}!`, `${f.name} is your new friend!`);
 // Birthday (25 Nov 2026)
-add('Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!', "Hooray! You're four today, Leo! We have the same name! Shall we play?");
+add('Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!', "Let's play!");
 
 const seen = new Map();
 for (const t of texts) for (const part of C.speechParts(t)) seen.set(C.clipKey(part), part);
