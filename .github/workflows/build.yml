@@ -1,0 +1,60 @@
+name: Build LEO TV app
+
+on:
+  push:
+    branches: ['**', '!builds']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        id: build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          gradle assembleRelease --no-daemon --stacktrace 2>&1 | tee build.log
+
+      # Publish results to the "builds" branch so they can be read with plain git.
+      - name: Save build results
+        if: always()
+        run: |
+          mkdir -p /tmp/out
+          cp build.log /tmp/out/build.log || echo "no log" > /tmp/out/build.log
+          echo "${{ steps.build.outcome }} ${GITHUB_SHA::7} $(date -u +%FT%TZ)" > /tmp/out/status.txt
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then cp app/build/outputs/apk/release/app-release.apk /tmp/out/leo-tv.apk; fi
+          git config user.name "leo-build"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan builds-tmp
+          git rm -rf . -q
+          cp /tmp/out/* .
+          git add -A
+          git commit -m "Build ${GITHUB_SHA::7}: ${{ steps.build.outcome }}"
+          git push -f origin HEAD:builds
+
+      - name: Publish release
+        if: steps.build.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest /tmp/out/leo-tv.apk --title "LEO TV (latest)" --notes "Built from ${GITHUB_SHA::7}" --target "$GITHUB_SHA"
+
+      - name: Fail if build failed
+        if: steps.build.outcome != 'success'
+        run: exit 1
