@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>LEO – Play &amp; Learn</title>
+<meta name="theme-color" content="#ffc93c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LEO">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, bouncy, encouraging — a picture-book friend, never a test.
+   IDEA: a sunny playroom where LEO the lion hosts each mini-game like a kids' TV show.
+   PICTURE: LEO himself, large, beside one big task; answers are chunky toys to tap.
+   COLOUR and TYPE: lion gold ground, sky blue stage, kit red accent; Baloo 2 rounded display.
+   LAYOUT: one task per screen, three huge answers in a row; works portrait, landscape and TV. */
+:root{--gold:#ffc93c;--mane:#f28c28;--sky:#2a7de1;--sky2:#5fb0ff;--red:#e63946;--ink:#2b2118;--paper:#fffaf0;--ok:#2fbf71;
+  --safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--gold);color:var(--ink);font:600 18px/1.3 "Baloo 2",ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;padding:calc(12px + var(--safe-t)) max(16px,3vw) calc(12px + var(--safe-b))}
+.screen.on{display:flex}
+h1,h2{margin:0;font-weight:800;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
+/* Focus ring for remote / controller navigation */
+[data-nav]{outline:none;transition:transform .15s}
+[data-nav]:focus-visible,[data-nav].focus{box-shadow:0 0 0 6px #fff,0 0 0 12px var(--sky);transform:scale(1.06)}
+.big{background:var(--red);color:#fff;border-radius:28px;padding:16px 36px;font-size:clamp(26px,5vw,40px);font-weight:800;box-shadow:0 8px 0 #a3222d}
+.big:active{transform:translateY(6px);box-shadow:0 2px 0 #a3222d}
+.big.blue{background:var(--sky);box-shadow:0 8px 0 #1b56a0}
+.top{display:flex;align-items:center;gap:12px;min-height:64px}
+.jar{display:flex;gap:6px;flex-wrap:wrap;background:#fff8;border-radius:40px;padding:6px 14px}
+.jar svg{width:clamp(26px,5vw,40px);height:auto}
+.spacer{flex:1}
+.icon{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 5px 0 #0002}
+.icon svg{width:36px;height:36px}
+.gear{opacity:.55;width:52px;height:52px}
+/* Start + home */
+#start,#home{align-items:center;justify-content:center;text-align:center;gap:clamp(10px,3vh,28px);background:radial-gradient(circle at 50% 35%,#fff3c4,var(--gold) 60%)}
+.leo-hero{width:min(54vh,70vw);height:auto;filter:drop-shadow(0 14px 0 #0001)}
+.wave{animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-2deg)}}
+.row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+#homeJar{visibility:hidden}
+#home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
+.menu-head{display:flex;align-items:center;gap:12px}
+.leo-mini{width:clamp(70px,14vh,130px);height:auto}
+.games{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1.6vw,20px);width:100%;max-width:1000px}
+.tile{background:#fff;border-radius:28px;padding:12px 6px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(15px,2.1vw,24px);font-weight:800;line-height:1.1}
+.tile svg{width:60%;height:auto;max-height:15vh}
+@media (max-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
+.ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
+/* Play */
+#play{background:linear-gradient(var(--sky2),var(--sky) 70%);color:#fff}
+.stage{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr);gap:clamp(8px,2vw,24px);align-items:center}
+.host{display:flex;flex-direction:column;align-items:center;gap:8px}
+.host svg{width:100%;max-width:220px;height:auto}
+.bubble{background:#fff;color:var(--ink);border-radius:24px;padding:10px 16px;font-size:clamp(18px,2.6vw,26px);text-align:center;position:relative}
+.task{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,3vh,26px)}
+.show{min-height:clamp(90px,22vh,200px);display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;max-width:640px}
+.show svg{width:clamp(56px,10vw,96px);height:auto}
+.show .hole{width:clamp(130px,24vw,220px)}.show .hole svg{width:100%}
+.answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,3vw,32px);width:100%;max-width:820px}
+.ans{background:#fff;color:var(--ink);border-radius:32px;aspect-ratio:1;display:grid;place-items:center;box-shadow:0 10px 0 #0003;font-size:clamp(64px,14vw,140px);font-weight:800}
+.ans svg{width:72%;height:72%}
+.ans.wrong{animation:wobble .5s;opacity:.45}
+.ans.right{background:var(--ok);color:#fff;animation:pop .5s}
+@keyframes wobble{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+@keyframes pop{50%{transform:scale(1.15)}}
+.goal{background:none;box-shadow:none;aspect-ratio:auto;display:flex;flex-direction:column;gap:6px;font-size:clamp(44px,9vw,90px);color:#fff}
+.goal svg{width:100%;height:auto}
+.pitch{position:relative;width:100%;max-width:820px}
+#ball{position:absolute;left:50%;bottom:-70px;width:56px;height:56px;margin-left:-28px;transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
+.drum{width:clamp(120px,22vw,200px)!important}
+.drum.hit{animation:hit .18s}
+@keyframes hit{50%{transform:scale(.92) translateY(6px)}}
+.again{background:#fff3;border-radius:20px;padding:6px 16px;color:#fff;font-size:20px}
+/* Reward */
+#reward,#tvdone{align-items:center;justify-content:center;text-align:center;gap:20px;background:radial-gradient(circle,#ffe08a,var(--mane))}
+.box{width:min(48vh,70vw);height:auto}
+.box.shake{animation:shake 1s infinite}
+@keyframes shake{10%,30%{transform:rotate(-6deg)}20%,40%{transform:rotate(6deg)}50%{transform:none}}
+.friend{width:min(40vh,60vw);height:auto;animation:pop .6s}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:12px;height:18px;border-radius:3px;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+/* TV */
+#tv{background:#111;color:#fff;padding:0}
+#player{position:absolute;inset:0}
+#player iframe{width:100%;height:100%;border:0}
+.timer{position:absolute;left:0;right:0;bottom:0;height:12px;background:#fff2;z-index:2}
+.timer b{display:block;height:100%;background:var(--gold);transition:width 1s linear}
+.tvmsg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
+/* Birthday (shows on 25 Nov 2026 only) */
+#birthday{align-items:center;justify-content:center;text-align:center;gap:clamp(6px,2vh,18px);background:radial-gradient(circle at 50% 40%,#fff6d6,#ffc93c 55%,#5fb0ff);overflow:hidden}
+#birthday h1{color:#e63946;text-shadow:0 4px 0 #fff;font-size:clamp(44px,10vw,96px);max-width:100%;position:relative;z-index:1}
+#birthday .bday-scene,#birthday .big{position:relative;z-index:1}
+.bday-scene{display:flex;align-items:flex-end;justify-content:center;gap:clamp(4px,2vw,24px);width:100%;max-width:820px}
+.bday-scene svg{height:auto}
+.bday-leo{width:min(36vh,44vw)}
+.cake{width:min(32vh,42vw)}
+.balloons{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.85}
+.balloons svg{position:absolute;bottom:-160px;width:clamp(60px,10vw,100px);animation:float 9s linear infinite}
+@keyframes float{to{transform:translateY(-130vh) rotate(8deg)}}
+.flame{transform-origin:50% 100%;animation:flicker .4s ease-in-out infinite alternate}
+@keyframes flicker{to{transform:scaleY(.8) scaleX(1.1)}}
+/* Stickers */
+#stickers{background:var(--paper)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:16px;overflow:auto;padding:8px}
+.card{background:#fff;border-radius:24px;padding:10px;text-align:center;box-shadow:0 6px 0 #0001}
+.card svg{width:100%;height:auto}
+.card.locked svg{filter:brightness(0) opacity(.12)}
+/* Parent */
+#parent{background:var(--paper);overflow:auto;font-size:17px}
+.pin{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+.pin button{height:72px;border-radius:20px;background:#fff;font-size:30px;box-shadow:0 4px 0 #0002}
+.dots{font-size:40px;letter-spacing:12px;text-align:center;min-height:52px}
+.panel{max-width:720px;margin:0 auto;width:100%;display:grid;gap:18px;padding-bottom:40px}
+.panel label{display:grid;gap:6px;font-size:17px}
+.panel input,.panel textarea{font:16px/1.4 system-ui,sans-serif;padding:12px;border-radius:14px;border:2px solid #0002;background:#fff;color:var(--ink);width:100%}
+.panel textarea{min-height:140px}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:5.5em minmax(0,1fr) 3.5em;gap:8px;align-items:center;font-size:15px}
+.bar div{height:14px;background:#0001;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.bar span:last-child{text-align:right}
+.note{font-size:14px;opacity:.75;font-family:system-ui,sans-serif;font-weight:400}
+.modal{position:fixed;inset:0;background:#0007;display:none;place-items:center;z-index:9}
+.modal.on{display:grid}.modal>div{background:#fff;border-radius:24px;padding:24px;max-width:340px;text-align:center;display:grid;gap:14px}
+@media (max-width:640px) and (orientation:portrait){.stage{grid-template-columns:1fr;grid-template-rows:auto 1fr}.host{flex-direction:row}.host svg{max-width:90px}}
+/* Jigsaw */
+.jig{--p:min(8.6vw,14.5vh);display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2.4vh,22px)}
+.board,.tray{display:grid;grid-template-columns:repeat(5,var(--p));gap:6px}
+.board{background:#ffffff33;padding:6px;border-radius:14px}
+.tray{min-height:calc(var(--p) * 2 + 6px)}
+.slot,.piece{width:var(--p);height:var(--p);padding:0;border-radius:8px;overflow:hidden;background:#ffffff55;display:block}
+.slot svg,.piece svg{width:100%;height:100%;display:block}
+.slot{outline:3px dashed #fff;outline-offset:-3px}
+.slot.empty svg{opacity:.22}
+.slot.filled{outline:none;animation:pop .4s}
+.piece{background:#fff;box-shadow:0 6px 0 #0003}
+.piece.sel{transform:translateY(-8px) scale(1.08);box-shadow:0 0 0 6px #ffc93c,0 10px 0 #0003}
+.slot.wrong{animation:wobble .4s}
+.slot.hint{animation:glow 1s 3}
+@keyframes glow{50%{box-shadow:0 0 0 8px #ffc93c}}
+.jig.done{--p:min(12vw,22vh)}.board.done{gap:0;padding:0}.board.done .slot{border-radius:0}
+@media (max-width:640px) and (orientation:portrait){.jig{--p:min(17vw,10vh)}}
+/* Penalty shootout */
+.pens{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2vh,18px);width:100%}
+.pgoal{position:relative;width:min(100%,720px);aspect-ratio:2.4/1;border:10px solid #fff;border-bottom:none;border-radius:8px 8px 0 0;background:repeating-linear-gradient(90deg,#ffffff40 0 2px,transparent 2px 24px),repeating-linear-gradient(0deg,#ffffff40 0 2px,transparent 2px 24px),#ffffff1a}
+.spots{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:8px;z-index:2}
+.spot{border-radius:18px;background:transparent;display:grid;place-items:start center;padding-top:6%}
+.spot svg{width:46%;height:auto;max-height:46%}
+.spot:focus-visible,.spot:hover{background:#ffffff40}
+#keeper{position:absolute;bottom:0;left:50%;width:22%;transform:translateX(-50%);transition:transform .45s ease-out;z-index:1;pointer-events:none}
+#keeper svg{width:100%;height:auto;display:block}
+.pball{width:clamp(56px,8vw,90px);transition:transform .5s ease-out}
+.pball svg{width:100%;height:auto}
+.pgoal.shake{animation:wobble .4s}
+.goals{font-size:clamp(20px,3vw,34px);font-weight:800}
+/* Copy my tune */
+.pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,2vw,24px);width:min(100%,680px);padding:12px}
+.pad{aspect-ratio:1;border-radius:50%;box-shadow:0 10px 0 #0003;display:grid;place-items:center;transition:transform .1s,filter .1s;filter:saturate(.75) brightness(.9)}
+.pad svg{width:46%;height:auto}
+.pad.lit{filter:brightness(1.3) saturate(1.2);transform:scale(1.12);box-shadow:0 0 0 8px #fff,0 10px 0 #0003}
+.pad:disabled{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Reusable art: LEO, star -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="leo" viewBox="0 0 200 230">
+      <g fill="#f28c28">
+        <circle cx="100" cy="88" r="78"/>
+        <circle cx="38" cy="60" r="26"/><circle cx="162" cy="60" r="26"/><circle cx="30" cy="110" r="26"/><circle cx="170" cy="110" r="26"/>
+        <circle cx="60" cy="20" r="24"/><circle cx="140" cy="20" r="24"/><circle cx="100" cy="10" r="24"/><circle cx="50" cy="150" r="24"/><circle cx="150" cy="150" r="24"/>
+      </g>
+      <circle cx="56" cy="40" r="16" fill="#ffc93c"/><circle cx="144" cy="40" r="16" fill="#ffc93c"/>
+      <circle cx="56" cy="40" r="8" fill="#f7a6a6"/><circle cx="144" cy="40" r="8" fill="#f7a6a6"/>
+      <ellipse cx="100" cy="94" rx="58" ry="56" fill="#ffd761"/>
+      <ellipse cx="78" cy="84" rx="9" ry="12" fill="#2b2118"/><ellipse cx="122" cy="84" rx="9" ry="12" fill="#2b2118"/>
+      <circle cx="81" cy="80" r="3.5" fill="#fff"/><circle cx="125" cy="80" r="3.5" fill="#fff"/>
+      <circle cx="64" cy="108" r="9" fill="#ff9a8a" opacity=".6"/><circle cx="136" cy="108" r="9" fill="#ff9a8a" opacity=".6"/>
+      <path d="M90 100h20l-10 11z" fill="#7a3b16" stroke="#7a3b16" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M84 118q16 16 32 0" fill="none" stroke="#2b2118" stroke-width="5" stroke-linecap="round"/>
+      <path d="M48 176q52-30 104 0v40q-52 18-104 0z" fill="#e63946"/>
+      <path d="M48 176l-12 26 22 6 4-22zM152 176l12 26-22 6-4-22z" fill="#fff"/>
+      <path d="M86 160l14 14 14-14" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M100 186l4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z" fill="#fff"/>
+    </symbol>
+    <!-- Jigsaw pictures: 500x200, cut into a 5x2 grid of 100px pieces. All original art. -->
+    <symbol id="pic0" viewBox="0 0 500 200">
+      <rect width="500" height="120" fill="#8fd3ff"/>
+      <circle cx="60" cy="38" r="24" fill="#ffd84d"/>
+      <g fill="#fff"><ellipse cx="210" cy="36" rx="34" ry="14"/><ellipse cx="236" cy="28" rx="22" ry="14"/><ellipse cx="350" cy="44" rx="30" ry="12"/><ellipse cx="372" cy="36" rx="18" ry="12"/></g>
+      <path d="M0 8h500" stroke="#2b2118" stroke-width="2"/>
+      <g>
+        <path d="M10 8l10 16 10-16zM50 8l10 16 10-16zM90 8l10 16 10-16zM130 8l10 16 10-16zM170 8l10 16 10-16zM210 8l10 16 10-16zM250 8l10 16 10-16zM290 8l10 16 10-16zM330 8l10 16 10-16zM370 8l10 16 10-16zM410 8l10 16 10-16zM450 8l10 16 10-16z" fill="#e63946"/>
+        <path d="M30 8l10 16 10-16zM70 8l10 16 10-16zM110 8l10 16 10-16zM150 8l10 16 10-16zM190 8l10 16 10-16zM230 8l10 16 10-16zM270 8l10 16 10-16zM310 8l10 16 10-16zM350 8l10 16 10-16zM390 8l10 16 10-16zM430 8l10 16 10-16zM470 8l10 16 10-16z" fill="#fff"/>
+      </g>
+      <rect y="110" width="500" height="90" fill="#4caf50"/>
+      <g fill="#43a047"><rect x="50" y="110" width="50" height="90"/><rect x="150" y="110" width="50" height="90"/><rect x="250" y="110" width="50" height="90"/><rect x="350" y="110" width="50" height="90"/><rect x="450" y="110" width="50" height="90"/></g>
+      <path d="M250 110v90M0 110h500" stroke="#fff" stroke-width="3"/>
+      <ellipse cx="250" cy="160" rx="44" ry="18" fill="none" stroke="#fff" stroke-width="3"/>
+      <rect x="398" y="62" width="92" height="80" fill="#ffffff33"/>
+      <path d="M410 62v80M422 62v80M434 62v80M446 62v80M458 62v80M470 62v80M482 62v80M398 76h92M398 90h92M398 104h92M398 118h92M398 132h92" stroke="#ffffff88" stroke-width="1.5"/>
+      <path d="M398 142V62h92v80" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
+      <use href="#leo" x="22" y="54" width="124" height="143"/>
+      <g transform="translate(300 160)"><circle r="18" fill="#fff" stroke="#2b2118" stroke-width="3"/><polygon points="0,-7 7,-2 4,6 -4,6 -7,-2" fill="#2b2118"/></g>
+      <path d="M180 168h70" stroke="#ffffff99" stroke-width="4" stroke-linecap="round" stroke-dasharray="6 8"/>
+    </symbol>
+    <symbol id="pic1" viewBox="0 0 500 200">
+      <rect width="500" height="200" fill="#ffe3f1"/>
+      <rect y="160" width="500" height="40" fill="#f7c59f"/>
+      <path d="M0 20q125 30 250 0t250 0" fill="none" stroke="#8a5cf6" stroke-width="3"/>
+      <g fill="#ffc93c"><path d="M30 26l8 18 10-14zM120 34l6 18 12-12zM210 24l8 18 10-14zM300 26l8 18 10-14zM390 34l6 18 12-12zM460 24l8 18 10-14z"/></g>
+      <g><path d="M60 140q-6-30 0-60M110 140q6-30 0-56" stroke="#2b2118" stroke-width="2" fill="none"/>
+        <ellipse cx="60" cy="62" rx="24" ry="28" fill="#e63946"/><ellipse cx="110" cy="66" rx="22" ry="26" fill="#2a7de1"/>
+        <path d="M455 150q6-30 0-64" stroke="#2b2118" stroke-width="2" fill="none"/><ellipse cx="455" cy="66" rx="24" ry="28" fill="#2fbf71"/></g>
+      <rect x="185" y="118" width="130" height="50" rx="8" fill="#ff7eb6"/>
+      <rect x="185" y="118" width="130" height="14" rx="7" fill="#fff"/>
+      <path d="M185 145h130" stroke="#fff" stroke-width="4" stroke-dasharray="10 8"/>
+      <g fill="#ffc93c"><rect x="207" y="88" width="8" height="30" rx="3"/><rect x="232" y="88" width="8" height="30" rx="3"/><rect x="258" y="88" width="8" height="30" rx="3"/><rect x="284" y="88" width="8" height="30" rx="3"/></g>
+      <g fill="#ff9a3c"><ellipse cx="211" cy="80" rx="5" ry="8"/><ellipse cx="236" cy="80" rx="5" ry="8"/><ellipse cx="262" cy="80" rx="5" ry="8"/><ellipse cx="288" cy="80" rx="5" ry="8"/></g>
+      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">LEO 4</text>
+      <rect x="350" y="122" width="44" height="44" rx="4" fill="#2a7de1"/><path d="M372 122v44M350 144h44" stroke="#ffc93c" stroke-width="6"/>
+      <rect x="402" y="132" width="36" height="34" rx="4" fill="#e63946"/><path d="M420 132v34M402 149h36" stroke="#fff" stroke-width="5"/>
+      <g fill="#8a5cf6"><circle cx="150" cy="150" r="5"/><circle cx="170" cy="100" r="4"/><circle cx="330" cy="70" r="5"/></g>
+    </symbol>
+    <symbol id="pic2" viewBox="0 0 500 200">
+      <defs><linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fc3f7"/><stop offset="1" stop-color="#0277bd"/></linearGradient></defs>
+      <rect width="500" height="200" fill="url(#sea)"/>
+      <path d="M0 178q60-14 120 0t120 0 130 0 130 0V200H0z" fill="#f4d58d"/>
+      <g fill="none" stroke="#2fbf71" stroke-width="8" stroke-linecap="round"><path d="M40 190q-14-30 0-60t0-60"/><path d="M160 190q14-26 0-52t0-40"/><path d="M330 190q-12-24 0-48"/><path d="M470 190q12-30 0-70"/></g>
+      <g><ellipse cx="100" cy="60" rx="30" ry="18" fill="#ff9a3c"/><path d="M128 60l22-16v32z" fill="#ff9a3c"/><circle cx="86" cy="56" r="4" fill="#2b2118"/></g>
+      <g><ellipse cx="390" cy="56" rx="28" ry="16" fill="#ffc93c"/><path d="M364 56l-20-14v28z" fill="#ffc93c"/><circle cx="404" cy="52" r="4" fill="#2b2118"/><path d="M386 42v28" stroke="#ff9a3c" stroke-width="4"/></g>
+      <g><ellipse cx="250" cy="110" rx="34" ry="20" fill="#ff7eb6"/><path d="M282 110l24-18v36z" fill="#ff7eb6"/><circle cx="234" cy="104" r="5" fill="#2b2118"/></g>
+      <g fill="#ffffffaa"><circle cx="60" cy="30" r="5"/><circle cx="70" cy="16" r="3"/><circle cx="220" cy="60" r="4"/><circle cx="230" cy="44" r="6"/><circle cx="440" cy="110" r="5"/><circle cx="430" cy="94" r="3"/></g>
+      <g transform="translate(420 168)" fill="#e63946"><ellipse rx="22" ry="12"/><path d="M-22 -4l-12-14 6 16zM22 -4l12-14-6 16z"/><circle cx="-7" cy="-14" r="4"/><circle cx="7" cy="-14" r="4"/></g>
+      <polygon points="230,170 236,182 249,183 239,191 242,200 230,194 218,200 221,191 211,183 224,182" fill="#ff9a3c"/>
+    </symbol>
+    <symbol id="pic3" viewBox="0 0 500 200">
+      <rect width="500" height="200" fill="#1b1f4b"/>
+      <g fill="#fff"><circle cx="30" cy="30" r="2"/><circle cx="150" cy="20" r="3"/><circle cx="190" cy="80" r="2"/><circle cx="330" cy="30" r="2"/><circle cx="360" cy="120" r="3"/><circle cx="480" cy="140" r="2"/><circle cx="20" cy="180" r="3"/><circle cx="140" cy="170" r="2"/><circle cx="300" cy="180" r="2"/><circle cx="410" cy="10" r="2"/></g>
+      <g fill="#ffc93c"><polygon points="110,40 114,50 124,50 116,56 119,66 110,60 101,66 104,56 96,50 106,50"/><polygon points="460,90 463,97 471,97 465,102 467,110 460,105 453,110 455,102 449,97 457,97"/></g>
+      <circle cx="440" cy="48" r="30" fill="#f5f3ce"/><g fill="#d9d6a8"><circle cx="430" cy="40" r="6"/><circle cx="450" cy="60" r="4"/><circle cx="452" cy="36" r="3"/></g>
+      <circle cx="80" cy="130" r="28" fill="#ff9a3c"/><ellipse cx="80" cy="130" rx="48" ry="10" fill="none" stroke="#ffc93c" stroke-width="5"/>
+      <circle cx="370" cy="170" r="22" fill="#2a7de1"/><path d="M356 160q10 4 8 14t12 10M378 152q6 8 14 6" stroke="#2fbf71" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <g transform="translate(250 100) rotate(20)">
+        <path d="M0 -80c22 18 26 52 22 96h-44c-4-44 0-78 22-96z" fill="#fff"/>
+        <path d="M0 -80c10 8 16 18 19 30h-38c3-12 9-22 19-30z" fill="#e63946"/>
+        <circle cy="-12" r="12" fill="#5fb8ff" stroke="#8a5cf6" stroke-width="4"/>
+        <path d="M-22 4l-18 26 16 0zM22 4l18 26-16 0z" fill="#e63946"/>
+        <path d="M-12 18q12 44 24 0z" fill="#ffc93c"/><path d="M-6 18q6 26 12 0z" fill="#ff9a3c"/>
+      </g>
+    </symbol>
+    <symbol id="star" viewBox="0 0 100 100"><path d="M50 5l13 30 32 3-24 21 7 32-28-17-28 17 7-32L5 38l32-3z" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<section id="start" class="screen on" aria-label="Start">
+  <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
+  <h1>LEO</h1>
+  <button class="big" id="startBtn" data-nav>Let's play!</button>
+</section>
+
+<section id="birthday" class="screen" aria-label="Happy birthday">
+  <div class="balloons" id="balloons"></div>
+  <h1>Happy 4th Birthday, Leo!</h1>
+  <div class="bday-scene">
+    <svg class="bday-leo wave" aria-hidden="true"><use href="#leo"/></svg>
+    <svg class="cake" viewBox="0 0 200 230" aria-label="Birthday cake with a number 4 candle">
+      <path class="flame" d="M100 8c10 14 12 22 0 30-12-8-10-16 0-30z" fill="#ffb020"/>
+      <text x="100" y="98" font-size="68" font-weight="800" text-anchor="middle" fill="#2a7de1" stroke="#fff" stroke-width="4" paint-order="stroke">4</text>
+      <rect x="30" y="108" width="140" height="44" rx="12" fill="#fff3c4"/>
+      <path d="M30 120q12 14 23 0t24 0 23 0 23 0 24 0 23 0" fill="none" stroke="#ff7eb6" stroke-width="10" stroke-linecap="round"/>
+      <rect x="16" y="150" width="168" height="62" rx="14" fill="#e63946"/>
+      <path d="M16 166q14 16 28 0t28 0 28 0 28 0 28 0 28 0" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="50" cy="194" r="6" fill="#ffc93c"/><circle cx="100" cy="196" r="6" fill="#5fb0ff"/><circle cx="150" cy="194" r="6" fill="#2fbf71"/>
+      <rect x="6" y="210" width="188" height="12" rx="6" fill="#fff"/>
+    </svg>
+  </div>
+  <button class="big" id="birthdayBtn" data-nav>Tap to party!</button>
+</section>
+
+<section id="home" class="screen" aria-label="Home">
+  <div class="top"><div class="jar" id="homeJar"></div><span class="spacer"></span>
+    <button class="icon gear" id="gear" aria-label="Grown-ups (hold)"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M19.4 13a7.5 7.5 0 0 0 0-2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1L15 3.5h-4L10.6 6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.5 7.5 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.4zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg></button></div>
+  <div class="menu-head"><svg class="leo-mini wave" aria-hidden="true"><use href="#leo"/></svg><h2>Pick a game!</h2></div>
+  <div class="games" id="gameTiles"></div>
+  <button class="big blue" id="stickerBtn" data-nav>My friends</button>
+</section>
+
+<section id="play" class="screen" aria-label="Game">
+  <div class="top"><button class="icon" id="homeBtn" data-nav aria-label="Home"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></button>
+    <div class="jar" id="playJar"></div><span class="spacer"></span></div>
+  <div class="stage">
+    <div class="host"><svg id="playLeo" aria-hidden="true"><use href="#leo"/></svg><div class="bubble" id="bubble" aria-live="polite"></div></div>
+    <div class="task" id="task"></div>
+  </div>
+</section>
+
+<section id="reward" class="screen" aria-label="Surprise">
+  <h2 id="rewardTitle">You earned a surprise!</h2>
+  <div id="rewardArt"></div>
+  <button class="big" id="rewardBtn" data-nav>Open it!</button>
+</section>
+
+<section id="tv" class="screen" aria-label="TV time">
+  <div id="player"></div>
+  <div class="timer"><b id="timerBar" style="width:100%"></b></div>
+  <div class="tvmsg" id="tvmsg" hidden></div>
+</section>
+
+<section id="tvdone" class="screen" aria-label="TV finished">
+  <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
+  <h2 id="tvdoneTitle">TV time is finished!</h2>
+  <button class="big" id="tvdoneBtn" data-nav>Play again</button>
+</section>
+
+<section id="stickers" class="screen" aria-label="My friends">
+  <div class="top"><button class="icon" id="stickersHome" data-nav aria-label="Home"><svg viewBox="0 0 24 24"><path fill="#2b2118" d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg></button><h2>My friends</h2></div>
+  <div class="grid" id="stickerGrid"></div>
+</section>
+
+<section id="parent" class="screen" aria-label="Grown-ups">
+  <div id="pinView" class="panel">
+    <h2 id="pinTitle">Grown-ups only</h2>
+    <p class="note" id="pinHint">Enter your 4-digit PIN.</p>
+    <div class="dots" id="pinDots"></div>
+    <div class="pin" id="pinPad"></div>
+    <button class="big blue" id="pinBack">Back</button>
+  </div>
+  <form id="settingsView" class="panel" hidden>
+    <h2>Grown-ups</h2>
+    <label>Rounds per game (prize at the end) <input id="setStars" type="number" min="3" max="10" inputmode="numeric"></label>
+    <label>TV time (minutes) <input id="setMinutes" type="number" min="5" max="30" inputmode="numeric"></label>
+    <label>Approved videos (one YouTube link per line)
+      <textarea id="setVideos" placeholder="https://www.youtube.com/watch?v=..."></textarea>
+      <span class="note" id="videoCount"></span></label>
+    <p class="note">Tip: lock the device to LEO with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
+    <div><h3>Numbers</h3><div class="bars" id="numBars"></div></div>
+    <div><h3>Shapes</h3><div class="bars" id="shapeBars"></div></div>
+    <p class="note" id="levelNote"></p>
+    <div class="row"><button class="big" type="submit">Save</button><button class="big blue" type="button" id="setBack">Back</button></div>
+    <div class="row"><button type="button" class="note" id="resetBtn">Reset progress</button><button type="button" class="note" id="pinChange">Change PIN</button></div>
+  </form>
+</section>
+
+<div class="modal" id="confirm"><div><p id="confirmText"></p><div class="row"><button class="big" id="confirmYes">Yes</button><button class="big blue" id="confirmNo">No</button></div></div></div>
+<div class="confetti" id="confetti"></div>
+
+<script src="core.js"></script>
+<script>
+{
+'use strict';
+const C = window.LeoCore;
+const $ = (id) => document.getElementById(id);
+let state = C.loadState(safeStorage());
+const save = () => C.saveState(safeStorage(), state);
+
+function safeStorage() { try { return window.localStorage; } catch (e) { return null; } }
+function rand(list) { return list[Math.floor(Math.random() * list.length)]; }
+function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+/* ---------- Screens & navigation ---------- */
+let current = 'start';
+function show(id) {
+  document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('on', s.id === id));
+  current = id;
+  const first = $(id).querySelector('[data-nav]:not([disabled])');
+  if (first && usingPad) first.focus();
+}
+let usingPad = false;
+function navItems() {
+  return [...$(current).querySelectorAll('[data-nav]:not([disabled])')].filter((el) => el.offsetParent !== null);
+}
+/** Spatial navigation for TV remote and controller. */
+function moveFocus(dir) {
+  usingPad = true;
+  const items = navItems();
+  if (!items.length) return;
+  const cur = items.includes(document.activeElement) ? document.activeElement : null;
+  if (!cur) { items[0].focus(); return; }
+  const a = cur.getBoundingClientRect();
+  const ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+  let best = null, bestScore = Infinity;
+  for (const el of items) {
+    if (el === cur) continue;
+    const b = el.getBoundingClientRect();
+    const dx = b.left + b.width / 2 - ax, dy = b.top + b.height / 2 - ay;
+    const main = { left: -dx, right: dx, up: -dy, down: dy }[dir];
+    if (main <= 4) continue;
+    const side = dir === 'left' || dir === 'right' ? Math.abs(dy) : Math.abs(dx);
+    const score = main + side * 2;
+    if (score < bestScore) { bestScore = score; best = el; }
+  }
+  (best || cur).focus();
+}
+function activate() { const el = document.activeElement; if (el && el.matches('[data-nav]')) el.click(); }
+
+document.addEventListener('keydown', (e) => {
+  if (current === 'parent' && e.target.matches('input,textarea')) return;
+  const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
+  if (map[e.key]) { e.preventDefault(); moveFocus(map[e.key]); }
+  else if (e.key === 'Enter' || e.key === ' ') { if (!document.activeElement.matches('[data-nav]')) { e.preventDefault(); moveFocus('right'); } }
+  else if (e.key === 'Escape' || e.key === 'Backspace' || e.key === 'GoBack') { e.preventDefault(); back(); }
+});
+function back() {
+  if (current === 'play' || current === 'stickers' || current === 'reward' || current === 'tvdone' || current === 'parent') goHome();
+  else if (current === 'tv') finishTv();
+}
+// Called by the Fire TV app: Back button returns "exit" only from the top-level screens.
+window.__leoBack = () => { if (['home', 'start', 'birthday'].includes(current)) return 'exit'; back(); return 'ok'; };
+window.__leoRepeat = () => { repeatPrompt(); };
+
+/* Gamepad (PlayStation / Xbox) via the standard mapping. */
+const pad = { prev: [], axisAt: 0 };
+function pollPad(t) {
+  const gp = [...(navigator.getGamepads ? navigator.getGamepads() : [])].find(Boolean);
+  if (gp) {
+    const pressed = gp.buttons.map((b) => b.pressed);
+    const down = (i) => pressed[i] && !pad.prev[i];
+    if (down(0)) { usingPad = true; activate(); }            // ✕ / A
+    if (down(1)) repeatPrompt();                              // ○ / B
+    if (down(12)) moveFocus('up'); if (down(13)) moveFocus('down');
+    if (down(14)) moveFocus('left'); if (down(15)) moveFocus('right');
+    if (down(9)) back();                                      // Options / Menu
+    const [x, y] = gp.axes;
+    if (t - pad.axisAt > 280) {
+      if (x < -0.6) { moveFocus('left'); pad.axisAt = t; } else if (x > 0.6) { moveFocus('right'); pad.axisAt = t; }
+      else if (y < -0.6) { moveFocus('up'); pad.axisAt = t; } else if (y > 0.6) { moveFocus('down'); pad.axisAt = t; }
+    }
+    pad.prev = pressed;
+  }
+  requestAnimationFrame(pollPad);
+}
+window.addEventListener('gamepadconnected', () => { usingPad = true; navItems()[0]?.focus(); });
+requestAnimationFrame(pollPad);
+document.addEventListener('pointerdown', () => { usingPad = false; });
+
+/* ---------- Voice ---------- */
+let voice = null;
+function pickVoice() {
+  try {
+    // Prefer the most natural voice the device has: premium/enhanced/neural/Google voices first, British English next.
+    const score = (v) => (/premium/i.test(v.name) ? 40 : 0) + (/enhanced|neural|natural/i.test(v.name) ? 30 : 0) + (/google/i.test(v.name) ? 20 : 0)
+      + (/en[-_]GB/i.test(v.lang) ? 15 : /^en/i.test(v.lang) ? 5 : -100) + (/serena|kate|martha|libby|sonia|female/i.test(v.name) ? 5 : 0);
+    voice = speechSynthesis.getVoices().slice().sort((x, y) => score(y) - score(x)).find((v) => score(v) > 0) || null;
+  } catch (e) { voice = null; }
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+/* In the Fire TV app, LEO speaks through the device's own voice engine (window.LeoNative). */
+const nativeVoice = typeof window.LeoNative === 'object' && window.LeoNative !== null;
+let speechSeq = 0;
+const speechPending = new Map();
+window.__leoSpeechDone = (id) => { const r = speechPending.get(id); if (r) { speechPending.delete(id); r(); } };
+function nativeSpeak(text, queue) {
+  return new Promise((resolve) => {
+    const id = `s${++speechSeq}`;
+    speechPending.set(id, resolve);
+    setTimeout(() => window.__leoSpeechDone(id), 800 + text.length * 110); // safety net
+    try { window.LeoNative.speak(text, id, !!queue); } catch (e) { console.warn('[LEO] native speech failed', e); window.__leoSpeechDone(id); }
+  });
+}
+function stopSpeech() {
+  try { if (nativeVoice) window.LeoNative.stop(); else if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { console.warn('[LEO] stop speech failed', e); }
+}
+function say(text) {
+  $('bubble').textContent = text;
+  if (nativeVoice) return nativeSpeak(text, false);
+  return new Promise((resolve) => {
+    try {
+      if (!('speechSynthesis' in window)) return resolve();
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      if (voice) u.voice = voice;
+      u.lang = 'en-GB'; u.rate = 0.9; u.pitch = 1.15;
+      const done = () => resolve();
+      u.onend = done; u.onerror = done;
+      setTimeout(done, 400 + text.length * 90); // safety net if onend never fires
+      speechSynthesis.speak(u);
+    } catch (e) { console.warn('[LEO] speech failed', e); resolve(); }
+  });
+}
+
+/* ---------- Sound (original jingles, synthesised) ---------- */
+let ac = null;
+function audio() {
+  try { if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; }
+  catch (e) { console.warn('[LEO] audio unavailable', e); return null; }
+}
+function tone(freq, start, dur, type = 'triangle', vol = 0.25) {
+  const a = audio(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, a.currentTime + start);
+  g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + start + dur);
+  o.connect(g).connect(a.destination); o.start(a.currentTime + start); o.stop(a.currentTime + start + dur + 0.05);
+}
+const sfx = {
+  right() { [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.09, 0.25)); },
+  nearly() { tone(330, 0, 0.18, 'sine', 0.2); tone(294, 0.16, 0.25, 'sine', 0.2); },
+  drum() { tone(110, 0, 0.25, 'sine', 0.6); tone(70, 0, 0.35, 'sine', 0.5); },
+  kick() { tone(180, 0, 0.12, 'square', 0.15); },
+  fanfare() { [392, 523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.3, 'square', 0.12)); },
+  cheer() {
+    const a = audio(); if (!a) return;
+    const len = a.sampleRate * 1.4, buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / len) * 0.35;
+    const s = a.createBufferSource(), f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 1400;
+    s.buffer = buf; s.connect(f).connect(a.destination); s.start();
+  }
+};
+
+/* ---------- Art ---------- */
+function starPts(cx, cy, r1, r2) {
+  return Array.from({ length: 10 }, (_, i) => { const r = i % 2 ? r2 : r1, a = Math.PI / 5 * i - Math.PI / 2; return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`; }).join(' ');
+}
+const SHAPE = {
+  circle: '<circle cx="50" cy="50" r="40"/>',
+  square: '<rect x="12" y="12" width="76" height="76" rx="4"/>',
+  triangle: '<polygon points="50,10 92,88 8,88" stroke-linejoin="round"/>',
+  star: `<polygon points="${starPts(50, 52, 44, 19)}" stroke-linejoin="round"/>`,
+  heart: '<path d="M50 88C18 64 6 46 8 30 10 14 30 8 42 18 46 22 48 25 50 28 52 25 54 22 58 18 70 8 90 14 92 30 94 46 82 64 50 88Z"/>',
+  rectangle: '<rect x="4" y="26" width="92" height="48" rx="4"/>',
+  diamond: '<polygon points="50,6 90,50 50,94 10,50" stroke-linejoin="round"/>',
+  oval: '<ellipse cx="50" cy="50" rx="44" ry="28"/>'
+};
+const SHAPE_FILL = { circle: '#e63946', square: '#2a7de1', triangle: '#2fbf71', star: '#ffc93c', heart: '#ff7eb6', rectangle: '#8a5cf6', diamond: '#ff9a3c', oval: '#3fd4c4' };
+function shapeSvg(name, mode = 'fill', colour) {
+  const attrs = mode === 'hole'
+    ? 'fill="#00000022" stroke="#fff" stroke-width="5" stroke-dasharray="10 8"'
+    : `fill="${colour || SHAPE_FILL[name]}" stroke="#00000022" stroke-width="3"`;
+  return `<svg viewBox="0 0 100 100" aria-label="${name}"><g ${attrs}>${SHAPE[name]}</g></svg>`;
+}
+const THING = {
+  ball: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#2b2118" stroke-width="4"/><polygon points="50,32 66,44 60,63 40,63 34,44" fill="#2b2118"/><path d="M50 32V8M66 44l22-8M60 63l12 20M40 63 28 83M34 44 12 36" stroke="#2b2118" stroke-width="4"/></svg>',
+  apple: '<svg viewBox="0 0 100 100"><path d="M50 30c-14-10-40-4-40 22 0 26 20 42 30 40 6-1 8-3 10-3s4 2 10 3c10 2 30-14 30-40 0-26-26-32-40-22z" fill="#e63946"/><path d="M50 30c0-10 4-18 10-22" stroke="#7a3b16" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M56 20c8-10 20-8 22-6-4 8-14 12-22 6z" fill="#2fbf71"/></svg>',
+  star: '<svg viewBox="0 0 100 100" fill="#ffc93c" stroke="#e0a400" stroke-width="3"><use href="#star"/></svg>',
+  note: '<svg viewBox="0 0 100 100"><path d="M40 14v52a14 12 0 1 0 8 11V34l30-8v30a14 12 0 1 0 8 11V8z" fill="#8a5cf6"/></svg>'
+};
+const PLURAL = { ball: 'footballs', apple: 'apples', star: 'stars', note: 'music notes' };
+const DRUM = '<svg class="drum" id="drum" viewBox="0 0 120 120"><path d="M20 70l30-50M100 70 70 20" stroke="#7a3b16" stroke-width="6" stroke-linecap="round"/><ellipse cx="60" cy="58" rx="46" ry="14" fill="#fff"/><path d="M14 58v34c0 8 20 16 46 16s46-8 46-16V58c0 8-20 14-46 14S14 66 14 58z" fill="#e63946"/><path d="M14 66l15 34 15-30 16 32 16-32 15 30 15-34" fill="none" stroke="#fff" stroke-width="4"/></svg>';
+const GOAL = '<svg viewBox="0 0 120 80"><rect x="6" y="6" width="108" height="74" fill="#ffffff22"/><path d="M6 80V6h108v74" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M18 6v74M30 6v74M42 6v74M54 6v74M66 6v74M78 6v74M90 6v74M102 6v74M6 18h108M6 30h108M6 42h108M6 54h108M6 66h108" stroke="#ffffff55" stroke-width="1.5"/></svg>';
+const BOX = '<svg class="box shake" viewBox="0 0 200 200"><rect x="30" y="80" width="140" height="100" rx="10" fill="#2a7de1"/><rect x="20" y="60" width="160" height="34" rx="8" fill="#5fb0ff"/><rect x="88" y="60" width="24" height="120" fill="#e63946"/><path d="M100 60c-30-40-60-10-36 0zM100 60c30-40 60-10 36 0z" fill="#e63946"/><text x="100" y="152" font-size="56" text-anchor="middle" fill="#fff" font-weight="800">?</text></svg>';
+function friendSvg(f) {
+  const ears = {
+    round: `<circle cx="58" cy="52" r="18" fill="${f.colour}"/><circle cx="142" cy="52" r="18" fill="${f.colour}"/>`,
+    pointy: `<path d="M50 74 60 26l28 34zM150 74 140 26l-28 34z" fill="${f.colour}"/>`,
+    antenna: '<path d="M78 50 66 18M122 50l12-32" stroke="#2b2118" stroke-width="5"/><circle cx="66" cy="16" r="9" fill="#ffc93c"/><circle cx="134" cy="16" r="9" fill="#ffc93c"/>'
+  }[f.ears];
+  return `<svg viewBox="0 0 200 200" aria-label="${f.name}">${ears}<ellipse cx="100" cy="116" rx="72" ry="66" fill="${f.colour}"/><ellipse cx="100" cy="138" rx="40" ry="30" fill="#ffffff55"/><circle cx="76" cy="104" r="13" fill="#fff"/><circle cx="124" cy="104" r="13" fill="#fff"/><circle cx="79" cy="106" r="7" fill="#2b2118"/><circle cx="127" cy="106" r="7" fill="#2b2118"/><path d="M84 132q16 14 32 0" fill="none" stroke="#2b2118" stroke-width="5" stroke-linecap="round"/></svg>`;
+}
+function renderJars() {
+  const n = state.settings.starsPerReward;
+  const html = Array.from({ length: n }, (_, i) => `<svg viewBox="0 0 100 100" fill="${i < state.stars ? '#ffc93c' : '#ffffff66'}" stroke="${i < state.stars ? '#e0a400' : '#0002'}" stroke-width="4"><use href="#star"/></svg>`).join('');
+  $('homeJar').innerHTML = html; $('playJar').innerHTML = html;
+}
+function confetti() {
+  const box = $('confetti'), colours = ['#e63946', '#2a7de1', '#ffc93c', '#2fbf71', '#ff7eb6'];
+  box.innerHTML = Array.from({ length: 40 }, () => `<i style="left:${Math.random() * 100}%;background:${rand(colours)};animation-delay:${(Math.random() * 0.6).toFixed(2)}s"></i>`).join('');
+  setTimeout(() => { box.innerHTML = ''; }, 3200);
+}
+
+/* ---------- Game loop ---------- */
+const PRAISE = ['Brilliant!', 'Well done, Leo!', 'Amazing!', "You're a superstar, Leo!", 'Fantastic!', 'Yes! Great job!'];
+const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+let round = null, firstTry = true, locked = false, lastType = null, promptText = '';
+let currentGame = null, roundIndex = 0;
+const GAME_ICON = {
+  balloons: '<svg viewBox="0 0 100 120"><ellipse cx="50" cy="46" rx="38" ry="44" fill="#e63946"/><path d="M46 89h8l-4 7z" fill="#e63946"/><path d="M50 96q-8 12 0 22" stroke="#2b2118" stroke-width="3" fill="none"/><text x="50" y="62" font-size="44" font-weight="800" text-anchor="middle" fill="#fff">3</text></svg>',
+  goal: THING.ball,
+  count: '<svg viewBox="0 0 120 120"><path d="M20 70l30-50M100 70 70 20" stroke="#7a3b16" stroke-width="6" stroke-linecap="round"/><ellipse cx="60" cy="58" rx="46" ry="14" fill="#fff" stroke="#0002" stroke-width="2"/><path d="M14 58v34c0 8 20 16 46 16s46-8 46-16V58c0 8-20 14-46 14S14 66 14 58z" fill="#e63946"/><path d="M14 66l15 34 15-30 16 32 16-32 15 30 15-34" fill="none" stroke="#fff" stroke-width="4"/></svg>',
+  shapes: `<svg viewBox="0 0 100 100"><circle cx="30" cy="32" r="20" fill="#e63946"/><rect x="56" y="12" width="36" height="36" rx="3" fill="#2a7de1"/><polygon points="${starPts(50, 72, 26, 11)}" fill="#ffc93c"/></svg>`,
+  puzzle: '<svg viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="8" fill="#0001" stroke="#2a7de1" stroke-width="5" stroke-dasharray="10 7"/><circle cx="50" cy="50" r="24" fill="#ffc93c" stroke="#0002" stroke-width="2"/></svg>',
+  jigsaw: '<svg viewBox="0 0 100 100"><path d="M12 22h22a9 9 0 1 1 18 0h22v22a9 9 0 1 0 0 18v22H52a9 9 0 1 0-18 0H12V62a9 9 0 1 1 0-18z" fill="#2fbf71" stroke="#0002" stroke-width="3"/></svg>',
+  penalty: `<svg viewBox="0 0 120 100"><path d="M8 70V12h104v58" fill="#ffffff22" stroke="#2b2118" stroke-width="5" stroke-linejoin="round"/><path d="M24 12v58M40 12v58M56 12v58M72 12v58M88 12v58M104 12v58M8 26h104M8 40h104M8 54h104" stroke="#0003" stroke-width="1.5"/><g transform="translate(86 76)"><circle r="16" fill="#fff" stroke="#2b2118" stroke-width="3"/><polygon points="0,-6 6,-2 4,5 -4,5 -6,-2" fill="#2b2118"/></g></svg>`,
+  tune: '<svg viewBox="0 0 100 100"><circle cx="28" cy="30" r="18" fill="#e63946"/><circle cx="72" cy="30" r="18" fill="#2a7de1"/><circle cx="28" cy="72" r="18" fill="#ffc93c"/><circle cx="72" cy="72" r="18" fill="#2fbf71"/></svg>'
+};
+const BALLOON_COLOURS = ['#e63946', '#ff9a3c', '#2fbf71', '#8a5cf6', '#ff5fa2'];
+
+function renderMenu() {
+  $('gameTiles').innerHTML = C.GAMES.map((g) => `<button class="tile" data-nav data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
+  $('gameTiles').querySelectorAll('.tile').forEach((t) => {
+    const g = C.GAMES.find((x) => x.id === t.dataset.game);
+    t.addEventListener('click', () => startGame(g.id));
+    t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // LEO reads the game names to a non-reader
+  });
+}
+function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
+function startGame(id) {
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; state = { ...state, stars: 0 }; save();
+  show('play'); renderJars(); newRound();
+}
+
+async function newRound() {
+  if (currentGame === 'jigsaw') return startJigsaw();
+  if (currentGame === 'penalty') return penaltyRound();
+  if (currentGame === 'tune') return tuneRound();
+  lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
+  round = C.makeRound(lastType, state);
+  firstTry = true; locked = false;
+  renderRound();
+  await repeatPrompt();
+}
+
+function promptFor(r) {
+  switch (r.type) {
+    case 'findNumber': return `Can you find number ${r.target}?`;
+    case 'goal': return `Kick the ball into goal number ${r.target}!`;
+    case 'countIt': return `How many ${PLURAL[r.thing]}? Let's count!`;
+    case 'drumCount': return 'Listen to my drum. How many bangs?';
+    case 'findShape': return `Can you find the ${r.target}?`;
+    case 'shapeFit': return 'Which shape fits in the hole?';
+    case 'jigsaw': return `Let's make a picture of ${C.PUZZLES[r.pic].name}! Pick a piece, then find where it goes.`;
+    case 'penalty': return 'Penalty time! Pick where to shoot!';
+    case 'simon': return 'Listen to my tune, then copy me!';
+  }
+}
+
+function renderRound() {
+  const r = round;
+  let showHtml = '', answers;
+  if (r.type === 'countIt') showHtml = Array.from({ length: r.target }, () => THING[r.thing]).join('');
+  if (r.type === 'drumCount') showHtml = DRUM + '<button class="again" id="againBtn" data-nav>Play again</button>';
+  if (r.type === 'shapeFit') showHtml = `<div class="hole">${shapeSvg(r.target, 'hole')}</div>`;
+  if (r.skill === 'numbers') {
+    answers = r.options.map((n) => r.type === 'goal'
+      ? `<button class="ans goal" data-nav data-v="${n}"><span>${n}</span>${GOAL}</button>`
+      : r.type === 'findNumber'
+        ? `<button class="ans balloon" data-nav data-v="${n}" style="background:${BALLOON_COLOURS[n % BALLOON_COLOURS.length]}">${n}</button>`
+        : `<button class="ans" data-nav data-v="${n}">${n}</button>`).join('');
+  } else {
+    // Same colour for every option in "fits" rounds so he matches by shape, not colour.
+    answers = r.options.map((s) => `<button class="ans" data-nav data-v="${s}">${shapeSvg(s, 'fill', r.type === 'shapeFit' ? '#ffc93c' : undefined)}</button>`).join('');
+  }
+  const pitch = r.type === 'goal' ? `<div class="pitch"><div class="answers">${answers}</div><div id="ball">${THING.ball}</div></div>` : `<div class="answers">${answers}</div>`;
+  $('task').innerHTML = `<div class="show">${showHtml}</div>${pitch}`;
+  $('task').querySelectorAll('.ans').forEach((b) => b.addEventListener('click', () => answer(b)));
+  const again = $('againBtn'); if (again) again.addEventListener('click', playDrum);
+  if (usingPad) $('task').querySelector('.ans')?.focus();
+}
+
+async function playDrum() {
+  if (!round || round.type !== 'drumCount') return;
+  await wait(300);
+  for (let i = 0; i < round.target; i++) {
+    sfx.drum(); const d = $('drum'); if (d) { d.classList.remove('hit'); void d.getBBox(); d.classList.add('hit'); }
+    await wait(650);
+  }
+}
+
+async function repeatPrompt() {
+  if (current !== 'play' || !round) return;
+  promptText = promptFor(round);
+  if (round.type === 'simon') { if (tune && !tune.playing) { tune.input = []; await say(promptText); await playTune(); } return; }
+  await say(promptText);
+  if (round.type === 'drumCount') await playDrum();
+}
+
+async function answer(btn) {
+  if (locked) return;
+  const v = round.skill === 'numbers' ? Number(btn.dataset.v) : btn.dataset.v;
+  if (v !== round.target) {
+    firstTry = false; sfx.nearly();
+    btn.classList.add('wrong'); btn.disabled = true;
+    const named = round.skill === 'numbers' ? `That's number ${v}.` : `That's a ${v}.`;
+    await say(`Ooh, nearly! ${named} ${promptFor(round)}`);
+    return;
+  }
+  locked = true;
+  btn.classList.add('right');
+  if (round.type === 'goal') {
+    const ball = $('ball'), b = btn.getBoundingClientRect(), o = ball.getBoundingClientRect();
+    sfx.kick(); ball.style.transform = `translate(${b.left + b.width / 2 - (o.left + o.width / 2)}px,${b.top + b.height * 0.6 - (o.top + o.height / 2)}px) rotate(540deg)`;
+    await wait(650); sfx.cheer();
+  }
+  sfx.right();
+  state = C.recordAnswer(state, round.skill, round.target, firstTry);
+  const res = C.addStar(state); state = res.state; save(); renderJars(); roundIndex++;
+  let praise = rand(PRAISE);
+  if (round.type === 'countIt' || round.type === 'drumCount') praise = `${Array.from({ length: round.target }, (_, i) => i + 1).join(', ')}. ${NUM_WORD[round.target]}! ${praise}`;
+  if (round.type === 'goal') praise = `Goal! Number ${round.target}! ${praise}`;
+  if (round.type === 'shapeFit') praise = `Yes! The ${round.target} fits! ${praise}`;
+  await say(praise);
+  if (res.rewardReady) startReward(); else newRound();
+}
+
+/* ---------- Shared: a win in a just-for-fun game ---------- */
+async function funWin(praise) {
+  sfx.right();
+  const res = C.addStar(state); state = res.state; save(); renderJars(); roundIndex++;
+  await say(praise);
+  if (current !== 'play') return;
+  if (res.rewardReady) startReward(); else newRound();
+}
+
+/* ---------- Jigsaw: tap a piece, then tap the square it belongs in ---------- */
+let jig = null;
+function pieceSvg(pic, i) {
+  const x = (i % C.JIGSAW_COLS) * 100, y = Math.floor(i / C.JIGSAW_COLS) * 100;
+  return `<svg viewBox="${x} ${y} 100 100" aria-hidden="true"><use href="#pic${pic}" width="500" height="200"/></svg>`;
+}
+function startJigsaw() {
+  const next = C.takeNextPuzzle(state); state = next.state; save();
+  jig = { pic: next.puzzle, order: C.jigsawOrder(), placed: [], sel: null, misses: 0, picks: 0 };
+  round = { type: 'jigsaw', pic: jig.pic }; locked = false;
+  renderJigsaw();
+  repeatPrompt();
+}
+function renderJigsaw(focus) {
+  const n = C.JIGSAW_PIECES, done = C.isJigsawDone(jig.placed);
+  const slots = Array.from({ length: n }, (_, i) => jig.placed.includes(i)
+    ? `<div class="slot filled">${pieceSvg(jig.pic, i)}</div>`
+    : `<button class="slot empty" data-nav data-slot="${i}" aria-label="Space ${i + 1}">${pieceSvg(jig.pic, i)}</button>`).join('');
+  const tray = jig.order.filter((i) => !jig.placed.includes(i))
+    .map((i) => `<button class="piece${jig.sel === i ? ' sel' : ''}" data-nav data-piece="${i}" aria-label="Piece">${pieceSvg(jig.pic, i)}</button>`).join('');
+  $('task').innerHTML = `<div class="jig${done ? ' done' : ''}"><div class="board${done ? ' done' : ''}" id="board">${slots}</div>${done ? '' : `<div class="tray">${tray}</div>`}</div>`;
+  $('task').querySelectorAll('.piece').forEach((b) => b.addEventListener('click', () => pickPiece(Number(b.dataset.piece))));
+  $('task').querySelectorAll('.slot.empty').forEach((b) => b.addEventListener('click', () => dropPiece(Number(b.dataset.slot), b)));
+  if (usingPad || focus) {
+    const target = focus === 'board' ? $('task').querySelector('.slot.empty') : $('task').querySelector(jig.sel != null ? `.piece[data-piece="${jig.sel}"]` : '.piece');
+    target?.focus();
+  }
+}
+function pickPiece(i) {
+  if (locked) return;
+  jig.sel = i; jig.misses = 0; jig.picks++;
+  tone(660, 0, 0.12, 'triangle', 0.2);
+  renderJigsaw(usingPad ? 'board' : null);
+  if (jig.picks <= 2) say('Where does this piece go?');
+}
+async function dropPiece(slot, btn) {
+  if (locked) return;
+  if (jig.sel == null) { say('Pick a piece first!'); $('task').querySelector('.piece')?.focus(); return; }
+  const res = C.placePiece(jig.placed, jig.sel, slot);
+  if (!res.ok) {
+    sfx.nearly(); jig.misses++;
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+    if (jig.misses >= 2) { // gentle hint: make the right square glow
+      $('task').querySelector(`.slot[data-slot="${jig.sel}"]`)?.classList.add('hint');
+      say('Look for the glowing space!');
+    } else say('Not there. Look at the picture!');
+    return;
+  }
+  jig.placed = res.placed; jig.sel = null;
+  // Fill the star jar as the picture comes together.
+  state = { ...state, stars: Math.round(jig.placed.length / C.JIGSAW_PIECES * state.settings.starsPerReward) }; save(); renderJars();
+  sfx.right();
+  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Leo!'])); return; }
+  locked = true;
+  renderJigsaw();
+  confetti(); sfx.fanfare();
+  await say(`You did it, Leo! ${C.PUZZLES[jig.pic].done}`);
+  await wait(1200);
+  if (current === 'play' && currentGame === 'jigsaw') { state = { ...state, stars: state.settings.starsPerReward }; save(); startReward(); }
+}
+
+/* ---------- Penalty shootout: pick a corner, beat the goalie ---------- */
+let pen = null;
+const ARROW = ['<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="8 6"/><path d="M38 18 22 30l16 12" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="8 6"/><circle cx="30" cy="30" r="8" fill="#fff"/></svg>',
+  '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="8 6"/><path d="M22 18l16 12-16 12" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>'];
+const SIDES = ['left', 'middle', 'right'];
+function keeperSvg() { // an original goalie: Pom with big gloves
+  const f = C.FRIENDS[1];
+  return friendSvg(f).replace('</svg>', '<circle cx="22" cy="120" r="20" fill="#2fbf71" stroke="#0003" stroke-width="3"/><circle cx="178" cy="120" r="20" fill="#2fbf71" stroke="#0003" stroke-width="3"/></svg>');
+}
+function penaltyRound() {
+  if (!pen) pen = { shots: 0, lastSaved: false, goals: 0 };
+  round = { type: 'penalty' }; locked = false;
+  $('task').innerHTML = `<div class="pens"><div class="pgoal" id="pgoal"><div id="keeper">${keeperSvg()}</div>
+    <div class="spots">${SIDES.map((sd, i) => `<button class="spot" data-nav data-spot="${i}" aria-label="Shoot ${sd}">${ARROW[i]}</button>`).join('')}</div></div>
+    <div class="pball" id="pball">${THING.ball}</div><div class="goals" id="goals">Goals: ${pen.goals}</div></div>`;
+  $('task').querySelectorAll('.spot').forEach((b) => b.addEventListener('click', () => shoot(Number(b.dataset.spot), b)));
+  if (usingPad) $('task').querySelector('.spot[data-spot="1"]')?.focus();
+  if (pen.shots === 0) repeatPrompt(); else say('Shoot again!');
+}
+async function shoot(spot, btn) {
+  if (locked) return;
+  locked = true;
+  const dive = C.keeperDive(spot, { firstShot: pen.shots === 0, lastSaved: pen.lastSaved });
+  pen.shots++;
+  const keeper = $('keeper'), ball = $('pball');
+  keeper.style.transform = `translateX(${[-202, -50, 102][dive]}%) rotate(${[-25, 0, 25][dive]}deg)`;
+  const b = btn.getBoundingClientRect(), o = ball.getBoundingClientRect();
+  sfx.kick();
+  ball.style.transform = `translate(${b.left + b.width / 2 - (o.left + o.width / 2)}px,${b.top + b.height / 2 - (o.top + o.height / 2)}px) scale(.7) rotate(720deg)`;
+  await wait(600);
+  if (current !== 'play') return;
+  if (dive === spot) {
+    pen.lastSaved = true; sfx.nearly();
+    await say(rand(['Ooh, the goalie saved it! Try again!', 'What a save! Have another go!']));
+    if (current === 'play') penaltyRound();
+    return;
+  }
+  pen.lastSaved = false; pen.goals++;
+  $('goals').textContent = `Goals: ${pen.goals}`;
+  $('pgoal').classList.add('shake'); sfx.cheer(); confetti();
+  await funWin(`GOAL! In the ${SIDES[spot]}! ${rand(PRAISE)}`);
+}
+
+/* ---------- Copy my tune: watch the drums light up, then copy ---------- */
+let tune = null;
+const PADS = [{ c: '#e63946', f: 262 }, { c: '#2a7de1', f: 330 }, { c: '#ffc93c', f: 392 }, { c: '#2fbf71', f: 523 }];
+const NOTE_ICON = '<svg viewBox="0 0 100 100"><path d="M40 14v52a14 12 0 1 0 8 11V34l30-8v30a14 12 0 1 0 8 11V8z" fill="#fff"/></svg>';
+function lightPad(i, ms = 420) {
+  const el = $('task').querySelector(`.pad[data-pad="${i}"]`);
+  tone(PADS[i].f, 0, ms / 1000, 'triangle', 0.3);
+  if (!el) return;
+  el.classList.add('lit'); setTimeout(() => el.classList.remove('lit'), ms);
+}
+async function tuneRound() {
+  tune = { seq: C.simonSequence(C.simonLength(roundIndex)), input: [], playing: false };
+  round = { type: 'simon' }; locked = false;
+  $('task').innerHTML = `<div class="pads">${PADS.map((p, i) => `<button class="pad" data-nav data-pad="${i}" style="background:${p.c}" aria-label="Drum ${i + 1}">${NOTE_ICON}</button>`).join('')}</div>`;
+  $('task').querySelectorAll('.pad').forEach((b) => b.addEventListener('click', () => tapPad(Number(b.dataset.pad))));
+  await say(roundIndex === 0 ? promptFor(round) : `Ready? ${tune.seq.length} notes this time!`);
+  await playTune();
+}
+async function playTune() {
+  if (!tune || current !== 'play') return;
+  tune.playing = true; tune.input = [];
+  await wait(400);
+  for (const i of tune.seq) { if (current !== 'play') return; lightPad(i); await wait(700); }
+  tune.playing = false;
+  if (current !== 'play') return;
+  if (usingPad) $('task').querySelector('.pad')?.focus();
+  say('Your turn!');
+}
+async function tapPad(i) {
+  if (!tune || tune.playing || locked) return;
+  lightPad(i, 300);
+  tune.input.push(i);
+  const res = C.checkSimon(tune.seq, tune.input);
+  if (res === 'wrong') {
+    tune.playing = true; sfx.nearly();
+    await say('Ooh, nearly! Listen again.');
+    tune.playing = false;
+    await playTune();
+    return;
+  }
+  if (res === 'done') { locked = true; await wait(350); confetti(); await funWin(`You copied my tune! ${rand(PRAISE)}`); }
+}
+
+// Read-only snapshot for automated play-testing.
+window.__leoDebug = () => ({ tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+
+/* ---------- Reward ---------- */
+let rewardStage = 'box';
+function startReward() {
+  rewardStage = 'box';
+  const game = C.GAMES.find((g) => g.id === currentGame);
+  $('rewardTitle').textContent = game ? `${game.name}: all done!` : 'You earned a surprise!';
+  $('rewardArt').innerHTML = BOX;
+  $('rewardBtn').textContent = 'Open it!';
+  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Leo! Open your surprise!');
+}
+$('rewardBtn').addEventListener('click', async () => {
+  if (rewardStage === 'box') {
+    const r = C.claimReward(state); state = r.state; save();
+    rewardStage = 'friend';
+    $('rewardArt').innerHTML = `<div class="friend">${friendSvg(r.friend)}</div>`;
+    $('rewardTitle').textContent = `You found ${r.friend.name}!`;
+    $('rewardBtn').textContent = state.settings.videoIds.length ? 'TV time!' : 'Dance party!';
+    confetti(); sfx.fanfare();
+    await say(`You found ${r.friend.name}! ${r.friend.name} is your new friend!`);
+  } else startTv();
+});
+
+/* ---------- TV time (approved YouTube videos only) ---------- */
+let yt = null, ytReady = null, tvTimer = null, tvEnd = 0, tvTotal = 1, tvErrors = 0;
+function loadYouTube() {
+  if (ytReady) return ytReady;
+  ytReady = new Promise((resolve, reject) => {
+    window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    s.onerror = () => { ytReady = null; reject(new Error('YouTube could not load')); };
+    document.head.appendChild(s);
+  });
+  return ytReady;
+}
+async function startTv() {
+  const minutes = state.settings.tvMinutes;
+  show('tv'); $('tvmsg').hidden = true;
+  tvTotal = minutes * 60000; tvEnd = Date.now() + tvTotal; tvErrors = 0;
+  clearInterval(tvTimer);
+  tvTimer = setInterval(() => {
+    const left = tvEnd - Date.now();
+    $('timerBar').style.width = `${Math.max(0, (100 * left) / tvTotal)}%`;
+    if (left <= 0) finishTv();
+  }, 1000);
+  if (!state.settings.videoIds.length) return danceParty();
+  try {
+    const YT = await loadYouTube();
+    playNext(YT);
+  } catch (err) {
+    console.warn('[LEO] TV fallback', err);
+    danceParty();
+  }
+}
+function playNext(YT) {
+  const next = C.takeNextVideo(state); state = next.state; save();
+  if (!next.videoId) return danceParty();
+  if (yt) { yt.loadVideoById(next.videoId); return; }
+  yt = new YT.Player('player', {
+    host: 'https://www.youtube-nocookie.com',
+    videoId: next.videoId,
+    playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1 },
+    events: {
+      onStateChange: (e) => { if (e.data === YT.PlayerState.ENDED && current === 'tv') playNext(YT); },
+      onError: (e) => {
+        console.warn('[LEO] video error', e.data);
+        tvErrors += 1;
+        if (tvErrors >= state.settings.videoIds.length) danceParty(); else playNext(YT); // skip videos that block embedding
+      }
+    }
+  });
+}
+let danceLoop = null;
+function danceParty() {
+  if (yt) { try { yt.destroy(); } catch (e) { console.warn(e); } yt = null; }
+  $('player').innerHTML = '';
+  $('tvmsg').hidden = false;
+  $('tvmsg').innerHTML = '<div class="row" style="flex-direction:column;align-items:center"><svg class="leo-hero wave" style="animation-duration:.6s"><use href="#leo"/></svg><h2>Dance party!</h2><button class="big" id="danceDone" data-nav>All done!</button></div>';
+  $('danceDone').addEventListener('click', finishTv);
+  if (usingPad) $('danceDone').focus();
+  tvTotal = 30000; tvEnd = Date.now() + tvTotal; // a short boogie when no shows are set up
+  const tune = [523, 587, 659, 523, 659, 698, 784, 659];
+  let i = 0; clearInterval(danceLoop);
+  danceLoop = setInterval(() => { tone(tune[i % tune.length], 0, 0.25, 'square', 0.1); if (i % 2 === 0) sfx.drum(); i++; }, 300);
+  say("Let's dance!");
+}
+function finishTv() {
+  clearInterval(tvTimer); clearInterval(danceLoop);
+  if (yt) { try { yt.pauseVideo(); yt.destroy(); } catch (e) { console.warn('[LEO] could not stop player', e); } yt = null; }
+  $('player').innerHTML = '';
+  if (current !== 'tv') return;
+  show('tvdone'); say('TV time is finished! Shall we play some more?');
+}
+
+/* ---------- Stickers ---------- */
+function renderStickers() {
+  const owned = new Set(state.friends);
+  $('stickerGrid').innerHTML = C.FRIENDS.map((f, i) => owned.has(i)
+    ? `<div class="card">${friendSvg(f)}<b>${f.name}</b></div>`
+    : `<div class="card locked">${friendSvg(f)}<b>?</b></div>`).join('');
+}
+
+/* ---------- Grown-ups ---------- */
+let pinEntry = '', pinMode = 'enter', pinFirst = '';
+function openParent() {
+  pinEntry = ''; pinMode = state.settings.pin ? 'enter' : 'create';
+  $('pinTitle').textContent = 'Grown-ups only';
+  $('pinHint').textContent = pinMode === 'create' ? 'Choose a 4-digit PIN for the grown-ups area.' : 'Enter your 4-digit PIN.';
+  $('pinView').hidden = false; $('settingsView').hidden = true;
+  drawPin(); show('parent');
+}
+function drawPin() {
+  $('pinDots').textContent = '●'.repeat(pinEntry.length) + '○'.repeat(4 - pinEntry.length);
+  $('pinPad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '⌫'].map((k) => k === '' ? '<span></span>' : `<button type="button" data-k="${k}">${k}</button>`).join('');
+}
+$('pinPad').addEventListener('click', (e) => {
+  const k = e.target.closest('button')?.dataset.k; if (k === undefined) return;
+  if (k === '⌫') pinEntry = pinEntry.slice(0, -1); else if (pinEntry.length < 4) pinEntry += k;
+  drawPin();
+  if (pinEntry.length < 4) return;
+  if (pinMode === 'create') { pinFirst = pinEntry; pinEntry = ''; pinMode = 'confirm'; $('pinHint').textContent = 'Type it again to confirm.'; drawPin(); }
+  else if (pinMode === 'confirm') {
+    if (pinEntry === pinFirst) { state.settings.pin = pinEntry; save(); openSettings(); }
+    else { pinEntry = ''; pinMode = 'create'; $('pinHint').textContent = "Those didn't match. Choose a PIN again."; drawPin(); }
+  } else if (C.checkPin(state, pinEntry)) openSettings();
+  else { pinEntry = ''; $('pinHint').textContent = 'Wrong PIN, try again.'; drawPin(); }
+});
+$('pinBack').addEventListener('click', goHome);
+function bars(items, stats, label) {
+  return items.map((it) => {
+    const s = stats[String(it)], pct = s && s.tries ? Math.round(100 * s.right / s.tries) : 0;
+    return `<div class="bar"><span>${label(it)}</span><div><i style="width:${pct}%"></i></div><span>${s ? pct + '%' : '–'}</span></div>`;
+  }).join('');
+}
+function openSettings() {
+  $('pinView').hidden = true; $('settingsView').hidden = false;
+  $('setStars').value = state.settings.starsPerReward;
+  $('setMinutes').value = state.settings.tvMinutes;
+  $('setVideos').value = state.settings.videoIds.map((id) => `https://www.youtube.com/watch?v=${id}`).join('\n');
+  updateVideoCount();
+  $('numBars').innerHTML = bars([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], state.stats.numbers, (n) => `Number ${n}`);
+  $('shapeBars').innerHTML = bars(C.BASIC_SHAPES.concat(C.EXTRA_SHAPES), state.stats.shapes, (s) => s[0].toUpperCase() + s.slice(1));
+  $('levelNote').textContent = `Now practising numbers 1–${C.numberMax(state)} and ${C.shapePool(state).length} shapes. Friends found: ${state.friends.length} of ${C.FRIENDS.length}. Percentages show first-try answers.`;
+}
+function updateVideoCount() {
+  const n = C.parseVideoList($('setVideos').value).length;
+  $('videoCount').textContent = n ? `${n} video${n === 1 ? '' : 's'} recognised.` : 'No videos yet: rewards will be a dance party.';
+}
+$('setVideos').addEventListener('input', updateVideoCount);
+$('settingsView').addEventListener('submit', (e) => {
+  e.preventDefault();
+  state.settings.starsPerReward = C.clampInt($('setStars').value, 3, 10, 5);
+  state.settings.tvMinutes = C.clampInt($('setMinutes').value, 5, 30, 10);
+  state.settings.videoIds = C.parseVideoList($('setVideos').value);
+  state.nextVideo = 0;
+  save(); goHome();
+});
+$('setBack').addEventListener('click', goHome);
+function ask(text) {
+  return new Promise((resolve) => {
+    $('confirmText').textContent = text; $('confirm').classList.add('on');
+    const done = (v) => { $('confirm').classList.remove('on'); $('confirmYes').onclick = $('confirmNo').onclick = null; resolve(v); };
+    $('confirmYes').onclick = () => done(true); $('confirmNo').onclick = () => done(false);
+  });
+}
+$('resetBtn').addEventListener('click', async () => {
+  if (!(await ask('Reset stars, friends and progress? Settings and PIN are kept.'))) return;
+  const keep = state.settings; state = C.defaultState(); state.settings = keep; save(); openSettings();
+});
+$('pinChange').addEventListener('click', () => { state.settings.pin = null; save(); openParent(); });
+
+/* Hold the gear for 2 seconds so little fingers don't wander in. */
+let holdTimer = null;
+$('gear').addEventListener('pointerdown', () => { holdTimer = setTimeout(openParent, 2000); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => $('gear').addEventListener(ev, () => clearTimeout(holdTimer)));
+
+/* ---------- Wiring ---------- */
+$('startBtn').addEventListener('click', () => { audio(); goHome(); });
+$('stickerBtn').addEventListener('click', () => { renderStickers(); show('stickers'); say(state.friends.length ? 'Here are all your friends!' : 'Play games to find new friends!'); });
+$('stickersHome').addEventListener('click', goHome);
+$('homeBtn').addEventListener('click', goHome);
+$('playLeo').addEventListener('click', repeatPrompt);
+$('tvdoneBtn').addEventListener('click', goHome);
+renderMenu();
+renderJars();
+
+/* ---------- Birthday surprise: 25 November 2026 only ---------- */
+function isBirthday(d = new Date()) { return d.getFullYear() === 2026 && d.getMonth() === 10 && d.getDate() === 25; }
+function playBirthdayTune() {
+  // "Happy Birthday to You" (public domain melody), one beat = 0.32s.
+  const G = 392, A = 440, B = 494, C5 = 523, D5 = 587, E5 = 659, F5 = 698, G5 = 784;
+  const notes = [[G, .75], [G, .25], [A, 1], [G, 1], [C5, 1], [B, 2], [G, .75], [G, .25], [A, 1], [G, 1], [D5, 1], [C5, 2],
+    [G, .75], [G, .25], [G5, 1], [E5, 1], [C5, 1], [B, 1], [A, 2], [F5, .75], [F5, .25], [E5, 1], [C5, 1], [D5, 1], [C5, 2]];
+  let t = 0;
+  const lineStarts = [];
+  const phraseStart = [0, 6, 12, 19]; // note index where each sung line begins
+  notes.forEach(([f, beats], i) => { if (phraseStart.includes(i)) lineStarts.push(t); tone(f, t, beats * 0.3, 'triangle', 0.22); t += beats * 0.32; });
+  // LEO sings along: one spoken line at the start of each musical phrase.
+  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!'];
+  lineStarts.forEach((start, i) => setTimeout(() => {
+    if (nativeVoice) { nativeSpeak(lines[i], true); return; }
+    try {
+      const u = new SpeechSynthesisUtterance(lines[i]);
+      if (voice) u.voice = voice;
+      u.lang = 'en-GB'; u.rate = 1.05; u.pitch = 1.4;
+      speechSynthesis.speak(u);
+      $('bubble').textContent = lines[i];
+    } catch (e) { console.warn('[LEO] could not sing', e); }
+  }, start * 1000));
+  return t * 1000;
+}
+if (isBirthday()) {
+  const colours = ['#e63946', '#2a7de1', '#ffc93c', '#2fbf71', '#8a5cf6'];
+  $('balloons').innerHTML = Array.from({ length: 10 }, (_, i) => `<svg viewBox="0 0 60 100" style="left:${i * 10 + Math.random() * 5}%;animation-delay:${(i * 0.9).toFixed(1)}s"><ellipse cx="30" cy="34" rx="26" ry="32" fill="${colours[i % colours.length]}"/><path d="M27 66h6l-3 6z" fill="${colours[i % colours.length]}"/><path d="M30 72q-6 12 0 26" stroke="#fff" stroke-width="2" fill="none"/></svg>`).join('');
+  show('birthday');
+  let partied = false, canPlay = false;
+  // Phones only allow sound after a tap, so the first touch anywhere starts the song.
+  async function party(fromTap) {
+    if (partied) return;
+    const a = audio();
+    if (fromTap !== true && (!a || a.state !== 'running')) return; // autoplay blocked: wait for a tap
+    partied = true;
+    stopSpeech();
+    confetti(); $('birthdayBtn').textContent = 'Singing…';
+    const len = playBirthdayTune();
+    await wait(len + 400);
+    confetti();
+    await say("Hooray! You're four today, Leo! We have the same name! Shall we play?");
+    canPlay = true; $('birthdayBtn').textContent = 'Play';
+  }
+  $('birthday').addEventListener('pointerdown', () => party(true));
+  document.addEventListener('keydown', () => { if (current === 'birthday') party(true); });
+  $('birthdayBtn').addEventListener('click', () => { if (canPlay) goHome(); else party(true); });
+  setTimeout(() => party(false), 600); // TV/desktop browsers that allow autoplay start singing straight away
+}
+
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch((err) => console.warn('[LEO] offline mode unavailable', err));
+}
+}
+</script>
+</body>
+</html>

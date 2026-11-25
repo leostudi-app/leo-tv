@@ -1,0 +1,5 @@
+{
+  "redirects": [
+    { "source": "/tv", "destination": "https://github.com/leostudi-app/leo-tv/releases/download/latest/leo-tv.apk", "permanent": false }
+  ]
+}
