@@ -473,7 +473,8 @@ function pollPad(t) {
     }
     pad.prev = pressed;
   }
-  requestAnimationFrame(pollPad);
+  // During videos, check the controller ~7 times a second instead of 60 to leave the TV's processor for the video.
+  if (current === 'tv') setTimeout(() => requestAnimationFrame(pollPad), 150); else requestAnimationFrame(pollPad);
 }
 window.addEventListener('gamepadconnected', () => { usingPad = true; navItems()[0]?.focus(); });
 requestAnimationFrame(pollPad);
@@ -1171,7 +1172,16 @@ async function startTv() {
 function captionsOff(p) {
   try { p.unloadModule('captions'); p.unloadModule('cc'); } catch (e) { console.warn('[LEO] captions', e); }
 }
+const onTvApp = /LeoTV/.test(navigator.userAgent);
+function sizePlayer() {
+  const el = $('player');
+  if (!onTvApp) { el.removeAttribute('style'); return; }
+  const w = Math.round(1280 / (window.devicePixelRatio || 1)), h = Math.round(w * 9 / 16);
+  const scale = Math.min(window.innerWidth / w, window.innerHeight / h);
+  el.style.cssText = `inset:auto;left:${(window.innerWidth - w * scale) / 2}px;top:${(window.innerHeight - h * scale) / 2}px;width:${w}px;height:${h}px;transform:scale(${scale});transform-origin:0 0`;
+}
 function playVideo(YT) {
+  sizePlayer();
   const videoId = C.videoForGame(state, currentGame, tvErrors);
   if (yt) { try { yt.destroy(); } catch (e) { console.warn('[LEO] old player', e); } yt = null; }
   $('player').innerHTML = '<div id="ytslot"></div>';
