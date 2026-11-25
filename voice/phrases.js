@@ -28,7 +28,7 @@ for (const p of C.PUZZLES) add(`Let's make a picture of ${p.name}! Pick a piece,
 add('Where does this piece go?', 'Pick a piece first!', 'Look for the glowing space!', 'Not there. Look at the picture!', 'Yes!', 'Perfect!', 'Great!');
 // Penalty
 add('Penalty time! Pick where to shoot!', 'Shoot again!', 'Ooh, the goalie saved it! Try again!', 'What a save! Have another go!');
-for (const side of ['left', 'middle', 'right']) add(`GOAL! In the ${side}!`);
+add('Goal! On the left!', 'Goal! In the middle!', 'Goal! On the right!');
 // Copy my tune
 add('Listen to my tune, then copy me!', 'Your turn!', 'Ooh, nearly! Listen again.', 'You copied my tune!');
 for (let k = 2; k <= 4; k++) add(`Ready? ${k} notes this time!`);

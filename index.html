@@ -897,7 +897,7 @@ async function shoot(spot, btn) {
   pen.lastSaved = false; pen.goals++;
   $('goals').textContent = `Goals: ${pen.goals}`;
   $('pgoal').classList.add('shake'); sfx.cheer(); confetti();
-  await funWin(`GOAL! In the ${SIDES[spot]}! ${rand(PRAISE)}`);
+  await funWin(`Goal! ${spot === 1 ? 'In the middle!' : `On the ${SIDES[spot]}!`} ${rand(PRAISE)}`);
 }
 
 /* ---------- Copy my tune: watch the drums light up, then copy ---------- */

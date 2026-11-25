@@ -52,7 +52,7 @@
   const JIGSAW_PIECES = JIGSAW_COLS * JIGSAW_ROWS;
   // Original pictures drawn in index.html (symbols #pic0..#pic3).
   const PUZZLES = [
-    { name: 'LEO playing football', done: 'LEO is playing football!' },
+    { name: 'Leo playing football', done: 'Leo is playing football!' },
     { name: 'a birthday party', done: "It's a birthday party!" },
     { name: 'the bottom of the sea', done: "It's under the sea!" },
     { name: 'a rocket in space', done: "It's a rocket in space!" }
