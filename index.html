@@ -1167,6 +1167,10 @@ async function startTv() {
     danceParty();
   }
 }
+// No subtitles over the cartoons: YouTube may turn them on from the channel's settings, so unload them.
+function captionsOff(p) {
+  try { p.unloadModule('captions'); p.unloadModule('cc'); } catch (e) { console.warn('[LEO] captions', e); }
+}
 function playVideo(YT) {
   const videoId = C.videoForGame(state, currentGame, tvErrors);
   if (yt) { try { yt.destroy(); } catch (e) { console.warn('[LEO] old player', e); } yt = null; }
@@ -1174,15 +1178,16 @@ function playVideo(YT) {
   yt = new YT.Player('ytslot', {
     host: 'https://www.youtube-nocookie.com',
     videoId,
-    playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1, origin: location.origin },
+    playerVars: { autoplay: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3, disablekb: 1, cc_load_policy: 0, origin: location.origin },
     events: {
       onReady: (e) => {
+        captionsOff(e.target);
         try { e.target.playVideo(); } catch (err) { console.warn('[LEO] autoplay', err); }
         // Phones often block autoplay: if it hasn't started, tell him to tap the video.
         setTimeout(() => { try { if (current === 'tv' && yt && yt.getPlayerState() !== YT.PlayerState.PLAYING) $('tvhint').hidden = false; } catch (err) { console.warn(err); } }, 2500);
       },
       onStateChange: (e) => {
-        if (e.data === YT.PlayerState.PLAYING) $('tvhint').hidden = true;
+        if (e.data === YT.PlayerState.PLAYING) { $('tvhint').hidden = true; captionsOff(e.target); }
         if (e.data === YT.PlayerState.ENDED && current === 'tv') finishTv(); // whole video watched: back to the games
       },
       onError: (e) => {
