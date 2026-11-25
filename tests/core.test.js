@@ -132,10 +132,10 @@ test('eight games, each mapping rounds to valid round types', () => {
   assert.throws(() => C.roundTypeFor('nope', 0), /Unknown game/);
 });
 
-test('prize videos default to the five chosen links, including for older saved progress', () => {
+test('prize videos default to the chosen links, including for older saved progress', () => {
   assert.deepEqual(C.defaultState().settings.videoIds, C.DEFAULT_VIDEOS);
   const old = { getItem: () => JSON.stringify({ stars: 2, settings: { videoIds: [] } }) };
-  assert.equal(C.loadState(old).settings.videoIds.length, 5);
+  assert.equal(C.loadState(old).settings.videoIds.length, 10);
   const custom = { getItem: () => JSON.stringify({ settings: { videoIds: ['aaaaaaaaaaa'] } }) };
   assert.deepEqual(C.loadState(custom).settings.videoIds, ['aaaaaaaaaaa']);
 });
