@@ -163,7 +163,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .spot:focus-visible,.spot:hover{background:#ffffff40}
 #keeper{position:absolute;bottom:0;left:50%;width:22%;transform:translateX(-50%);transition:transform .45s ease-out;z-index:1;pointer-events:none}
 #keeper svg{width:100%;height:auto;display:block}
-.pball{width:clamp(56px,8vw,90px);transition:transform .5s ease-out}
+.pball{position:relative;z-index:3;width:clamp(56px,8vw,90px);transition:transform .5s ease-out} /* ball flies in front of the goalie */
 .pball svg{width:100%;height:auto}
 .pgoal.shake{animation:wobble .4s}
 .goals{font-size:clamp(20px,3vw,34px);font-weight:800}
@@ -907,11 +907,17 @@ async function shoot(spot, btn) {
   const keeper = $('keeper'), ball = $('pball');
   keeper.style.transform = `translateX(${[-202, -50, 102][dive]}%) rotate(${[-25, 0, 25][dive]}deg)`;
   const b = btn.getBoundingClientRect(), o = ball.getBoundingClientRect();
+  const g = $('pgoal').getBoundingClientRect(), kh = keeper.getBoundingClientRect().height;
+  // A goal flies to the corner; a save is aimed at the goalie's gloves.
+  const tx = b.left + b.width / 2 - (o.left + o.width / 2);
+  const ty = (dive === spot ? g.bottom - kh * 0.55 : b.top + b.height / 2) - (o.top + o.height / 2);
   sfx.kick();
-  ball.style.transform = `translate(${b.left + b.width / 2 - (o.left + o.width / 2)}px,${b.top + b.height / 2 - (o.top + o.height / 2)}px) scale(.7) rotate(720deg)`;
+  ball.style.transform = `translate(${tx}px,${ty}px) scale(.7) rotate(720deg)`;
   await wait(600);
   if (current !== 'play') return;
   if (dive === spot) {
+    // Saved: the ball bounces back off the goalie's gloves.
+    ball.style.transform = `translate(${tx * 0.6}px,${ty * 0.4}px) scale(.85) rotate(-200deg)`;
     pen.lastSaved = true; sfx.nearly();
     await say(rand(['Ooh, the goalie saved it! Try again!', 'What a save! Have another go!']));
     if (current === 'play') penaltyRound();
