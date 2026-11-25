@@ -1,4 +1,4 @@
-/* LEO core logic — pure functions, no DOM. Shared by index.html and the Node tests. */
+/* ARTHUR core logic — pure functions, no DOM. Shared by index.html and the Node tests. */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api; // Node (tests)
@@ -15,7 +15,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const STORAGE_KEY = 'leo.v1';
+  const STORAGE_KEY = 'arthur.v1';
   const HISTORY_LEN = 10; // rolling window used to judge mastery
   const MASTERY = 0.8; // 80% first-try accuracy unlocks the next level
 
@@ -74,7 +74,7 @@
   // Memory Pairs: board sizes grow across a game (pairs per board).
   const PAIRS_SIZES = [3, 3, 4, 5, 6];
 
-  // LEO makes each noise himself; art for every animal lives in index.html.
+  // ARTHUR makes each noise himself; art for every animal lives in index.html.
   const ANIMALS = {
     dog: 'Woof! Woof!', cat: 'Meow!', pig: 'Oink! Oink!', cow: 'Moooo!',
     sheep: 'Baa! Baa!', duck: 'Quack! Quack!', frog: 'Ribbit! Ribbit!', lion: 'Roar!'
@@ -89,13 +89,13 @@
   const JIGSAW_PIECES = JIGSAW_COLS * JIGSAW_ROWS;
   // Original pictures drawn in index.html (symbols #pic0..#pic3).
   const PUZZLES = [
-    { name: 'Leo playing football', done: 'Leo is playing football!' },
+    { name: 'Arthur playing football', done: 'Arthur is playing football!' },
     { name: 'a birthday party', done: "It's a birthday party!" },
     { name: 'the bottom of the sea', done: "It's under the sea!" },
     { name: 'a rocket in space', done: "It's a rocket in space!" }
   ];
 
-  // Prize videos chosen by Leo's dad; editable in the grown-ups area.
+  // Prize videos chosen by Arthur's dad; editable in the grown-ups area.
   // Video N plays after game N (Number Balloons first ... Number Order tenth).
   const DEFAULT_VIDEOS = ['nEUTY8n2iZo', 'XcTvDcJt058', 'uaEcjl_jO9w', 'S-lkBBl-KG4', 'oVL8CvA5NIs',
     'uFs-T_iq6lc', '64FUWQMZakY', 'd3XW_lvBRVw', 'PfpLAqAtjnI', 'EW6cIIRayXc',
@@ -448,7 +448,7 @@
     return ids[i];
   }
 
-  /** Splits what LEO says into sentences; each sentence has its own recorded voice clip. */
+  /** Splits what ARTHUR says into sentences; each sentence has its own recorded voice clip. */
   function speechParts(text) {
     return String(text || '').split(/(?<=[.!?])\s+/).map((t) => t.trim()).filter(Boolean);
   }

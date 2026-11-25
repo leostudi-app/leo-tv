@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>LEO – Play &amp; Learn</title>
+<title>ARTHUR – Play &amp; Learn</title>
 <meta name="theme-color" content="#ffc93c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="LEO">
+<meta name="apple-mobile-web-app-title" content="ARTHUR">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -17,8 +17,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
 <style>
 /* VOICE: warm, bouncy, encouraging — a picture-book friend, never a test.
-   IDEA: a sunny playroom where LEO the lion hosts each mini-game like a kids' TV show.
-   PICTURE: LEO himself, large, beside one big task; answers are chunky toys to tap.
+   IDEA: a sunny playroom where ARTHUR the lion hosts each mini-game like a kids' TV show.
+   PICTURE: ARTHUR himself, large, beside one big task; answers are chunky toys to tap.
    COLOUR and TYPE: lion gold ground, sky blue stage, kit red accent; Baloo 2 rounded display.
    LAYOUT: one task per screen, three huge answers in a row; works portrait, landscape and TV. */
 :root{--gold:#ffc93c;--mane:#f28c28;--sky:#2a7de1;--sky2:#5fb0ff;--red:#e63946;--ink:#2b2118;--paper:#fffaf0;--ok:#2fbf71;
@@ -203,7 +203,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 </head>
 <body>
 
-<!-- Reusable art: LEO, star -->
+<!-- Reusable art: ARTHUR, star -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="leo" viewBox="0 -16 200 246">
@@ -259,7 +259,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
       <path d="M185 145h130" stroke="#fff" stroke-width="4" stroke-dasharray="10 8"/>
       <g fill="#ffc93c"><rect x="207" y="88" width="8" height="30" rx="3"/><rect x="232" y="88" width="8" height="30" rx="3"/><rect x="258" y="88" width="8" height="30" rx="3"/><rect x="284" y="88" width="8" height="30" rx="3"/></g>
       <g fill="#ff9a3c"><ellipse cx="211" cy="80" rx="5" ry="8"/><ellipse cx="236" cy="80" rx="5" ry="8"/><ellipse cx="262" cy="80" rx="5" ry="8"/><ellipse cx="288" cy="80" rx="5" ry="8"/></g>
-      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">LEO 4</text>
+      <text x="250" y="190" font-size="26" font-weight="800" text-anchor="middle" fill="#8a5cf6" font-family="system-ui,sans-serif">ARTHUR 4</text>
       <rect x="350" y="122" width="44" height="44" rx="4" fill="#2a7de1"/><path d="M372 122v44M350 144h44" stroke="#ffc93c" stroke-width="6"/>
       <rect x="402" y="132" width="36" height="34" rx="4" fill="#e63946"/><path d="M420 132v34M402 149h36" stroke="#fff" stroke-width="5"/>
       <g fill="#8a5cf6"><circle cx="150" cy="150" r="5"/><circle cx="170" cy="100" r="4"/><circle cx="330" cy="70" r="5"/></g>
@@ -297,13 +297,13 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 
 <section id="start" class="screen on" aria-label="Start">
   <svg class="leo-hero wave" aria-hidden="true"><use href="#leo"/></svg>
-  <h1>LEO</h1>
+  <h1>ARTHUR</h1>
   <button class="big" id="startBtn" data-nav>Let's play!</button>
 </section>
 
 <section id="birthday" class="screen" aria-label="Happy birthday">
   <div class="balloons" id="balloons"></div>
-  <h1>Happy 4th Birthday, Leo!</h1>
+  <h1>Happy 4th Birthday, Arthur!</h1>
   <div class="bday-scene">
     <svg class="bday-leo wave" aria-hidden="true"><use href="#leo"/></svg>
     <svg class="cake" viewBox="0 0 200 230" aria-label="Birthday cake with a number 4 candle">
@@ -375,12 +375,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
     <label>Prize videos, one YouTube link per line (video 1 plays after game 1, and so on)
       <textarea id="setVideos" data-nav placeholder="https://www.youtube.com/watch?v=..."></textarea>
       <span class="note" id="videoCount"></span></label>
-    <p class="note">Tip: lock the device to LEO with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
+    <p class="note">Tip: lock the device to ARTHUR with Guided Access (iPhone/iPad) or screen pinning (Android) so he can't leave the app.</p>
     <div><h3>Numbers</h3><div class="bars" id="numBars"></div></div>
     <div><h3>Shapes</h3><div class="bars" id="shapeBars"></div></div>
     <p class="note" id="levelNote"></p>
     <p class="note" id="voiceNote"></p>
-    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test LEO's voice</button></div>
+    <div class="row"><button class="big blue" type="button" id="voiceTest" data-nav>Test ARTHUR's voice</button></div>
     <p class="note">Settings and videos are saved on this device only, so set them on each phone, tablet or TV.</p>
     <div class="row"><button class="big" type="submit" data-nav>Save</button><button class="big blue" type="button" id="setBack" data-nav>Back</button></div>
     <div class="row"><button type="button" class="note" id="resetBtn" data-nav>Reset progress</button><button type="button" class="note" id="pinChange" data-nav>Change PIN</button></div>
@@ -491,7 +491,7 @@ function pickVoice() {
   } catch (e) { voice = null; }
 }
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-/* In the Fire TV app, LEO speaks through the device's own voice engine (window.LeoNative). */
+/* In the Fire TV app, ARTHUR speaks through the device's own voice engine (window.LeoNative). */
 const nativeVoice = typeof window.LeoNative === 'object' && window.LeoNative !== null;
 let speechSeq = 0;
 const speechPending = new Map();
@@ -572,7 +572,7 @@ function say(text) {
 
 /* ---------- Sound (original jingles, synthesised) ---------- */
 let ac = null;
-// iPhone: let LEO's music play even when the ring/silent switch is on (Safari 17+).
+// iPhone: let ARTHUR's music play even when the ring/silent switch is on (Safari 17+).
 try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { console.warn('[LEO] audio session', e); }
 // iPhone only starts Web Audio from a finished tap (touchend/click), not from touchstart/pointerdown.
 function unlockAudio() {
@@ -659,7 +659,7 @@ function confetti() {
 }
 
 /* ---------- Game loop ---------- */
-const PRAISE = ['Brilliant!', 'Well done, Leo!', 'Amazing!', "You're a superstar, Leo!", 'Fantastic!', 'Yes! Great job!'];
+const PRAISE = ['Brilliant!', 'Well done, Arthur!', 'Amazing!', "You're a superstar, Arthur!", 'Fantastic!', 'Yes! Great job!'];
 const NUM_WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
 let round = null, firstTry = true, locked = false, lastType = null, promptText = '';
 let currentGame = null, roundIndex = 0;
@@ -696,10 +696,10 @@ function renderMenu() {
   $('gameTiles').querySelectorAll('.tile').forEach((t) => {
     const g = C.GAMES.find((x) => x.id === t.dataset.game);
     t.addEventListener('click', () => startGame(g.id));
-    t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // LEO reads the game names to a non-reader
+    t.addEventListener('focus', () => { if (usingPad) say(g.name); }); // ARTHUR reads the game names to a non-reader
   });
 }
-function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
+function goHome() { renderJars(); show('home'); say('Hello Arthur! Pick a game!'); }
 function startGame(id) {
   currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
@@ -871,11 +871,11 @@ async function dropPiece(slot, btn) {
   // Fill the star jar as the picture comes together.
   state = { ...state, stars: Math.round(jig.placed.length / C.JIGSAW_PIECES * state.settings.starsPerReward) }; save(); renderJars();
   sfx.right();
-  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Leo!'])); return; }
+  if (!C.isJigsawDone(jig.placed)) { renderJigsaw(); say(rand(['Yes!', 'Perfect!', 'Great!', 'Brilliant!', 'Well done, Arthur!'])); return; }
   locked = true;
   renderJigsaw();
   confetti(); sfx.fanfare();
-  await say(`You did it, Leo! ${C.PUZZLES[jig.pic].done}`);
+  await say(`You did it, Arthur! ${C.PUZZLES[jig.pic].done}`);
   await wait(1200);
   if (current === 'play' && currentGame === 'jigsaw') { state = { ...state, stars: state.settings.starsPerReward }; save(); startReward(); }
 }
@@ -1119,7 +1119,7 @@ function startReward() {
   $('rewardTitle').textContent = game ? `${game.name}: all done!` : 'You earned a surprise!';
   $('rewardArt').innerHTML = BOX;
   $('rewardBtn').textContent = 'Open it!'; $('skipBtn').hidden = true;
-  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Leo! Open your surprise!');
+  show('reward'); sfx.fanfare(); confetti(); say('Wow! You finished the game, Arthur! Open your surprise!');
 }
 $('rewardBtn').addEventListener('click', async () => {
   if (rewardStage === 'box') {
@@ -1281,13 +1281,13 @@ function openSettings() {
 function updateVoiceNote() {
   let msg;
   try {
-    if (clipSet && clipSet.size) msg = `Voice: LEO's recorded voice, Poppy (${clipSet.size} phrases)`;
+    if (clipSet && clipSet.size) msg = `Voice: ARTHUR's recorded voice, Poppy (${clipSet.size} phrases)`;
     else if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
-    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the LEO app on TV)';
+    else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the ARTHUR app on TV)';
   } catch (e) { msg = 'Voice: unknown'; console.warn('[LEO] voice status', e); }
   $('voiceNote').textContent = msg;
 }
-$('voiceTest').addEventListener('click', () => { say('Hello Leo! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
+$('voiceTest').addEventListener('click', () => { say('Hello Arthur! Can you hear me?'); setTimeout(updateVoiceNote, 1500); });
 function updateVideoCount() {
   const n = C.parseVideoList($('setVideos').value).length;
   $('videoCount').textContent = n
@@ -1334,7 +1334,7 @@ renderMenu();
 renderJars();
 
 /* ---------- Birthday surprise: 25 November 2026 only ---------- */
-function isBirthday(d = new Date()) { return d.getFullYear() === 2026 && d.getMonth() === 10 && d.getDate() === 25; }
+function isBirthday() { return false; } // Arthur's version: no birthday screen
 function playBirthdayTune() {
   // "Happy Birthday to You" (public domain melody), one beat = 0.32s.
   const G = 392, A = 440, B = 494, C5 = 523, D5 = 587, E5 = 659, F5 = 698, G5 = 784;
@@ -1344,8 +1344,8 @@ function playBirthdayTune() {
   const lineStarts = [];
   const phraseStart = [0, 6, 12, 19]; // note index where each sung line begins
   notes.forEach(([f, beats], i) => { if (phraseStart.includes(i)) lineStarts.push(t); tone(f, t, beats * 0.3, 'triangle', 0.22); t += beats * 0.32; });
-  // LEO sings along: one spoken line at the start of each musical phrase.
-  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!'];
+  // ARTHUR sings along: one spoken line at the start of each musical phrase.
+  const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Arthur', 'Happy birthday to you!'];
   lineStarts.forEach((start, i) => setTimeout(() => {
     if (hasClips(lines[i])) { $('bubble').textContent = lines[i]; sayClips(lines[i], true); return; }
     if (nativeVoice) { nativeSpeak(lines[i], true); return; }
