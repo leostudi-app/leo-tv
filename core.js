@@ -2,7 +2,16 @@
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api; // Node (tests)
-  else root.LeoCore = api; // Browser
+  else {
+    root.LeoCore = api; // Browser
+    // Elements with the hidden attribute must really disappear: CSS display rules were overriding it,
+    // leaving an invisible layer over the video that swallowed taps on phones.
+    if (typeof document !== 'undefined' && document.head) {
+      const fix = document.createElement('style');
+      fix.textContent = '[hidden]{display:none!important}';
+      document.head.appendChild(fix);
+    }
+  }
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
