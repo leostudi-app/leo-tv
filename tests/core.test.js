@@ -126,8 +126,8 @@ test('loadState survives corrupt storage and keeps new defaults', () => {
 });
 
 test('eight games, each mapping rounds to valid round types', () => {
-  assert.equal(C.GAMES.length, 14);
-  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide', 'fire'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
+  assert.equal(C.GAMES.length, 15);
+  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide', 'fire', 'race'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
   assert.deepEqual([0, 1, 2].map((i) => C.roundTypeFor('count', i)), ['countIt', 'drumCount', 'countIt']);
   assert.throws(() => C.roundTypeFor('nope', 0), /Unknown game/);
 });
@@ -135,7 +135,7 @@ test('eight games, each mapping rounds to valid round types', () => {
 test('prize videos default to the chosen links, including for older saved progress', () => {
   assert.deepEqual(C.defaultState().settings.videoIds, C.DEFAULT_VIDEOS);
   const old = { getItem: () => JSON.stringify({ stars: 2, settings: { videoIds: [] } }) };
-  assert.equal(C.loadState(old).settings.videoIds.length, 12);
+  assert.equal(C.loadState(old).settings.videoIds.length, 15);
   const custom = { getItem: () => JSON.stringify({ settings: { videoIds: ['aaaaaaaaaaa'] } }) };
   assert.deepEqual(C.loadState(custom).settings.videoIds, ['aaaaaaaaaaa']);
 });
@@ -224,7 +224,7 @@ test('number order: consecutive, shuffled, growing; starts at 1 until mastered',
 test('each game has its own video, wrapping and skipping on errors', () => {
   const s = C.defaultState();
   s.settings.videoIds = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'];
-  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2', 'v3']); // games 11-14 wrap until more videos are added
+  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2', 'v3', 'v4']); // games 11-15 wrap until more videos are added
   assert.equal(C.videoForGame(s, 'order', 1), 'v0'); // next one along when a video won't play
   s.settings.videoIds = ['a', 'b', 'c'];
   assert.equal(C.videoForGame(s, 'tune'), 'b'); // game 8 of 10 wraps round 3 videos
@@ -233,14 +233,17 @@ test('each game has its own video, wrapping and skipping on errors', () => {
 });
 
 test('twelve built-in videos; old default lists upgrade, custom lists are kept', () => {
-  assert.equal(C.defaultState().settings.videoIds.length, 12);
+  assert.equal(C.defaultState().settings.videoIds.length, 15);
   const ten = C.loadState({ getItem: () => JSON.stringify({ version: 3, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 10) } }) });
-  assert.equal(ten.settings.videoIds.length, 12);
+  assert.equal(ten.settings.videoIds.length, 15);
+  const twelve = C.loadState({ getItem: () => JSON.stringify({ version: 4, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 12) } }) });
+  assert.deepEqual(twelve.settings.videoIds, C.DEFAULT_VIDEOS);
+  assert.equal(C.videoForGame(twelve, 'race'), 'fdGWRq1dVBA');
   const old = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: C.DEFAULT_VIDEOS.slice(0, 5) } }) });
   assert.deepEqual(old.settings.videoIds, C.DEFAULT_VIDEOS);
   const mine = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: ['aaaaaaaaaaa'] } }) });
   assert.deepEqual(mine.settings.videoIds, ['aaaaaaaaaaa']);
-  assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 12);
+  assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 15);
 });
 
 test('shape builder: every layer is one known shape and colour; options hold exactly one right answer', () => {
@@ -288,4 +291,14 @@ test('fire rescue: fires only appear in free windows, and rounds grow', () => {
   assert.equal(C.nextFire(all), null);
   assert.ok(C.fireRoundPlan(4).total > C.fireRoundPlan(0).total);
   assert.deepEqual(C.fireRoundPlan(99), C.FIRE_ROUNDS[C.FIRE_ROUNDS.length - 1]);
+});
+
+test('race day: cones sit between start and finish, well spaced, and races get busier', () => {
+  for (let r = 0; r < 5; r++) for (let k = 0; k < 30; k++) {
+    const plan = C.raceRoundPlan(r), cones = C.raceObstacles(plan.cones);
+    assert.equal(cones.length, plan.cones);
+    assert.ok(cones[0] >= 800 && cones[cones.length - 1] <= C.RACE_LENGTH - 350);
+    for (let i = 1; i < cones.length; i++) assert.ok(cones[i] - cones[i - 1] >= 420);
+  }
+  assert.ok(C.raceRoundPlan(4).cones > C.raceRoundPlan(0).cones);
 });

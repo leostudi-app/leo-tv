@@ -54,7 +54,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{--cols:7;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1260px}
+.games{--cols:8;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1300px}
 .games>.tile{flex:0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols))}
 .tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
 .tile svg{width:56%;height:auto;max-height:14vh}
@@ -225,6 +225,17 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .fcol{position:absolute;top:0;height:100%;background:transparent;border:0;border-radius:20px;padding:0;cursor:pointer}
 .fcol:focus-visible,.fcol.pad:focus{outline:6px solid #fff;outline-offset:-10px;box-shadow:inset 0 0 0 16px #ffc93c55}
 @media (max-width:640px) and (orientation:portrait){.fscene{width:100%}}
+/* Race Day */
+.task.racetask{width:100%}
+.rscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
+.rscene>svg{position:absolute;inset:0;width:100%;height:100%}
+.rjump{position:absolute;inset:0;background:transparent;border:0;border-radius:22px;cursor:pointer}
+.rjump:focus-visible,.rjump.pad:focus{outline:6px solid #fff;outline-offset:-8px}
+.rscene .count{font:800 150px system-ui,sans-serif;fill:#fff;stroke:#2b2118;stroke-width:6;paint-order:stroke;text-anchor:middle}
+.rscene .wob{animation:wobble .3s 2}
+.rscene .cue{opacity:0}.rscene .ready .cue{opacity:1;animation:pop .5s infinite}
+.rscene .cue{transform-box:fill-box;transform-origin:50% 50%}
+@media (max-width:640px) and (orientation:portrait){.rscene{width:100%}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -728,7 +739,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; $('task').classList.remove('hidetask', 'firetask'); state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -741,6 +752,7 @@ async function newRound() {
   if (currentGame === 'pairs') return pairsRound();
   if (currentGame === 'hide') return hideRoundStart();
   if (currentGame === 'fire') return fireRoundStart();
+  if (currentGame === 'race') return raceRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -764,6 +776,7 @@ function promptFor(r) {
     case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
       return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
     case 'pairs': return 'Find the matching pairs! Turn over two cards.';
+    case 'race': return roundIndex === 0 ? 'Race day! Jump over the cones and win the race!' : 'Another race! Jump over the cones!';
     case 'fire': return roundIndex === 0 ? 'Nee naw! Fire! Drive to the fire and spray the water!' : 'Fire! Fire! Put it out!';
     case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
   }
@@ -1335,8 +1348,133 @@ async function sprayAt(col) {
   if (cur.spawned < cur.plan.total) setTimeout(() => { if (fr === cur) { spawnFire(); if (cur.active.length < cur.plan.atOnce) spawnFire(); } }, 900);
 }
 
+/* ---------- Race Day: one-button racing — jump the cones and win ---------- */
+const LANE_Y = [300, 392, 490]; // wheel line of each lane: two rivals, then LEO nearest
+const LEO_SCREEN_X = 210; // where LEO's car sits on screen; the world scrolls past
+function raceCar(colour, number, driver) {
+  // An original side-on race car, 170 wide, wheels resting on y=64.
+  return `<rect x="2" y="12" width="12" height="22" rx="3" fill="#2b2118"/><rect x="-2" y="8" width="26" height="8" rx="3" fill="${colour}"/>`
+    + `<path d="M10 52q0-22 30-24l34-2q14-20 38-20h8q20 2 30 20l12 4q18 6 18 24v4q0 6-8 6H18q-8 0-8-8z" fill="${colour}"/>`
+    + `<path d="M24 46h138" stroke="#fff" stroke-width="5" opacity=".85"/>`
+    + `<circle cx="66" cy="44" r="15" fill="#fff"/><text x="66" y="51" font-size="20" font-weight="800" text-anchor="middle" fill="#2b2118" font-family="system-ui,sans-serif">${number}</text>`
+    + driver
+    + `<g fill="#2b2118"><circle cx="44" cy="64" r="17"/><circle cx="140" cy="64" r="17"/></g><g fill="#ccc"><circle cx="44" cy="64" r="7"/><circle cx="140" cy="64" r="7"/></g>`;
+}
+const LEO_DRIVER = '<svg x="84" y="-34" width="48" height="59" viewBox="0 -16 200 246"><use href="#leo"/><path d="M22 70q78-120 156 0z" fill="#fff"/><path d="M22 70q78-120 156 0" fill="none" stroke="#e63946" stroke-width="14"/><rect x="14" y="62" width="172" height="16" rx="8" fill="#e63946"/></svg>';
+const HELMET = (c) => `<circle cx="108" cy="2" r="17" fill="${c}"/><path d="M96 0h26v8H96z" fill="#2b2118" opacity=".7"/>`;
+const CONE = '<g class="cue"><path d="M0-96l8 16 18 3-13 12 3 18-16-9-16 9 3-18-13-12 18-3z" fill="#ffc93c" stroke="#fff" stroke-width="3"/></g><path d="M-22 0 0-48 22 0z" fill="#ff9a3c"/><path d="M-13-20h26l-4-9h-18z" fill="#fff"/><rect x="-28" y="-6" width="56" height="8" rx="3" fill="#e07f24"/>';
+function raceScene(r) {
+  const cones = r.cones.map((x, i) => `<g id="cone${i}" transform="translate(${x} ${LANE_Y[2]})">${CONE}</g>`).join('');
+  const stand = Array.from({ length: 12 }, (_, i) => `<g transform="translate(${i * 400} 0)"><rect x="0" y="170" width="360" height="70" fill="#8a5cf6"/><rect x="0" y="160" width="360" height="14" fill="#e63946"/>`
+    + Array.from({ length: 14 }, (_, k) => `<circle cx="${14 + k * 25}" cy="${196 + (k % 2) * 18}" r="9" fill="${['#ffc93c', '#ff7eb6', '#5fb0ff', '#fff', '#2fbf71'][(k + i) % 5]}"/>`).join('')
+    + `<path d="M380 160v-60" stroke="#fff" stroke-width="4"/><path d="M380 100l34 10-34 10z" fill="${['#e63946', '#ffc93c', '#2a7de1'][i % 3]}"/></g>`).join('');
+  const finishX = C.RACE_LENGTH + LEO_SCREEN_X + 170;
+  const checks = Array.from({ length: 24 }, (_, k) => `<rect x="${(k % 2) * 18}" y="${250 + k * 12}" width="18" height="12" fill="${(k + Math.floor(k / 2)) % 2 ? '#2b2118' : '#fff'}"/>`).join('');
+  return `<svg viewBox="0 0 1000 560" aria-hidden="true"><defs><linearGradient id="rsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc4ff"/><stop offset="1" stop-color="#d8f0ff"/></linearGradient></defs>
+    <rect width="1000" height="560" fill="url(#rsSky)"/><circle cx="880" cy="70" r="40" fill="#ffd54a"/>
+    <g id="rsHills"><path d="M0 200q150-110 300 0t300 0 300 0 300 0 300 0 300 0 300 0V260H0z" fill="#9be15d"/></g>
+    <g id="rsStand">${stand}</g>
+    <rect y="240" width="1000" height="320" fill="#7ccf5a"/>
+    <rect y="252" width="1000" height="260" fill="#5b6270"/>
+    <path id="rsLines" d="M0 334h1000M0 424h1000" stroke="#fff" stroke-width="5" stroke-dasharray="50 40"/>
+    <path d="M0 252h1000M0 512h1000" stroke="#fff" stroke-width="6"/>
+    <g id="rsWorld">
+      <g transform="translate(${LEO_SCREEN_X + 170} 0)"><rect x="-4" y="252" width="8" height="250" fill="#fff"/><text x="-30" y="246" font-size="22" font-weight="800" fill="#fff" font-family="system-ui,sans-serif">START</text></g>
+      <g transform="translate(${finishX} 0)">${checks}<rect x="-6" y="120" width="8" height="132" fill="#fff"/><rect x="38" y="120" width="8" height="132" fill="#fff"/><rect x="-6" y="120" width="52" height="34" fill="#2b2118"/><text x="20" y="144" font-size="18" font-weight="800" text-anchor="middle" fill="#fff" font-family="system-ui,sans-serif">FINISH</text></g>
+      ${cones}
+    </g>
+    <g id="rsCar1" transform="translate(${LEO_SCREEN_X} ${LANE_Y[0] - 64})">${raceCar('#2a7de1', 7, HELMET('#ffc93c'))}</g>
+    <g id="rsCar2" transform="translate(${LEO_SCREEN_X} ${LANE_Y[1] - 64})">${raceCar('#2fbf71', 2, HELMET('#ff7eb6'))}</g>
+    <g id="rsLeo" transform="translate(${LEO_SCREEN_X} ${LANE_Y[2] - 64})"><g id="rsLeoBody">${raceCar('#e63946', 4, LEO_DRIVER)}</g></g>
+    <text id="rsCount" class="count" x="500" y="200"></text>
+  </svg>`;
+}
+GAME_ICON.race = `<svg viewBox="-6 -40 190 112"><g transform="translate(0 -10)">${raceCar('#e63946', 4, LEO_DRIVER)}</g></svg>`;
+let race = null;
+async function raceRoundStart() {
+  const plan = C.raceRoundPlan(roundIndex);
+  const r = { plan, cones: C.raceObstacles(plan.cones), hit: new Set(), leo: 0, rivals: [0, 0], jumpT: -1, slowUntil: 0, running: false, done: false, last: 0 };
+  race = r; round = { type: 'race' }; locked = false;
+  const task = $('task');
+  task.classList.add('racetask');
+  task.innerHTML = `<div class="rscene">${raceScene(r)}<button class="rjump" id="rjump" data-nav aria-label="Jump"></button></div>`;
+  $('rjump').addEventListener('click', raceJump);
+  if (usingPad) $('rjump').focus();
+  raceDraw(r);
+  await repeatPrompt();
+  if (race !== r || current !== 'play') return;
+  for (const n of ['3', '2', '1', 'GO!']) {
+    $('rsCount').textContent = n; tone(n === 'GO!' ? 880 : 440, 0, n === 'GO!' ? 0.4 : 0.2, 'square', 0.12);
+    await wait(650);
+    if (race !== r || current !== 'play') return;
+  }
+  $('rsCount').textContent = '';
+  r.running = true; r.last = performance.now();
+  requestAnimationFrame((t) => raceTick(r, t));
+}
+function raceJump() {
+  const r = race;
+  if (!r || r.done) return;
+  if (!r.running) { repeatPrompt(); return; }
+  if (r.jumpT >= 0) return; // already in the air
+  r.jumpT = 0; tone(520, 0, 0.15, 'triangle', 0.2); tone(780, 0.08, 0.15, 'triangle', 0.2);
+}
+const JUMP_TIME = 1.0, JUMP_HEIGHT = 130, LEO_SPEED = 430;
+function raceTick(r, now) {
+  if (race !== r || current !== 'play' || r.done) return;
+  const dt = Math.min(0.05, (now - r.last) / 1000); r.last = now;
+  const slow = now < r.slowUntil ? 0.45 : 1;
+  r.leo += LEO_SPEED * r.plan.speed * slow * dt;
+  // Rivals keep it close but LEO always gets to win: they ease off if they get ahead, and never pass him near the end.
+  r.rivals = r.rivals.map((x, i) => {
+    const base = LEO_SPEED * r.plan.speed * (0.9 - i * 0.05);
+    const ahead = x - r.leo;
+    let v = base * (ahead > 120 ? 0.6 : ahead < -350 ? 1.25 : 1);
+    let nx = x + v * dt;
+    if (nx > C.RACE_LENGTH - 260) nx = Math.min(nx, r.leo - 50 - i * 40);
+    return nx;
+  });
+  if (r.jumpT >= 0) { r.jumpT += dt; if (r.jumpT >= JUMP_TIME) r.jumpT = -1; }
+  const air = r.jumpT >= 0 ? Math.sin((r.jumpT / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0;
+  // A cone is hit if it passes under the car while the wheels are near the ground.
+  r.cones.forEach((x, i) => {
+    const sx = x - r.leo; // cone position relative to the car's front-left
+    // Jump cue: the cone bounces with a star over it while it's the right moment to jump.
+    const cue = !r.hit.has(i) && sx > LEO_SCREEN_X + 170 && sx < LEO_SCREEN_X + 440;
+    const el = $(`cone${i}`);
+    if (cue !== el.classList.contains('ready')) el.classList.toggle('ready', cue);
+    if (!r.hit.has(i) && sx > LEO_SCREEN_X + 40 && sx < LEO_SCREEN_X + 140 && air < 25) {
+      r.hit.add(i); r.slowUntil = now + 1000; sfx.nearly();
+      $(`cone${i}`).setAttribute('opacity', '.35');
+      const body = $('rsLeoBody'); body.classList.remove('wob'); void body.getBBox(); body.classList.add('wob');
+      say('Oops! Jump over the cones!');
+    }
+  });
+  r.air = air;
+  raceDraw(r);
+  if (r.leo >= C.RACE_LENGTH) { raceFinish(r); return; }
+  requestAnimationFrame((t) => raceTick(r, t));
+}
+function raceDraw(r) {
+  const cam = r.leo;
+  $('rsWorld').setAttribute('transform', `translate(${-cam} 0)`);
+  $('rsStand').setAttribute('transform', `translate(${-((cam * 0.5) % 400)} 0)`);
+  $('rsHills').setAttribute('transform', `translate(${-((cam * 0.2) % 600)} 0)`);
+  $('rsLines').setAttribute('stroke-dashoffset', String(cam % 90));
+  $('rsLeo').setAttribute('transform', `translate(${LEO_SCREEN_X} ${LANE_Y[2] - 64 - (r.air || 0)})`);
+  r.rivals.forEach((x, i) => $(`rsCar${i + 1}`).setAttribute('transform', `translate(${LEO_SCREEN_X + (x - r.leo)} ${LANE_Y[i] - 64 * 0.82}) scale(.82)`)); // rivals are further away
+}
+async function raceFinish(r) {
+  r.done = true; r.running = false; locked = true;
+  $('rsCount').textContent = '1st!';
+  confetti(); [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * 0.1, 0.3));
+  await wait(400);
+  if (race !== r) return;
+  await funWin('You won the race!');
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ race: race ? { leo: Math.round(race.leo), rivals: race.rivals.map(Math.round), cones: race.cones, hits: race.hit.size, running: race.running, air: race.jumpT >= 0, done: race.done } : null, fire: fr ? { col: fr.col, active: fr.active.map((f) => ({ col: f.col, floor: f.floor })), out: fr.out, total: fr.plan.total } : null, hide: hs ? { ...hs.h, amount: hs.amount } : null, build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';

@@ -38,7 +38,8 @@
     { id: 'build', name: 'Shape Builder', types: ['build'] }, // one colour per layer
     { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] },
     { id: 'hide', name: 'Hide & Seek', types: ['hide'] }, // find the puppy family
-    { id: 'fire', name: 'Fire Rescue', types: ['fire'] } // drive the fire engine, spray the fires
+    { id: 'fire', name: 'Fire Rescue', types: ['fire'] }, // drive the fire engine, spray the fires
+    { id: 'race', name: 'Race Day', types: ['race'] } // jump the cones, win the race
   ];
 
   // Shape Builder: each picture is built layer by layer; every layer is one shape in one colour.
@@ -101,9 +102,10 @@
   // Video N plays after game N (Number Balloons first ... Number Order tenth).
   const DEFAULT_VIDEOS = ['nEUTY8n2iZo', 'XcTvDcJt058', 'uaEcjl_jO9w', 'S-lkBBl-KG4', 'oVL8CvA5NIs',
     'uFs-T_iq6lc', '64FUWQMZakY', 'd3XW_lvBRVw', 'PfpLAqAtjnI', 'EW6cIIRayXc',
-    'eEV_z7kXO6c', 'GHpyJ5svbgM'];
+    'eEV_z7kXO6c', 'GHpyJ5svbgM',
+    '6dWXexP_WMk', 'KzSamG3CwLU', 'fdGWRq1dVBA']; // Hide & Seek, Fire Rescue, Race Day
   // Earlier built-in lists: a device still on one of these (never customised) moves to the full list.
-  const OLD_DEFAULT_LISTS = [DEFAULT_VIDEOS.slice(0, 5).join(), DEFAULT_VIDEOS.slice(0, 10).join()];
+  const OLD_DEFAULT_LISTS = [DEFAULT_VIDEOS.slice(0, 5).join(), DEFAULT_VIDEOS.slice(0, 10).join(), DEFAULT_VIDEOS.slice(0, 12).join()];
 
   // Original collectable friends (no third-party characters).
   const FRIENDS = [
@@ -123,7 +125,7 @@
 
   function defaultState() {
     return {
-      version: 4,
+      version: 5,
       settings: { starsPerReward: 5, tvMinutes: 4, videoIds: DEFAULT_VIDEOS.slice(), pin: null },
       stars: 0,
       rewardsEarned: 0,
@@ -144,7 +146,7 @@
     // v2: 8 games x (play + 4 min prize) is about an hour. Move the old 10-minute default to 4.
     if ((raw.version || 1) < 2 && settings.tvMinutes === 10) settings.tvMinutes = 4;
     // v3/v4: more built-in videos. Only replace a list nobody has customised (exactly an old built-in list).
-    if ((raw.version || 1) < 4 && OLD_DEFAULT_LISTS.includes(settings.videoIds.join())) settings.videoIds = DEFAULT_VIDEOS.slice();
+    if ((raw.version || 1) < 5 && OLD_DEFAULT_LISTS.includes(settings.videoIds.join())) settings.videoIds = DEFAULT_VIDEOS.slice();
     return {
       ...base,
       ...raw,
@@ -445,6 +447,22 @@
     return free.length ? free[Math.floor(rng() * free.length)] : null;
   }
 
+  // Race Day: one-button racing. Jump the cones in LEO's lane; races get longer and busier.
+  const RACE_LENGTH = 4200; // track units from start line to finish
+  const RACE_ROUNDS = [{ cones: 3, speed: 1 }, { cones: 4, speed: 1.05 }, { cones: 5, speed: 1.1 }, { cones: 6, speed: 1.15 }, { cones: 7, speed: 1.2 }];
+
+  function raceRoundPlan(roundIndex) {
+    return RACE_ROUNDS[Math.min(Math.max(0, roundIndex), RACE_ROUNDS.length - 1)];
+  }
+
+  /** Cone positions along the track: sorted, clear of the start and finish, and at least `gap` apart. */
+  function raceObstacles(count, length = RACE_LENGTH, rng = Math.random, gap = 420) {
+    const first = 800, last = length - 350;
+    const slack = Math.max(0, (last - first) - gap * (count - 1));
+    const offsets = Array.from({ length: count }, () => rng() * slack).sort((a, b) => a - b);
+    return offsets.map((o, i) => Math.round(first + o + gap * i));
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -514,7 +532,7 @@
     ANIMALS, orderRound, nextInOrder, COLOURS, BUILDS, BUILD_SHAPES, buildOptions, PAIRS_SIZES, memoryDeck, isPair,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
     speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
-    FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire,
+    FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire, RACE_LENGTH, RACE_ROUNDS, raceRoundPlan, raceObstacles,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });
