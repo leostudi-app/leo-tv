@@ -381,6 +381,20 @@
     return ids[i];
   }
 
+  /** Splits what LEO says into sentences; each sentence has its own recorded voice clip. */
+  function speechParts(text) {
+    return String(text || '').split(/(?<=[.!?])\s+/).map((t) => t.trim()).filter(Boolean);
+  }
+
+  /** Stable file name for a sentence's clip: readable slug plus a short hash to keep it unique. */
+  function clipKey(sentence) {
+    const t = String(sentence).trim();
+    let h = 5381;
+    for (let i = 0; i < t.length; i++) h = ((h * 33) ^ t.charCodeAt(i)) >>> 0;
+    const slug = t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'x';
+    return `${slug}-${h.toString(36)}`;
+  }
+
   function isValidPin(pin) {
     return typeof pin === 'string' && /^\d{4}$/.test(pin);
   }
@@ -397,6 +411,7 @@
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
     ANIMALS, orderRound, nextInOrder,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
+    speechParts, clipKey, ORDER_LENGTHS,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });

@@ -488,10 +488,43 @@ function nativeSpeak(text, queue) {
   });
 }
 function stopSpeech() {
+  clipToken++; if (clipAudio) { try { clipAudio.pause(); } catch (e) { console.warn(e); } }
   try { if (nativeVoice) window.LeoNative.stop(); else if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { console.warn('[LEO] stop speech failed', e); }
+}
+/* Recorded voice: one clip per sentence (voice/clips). Used wherever the device can't speak itself,
+   e.g. Fire TV, whose speech engine apps often can't use. ?voice=clips forces it (testing). */
+let clipSet = null, clipToken = 0, clipAudio = null;
+const forceClips = /[?&]voice=clips\b/.test(location.search);
+fetch('voice/manifest.json').then((r) => (r.ok ? r.json() : [])).then((keys) => { clipSet = new Set(keys); })
+  .catch((e) => console.warn('[LEO] no recorded voice', e));
+function useClips() {
+  if (!clipSet || !clipSet.size) return false;
+  return forceClips || nativeVoice || !('speechSynthesis' in window);
+}
+function playClip(key, token) {
+  return new Promise((resolve) => {
+    if (token !== clipToken) return resolve();
+    const a = new Audio(`voice/clips/${key}.mp3`);
+    clipAudio = a;
+    const done = () => { clearTimeout(t); resolve(); };
+    const t = setTimeout(done, 9000); // never get stuck on a clip
+    a.onended = done; a.onerror = done;
+    a.play().catch((e) => { console.warn('[LEO] clip blocked', e); done(); });
+  });
+}
+async function sayClips(text, queue) {
+  const token = queue ? clipToken : ++clipToken;
+  if (!queue && clipAudio) { try { clipAudio.pause(); } catch (e) { console.warn(e); } }
+  for (const part of C.speechParts(text)) {
+    const key = C.clipKey(part);
+    if (!clipSet.has(key)) { (window.__missingVoice = window.__missingVoice || []).push(part); continue; }
+    if (token !== clipToken) return;
+    await playClip(key, token);
+  }
 }
 function say(text) {
   $('bubble').textContent = text;
+  if (useClips()) return sayClips(text, false);
   if (nativeVoice) return nativeSpeak(text, false);
   return new Promise((resolve) => {
     try {
@@ -1096,7 +1129,8 @@ function openSettings() {
 function updateVoiceNote() {
   let msg;
   try {
-    if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
+    if (useClips()) msg = `Voice: LEO's recorded voice (${clipSet.size} phrases)`;
+    else if (nativeVoice) msg = `TV voice: ${window.LeoNative.status ? window.LeoNative.status() : (window.LeoNative.canSpeak() ? 'ready' : 'not ready')}`;
     else msg = 'speechSynthesis' in window ? `Voice: ${voice ? voice.name : 'device default'}` : 'Voice: this browser cannot speak (use the LEO app on TV)';
   } catch (e) { msg = 'Voice: unknown'; console.warn('[LEO] voice status', e); }
   $('voiceNote').textContent = msg;
@@ -1161,6 +1195,7 @@ function playBirthdayTune() {
   // LEO sings along: one spoken line at the start of each musical phrase.
   const lines = ['Happy birthday to you', 'Happy birthday to you', 'Happy birthday dear Leo', 'Happy birthday to you!'];
   lineStarts.forEach((start, i) => setTimeout(() => {
+    if (useClips()) { $('bubble').textContent = lines[i]; sayClips(lines[i], true); return; }
     if (nativeVoice) { nativeSpeak(lines[i], true); return; }
     try {
       const u = new SpeechSynthesisUtterance(lines[i]);
