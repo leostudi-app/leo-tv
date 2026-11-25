@@ -126,8 +126,8 @@ test('loadState survives corrupt storage and keeps new defaults', () => {
 });
 
 test('eight games, each mapping rounds to valid round types', () => {
-  assert.equal(C.GAMES.length, 10);
-  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
+  assert.equal(C.GAMES.length, 12);
+  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
   assert.deepEqual([0, 1, 2].map((i) => C.roundTypeFor('count', i)), ['countIt', 'drumCount', 'countIt']);
   assert.throws(() => C.roundTypeFor('nope', 0), /Unknown game/);
 });
@@ -224,7 +224,7 @@ test('number order: consecutive, shuffled, growing; starts at 1 until mastered',
 test('each game has its own video, wrapping and skipping on errors', () => {
   const s = C.defaultState();
   s.settings.videoIds = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'];
-  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9']);
+  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1']); // games 11-12 wrap until more videos are added
   assert.equal(C.videoForGame(s, 'order', 1), 'v0'); // next one along when a video won't play
   s.settings.videoIds = ['a', 'b', 'c'];
   assert.equal(C.videoForGame(s, 'tune'), 'b'); // game 8 of 10 wraps round 3 videos
@@ -239,4 +239,25 @@ test('ten built-in videos; old default lists upgrade, custom lists are kept', ()
   const mine = C.loadState({ getItem: () => JSON.stringify({ version: 2, settings: { videoIds: ['aaaaaaaaaaa'] } }) });
   assert.deepEqual(mine.settings.videoIds, ['aaaaaaaaaaa']);
   assert.equal(C.loadState({ getItem: () => JSON.stringify(old) }).settings.videoIds.length, 10);
+});
+
+test('shape builder: every layer is one known shape and colour; options hold exactly one right answer', () => {
+  for (const b of C.BUILDS) for (const l of b.layers) {
+    assert.ok(C.BUILD_SHAPES.includes(l.shape) && C.COLOURS[l.colour], `${b.name}: ${l.shape} ${l.colour}`);
+    for (let k = 0; k < 20; k++) {
+      const o = C.buildOptions(l);
+      assert.equal(o.length, 3);
+      assert.equal(o.filter((x) => x.shape === l.shape && x.colour === l.colour).length, 1);
+      assert.equal(new Set(o.map((x) => x.shape + x.colour)).size, 3);
+    }
+  }
+});
+
+test('memory pairs: each item exactly twice, matching only true pairs', () => {
+  const d = C.memoryDeck(4, ['a', 'b', 'c', 'd', 'e']);
+  assert.equal(d.length, 8);
+  for (const x of new Set(d)) assert.equal(d.filter((y) => y === x).length, 2);
+  const i = d.indexOf(d[0], 1);
+  assert.ok(C.isPair(d, 0, i)); assert.ok(!C.isPair(d, 0, 0));
+  assert.throws(() => C.memoryDeck(9, ['a']), /pairs/);
 });

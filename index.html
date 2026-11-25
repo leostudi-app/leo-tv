@@ -54,8 +54,8 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(8px,1.4vw,18px);width:100%;max-width:1100px}
-.tile{background:#fff;border-radius:24px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.8vw,22px);font-weight:800;line-height:1.1}
+.games{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(8px,1.3vw,16px);width:100%;max-width:1200px}
+.tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
 .tile svg{width:56%;height:auto;max-height:14vh}
 @media (max-width:640px){.games{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
@@ -182,6 +182,22 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .onum.wrong{animation:wobble .4s}.onum.hint{animation:glow 1s 3}
 @media (max-width:640px) and (orientation:portrait){.order{--o:min(17vw,12vh)}}
 .ear{width:clamp(90px,16vw,150px)!important}
+/* Shape builder */
+.bboard{width:min(36vh,62vw)!important;height:auto;background:#ffffff22;border-radius:18px}
+.bboard .ghost{fill:#ffffff40;stroke:#fff;stroke-width:3;stroke-dasharray:8 6;animation:glowfill 1.2s infinite alternate}
+@keyframes glowfill{to{fill:#ffffff80}}
+.bboard .placed{animation:pop .4s}
+.show.buildshow{min-height:0}
+.buildshow + .answers .ans{aspect-ratio:auto;height:min(24vh,170px)}
+.buildshow + .answers .ans svg{height:80%}
+/* Memory pairs */
+.cards{display:grid;grid-template-columns:repeat(var(--cols),var(--c));gap:clamp(8px,1.4vw,16px);--c:min(9.4vw,19vh)}
+.card{width:var(--c);height:var(--c);border-radius:18px;background:#fff;box-shadow:0 8px 0 #0003;display:grid;place-items:center;padding:8%}
+.card svg{width:100%;height:100%}
+.card.back{background:linear-gradient(135deg,#ff9a3c,#e63946)}
+.card.back svg{width:60%;height:60%}
+.card.matched{opacity:.55;box-shadow:none}
+@media (max-width:640px) and (orientation:portrait){.cards{--c:min(20vw,13vh);grid-template-columns:repeat(min(var(--cols),4),var(--c))}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -655,6 +671,8 @@ const GAME_ICON_BASE = {
   jigsaw: '<svg viewBox="0 0 100 100"><path d="M12 22h22a9 9 0 1 1 18 0h22v22a9 9 0 1 0 0 18v22H52a9 9 0 1 0-18 0H12V62a9 9 0 1 1 0-18z" fill="#2fbf71" stroke="#0002" stroke-width="3"/></svg>',
   penalty: `<svg viewBox="0 0 120 100"><path d="M8 70V12h104v58" fill="#ffffff22" stroke="#2b2118" stroke-width="5" stroke-linejoin="round"/><path d="M24 12v58M40 12v58M56 12v58M72 12v58M88 12v58M104 12v58M8 26h104M8 40h104M8 54h104" stroke="#0003" stroke-width="1.5"/><g transform="translate(86 76)"><circle r="16" fill="#fff" stroke="#2b2118" stroke-width="3"/><polygon points="0,-6 6,-2 4,5 -4,5 -6,-2" fill="#2b2118"/></g></svg>`,
   tune: '<svg viewBox="0 0 100 100"><circle cx="28" cy="30" r="18" fill="#e63946"/><circle cx="72" cy="30" r="18" fill="#2a7de1"/><circle cx="28" cy="72" r="18" fill="#ffc93c"/><circle cx="72" cy="72" r="18" fill="#2fbf71"/></svg>',
+  build: '<svg viewBox="0 0 100 100"><rect x="22" y="48" width="56" height="44" rx="3" fill="#e63946"/><polygon points="50,12 86,50 14,50" fill="#2a7de1"/><rect x="44" y="66" width="12" height="26" fill="#ffc93c"/></svg>',
+  pairs: '<svg viewBox="0 0 110 100"><rect x="6" y="14" width="46" height="64" rx="8" fill="#ff9a3c" transform="rotate(-8 29 46)"/><rect x="56" y="14" width="46" height="64" rx="8" fill="#fff" stroke="#0002" stroke-width="3" transform="rotate(8 79 46)"/><circle cx="79" cy="44" r="12" fill="#e63946"/><text x="29" y="56" font-size="34" font-weight="800" text-anchor="middle" fill="#fff" transform="rotate(-8 29 46)">?</text></svg>',
   order: '<svg viewBox="0 0 120 70"><g font-size="40" font-weight="800" text-anchor="middle" fill="#fff"><circle cx="20" cy="35" r="18" fill="#e63946"/><text x="20" y="49">1</text><circle cx="60" cy="35" r="18" fill="#2fbf71"/><text x="60" y="49">2</text><circle cx="100" cy="35" r="18" fill="#2a7de1"/><text x="100" y="49">3</text></g></svg>'
 };
 const BALLOON_COLOURS = ['#e63946', '#ff9a3c', '#2fbf71', '#8a5cf6', '#ff5fa2'];
@@ -682,7 +700,7 @@ function renderMenu() {
 }
 function goHome() { renderJars(); show('home'); say('Hello Leo! Pick a game!'); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -691,6 +709,8 @@ async function newRound() {
   if (currentGame === 'penalty') return penaltyRound();
   if (currentGame === 'tune') return tuneRound();
   if (currentGame === 'order') return orderGameRound();
+  if (currentGame === 'build') return buildRound();
+  if (currentGame === 'pairs') return pairsRound();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
   firstTry = true; locked = false;
@@ -711,6 +731,9 @@ function promptFor(r) {
     case 'simon': return 'Listen to my tune, then copy me!';
     case 'animal': return `Listen! ${r.sound} Which animal says that?`;
     case 'order': return `Put the numbers in order! Start with number ${r.numbers[0]}.`;
+    case 'build': if (!bld || bld.step >= bld.b.layers.length) return 'Yes!';
+      return bld.step === 0 ? `Let's build a ${r.name}! ${findPiece(bld.b.layers[0])}` : findPiece(bld.b.layers[bld.step]);
+    case 'pairs': return 'Find the matching pairs! Turn over two cards.';
   }
 }
 
@@ -982,8 +1005,104 @@ async function tapNumber(n, btn) {
   await funWin(`${ord.numbers.join(', ')}! ${rand(PRAISE)}`);
 }
 
+/* ---------- Shape builder: add each layer by finding its shape in its colour ---------- */
+let bld = null;
+const an = (word) => (/^[aeiou]/.test(word) ? 'an' : 'a');
+const findPiece = (l) => `Find the ${l.colour} ${l.shape}!`;
+function buildPieceSvg(shape, colour, box, cls) {
+  const [x, y, w, h] = box, fill = cls === 'ghost' ? '' : ` fill="${C.COLOURS[colour]}" stroke="#0002" stroke-width="2"`;
+  if (shape === 'square' || shape === 'rectangle') return `<rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="4"${fill}/>`;
+  if (shape === 'circle') return `<ellipse class="${cls}" cx="${x + w / 2}" cy="${y + h / 2}" rx="${w / 2}" ry="${h / 2}"${fill}/>`;
+  if (shape === 'triangle') return `<polygon class="${cls}" points="${x + w / 2},${y} ${x + w},${y + h} ${x},${y + h}" stroke-linejoin="round"${fill}/>`;
+  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="0 0 100 100" preserveAspectRatio="none"><g class="${cls}"${fill}>${SHAPE[shape]}</g></svg>`;
+}
+function buildRound() {
+  const b = C.BUILDS[roundIndex % C.BUILDS.length];
+  bld = { b, step: 0, opts: C.buildOptions(b.layers[0]) };
+  round = { type: 'build', name: b.name }; locked = false; firstTry = true;
+  renderBuild();
+  repeatPrompt();
+}
+function renderBuild(justPlaced) {
+  const { b, step } = bld;
+  const parts = b.layers.map((l, i) => i < step || i === step
+    ? l.boxes.map((box) => buildPieceSvg(l.shape, l.colour, box, i < step ? (i === justPlaced ? 'placed' : '') : 'ghost')).join('') : '').join('');
+  const board = `<svg class="bboard" viewBox="0 0 200 200" aria-label="Build a ${b.name}"><path d="M0 192h200" stroke="#fff" stroke-width="4" opacity=".6"/>${parts}</svg>`;
+  const done = step >= b.layers.length;
+  const answers = done ? '' : bld.opts.map((o) => `<button class="ans" data-nav data-shape="${o.shape}" data-colour="${o.colour}" aria-label="${o.colour} ${o.shape}">${shapeSvg(o.shape, 'fill', C.COLOURS[o.colour])}</button>`).join('');
+  $('task').innerHTML = `<div class="show buildshow">${board}</div><div class="answers">${answers}</div>`;
+  $('task').querySelectorAll('.ans').forEach((btn) => btn.addEventListener('click', () => pickBuildPiece(btn)));
+  if (usingPad) $('task').querySelector('.ans')?.focus();
+}
+async function pickBuildPiece(btn) {
+  if (locked) return;
+  const layer = bld.b.layers[bld.step], { shape, colour } = btn.dataset;
+  if (shape !== layer.shape || colour !== layer.colour) {
+    sfx.nearly(); btn.classList.add('wrong'); btn.disabled = true;
+    say(`That's ${an(colour)} ${colour} ${shape}. ${findPiece(layer)}`);
+    return;
+  }
+  sfx.right();
+  bld.step++;
+  if (bld.step < bld.b.layers.length) {
+    bld.opts = C.buildOptions(bld.b.layers[bld.step]);
+    renderBuild(bld.step - 1);
+    say(`Yes! Now ${findPiece(bld.b.layers[bld.step]).replace('Find', 'find')}`);
+    return;
+  }
+  locked = true;
+  renderBuild(bld.step - 1);
+  confetti();
+  await funWin(`You built a ${bld.b.name}!`);
+}
+
+/* ---------- Memory pairs: turn over two cards to find matching animals ---------- */
+let mem = null;
+const PLURAL_ANIMAL = { dog: 'dogs', cat: 'cats', pig: 'pigs', cow: 'cows', sheep: 'sheep', duck: 'ducks', frog: 'frogs', lion: 'lions' };
+const CARD_BACK = '<svg viewBox="0 0 100 100"><use href="#star" fill="#fff" opacity=".9"/></svg>';
+function pairsRound() {
+  const n = C.PAIRS_SIZES[Math.min(roundIndex, C.PAIRS_SIZES.length - 1)];
+  mem = { deck: C.memoryDeck(n, Object.keys(ANIMAL_ART)), open: [], matched: new Set(), busy: false };
+  round = { type: 'pairs' }; locked = false;
+  renderPairs(0);
+  if (roundIndex === 0) repeatPrompt(); else say('Here are more cards!');
+}
+function renderPairs(focusIdx) {
+  const cols = mem.deck.length <= 6 ? 3 : mem.deck.length / 2;
+  const cards = mem.deck.map((item, i) => {
+    const up = mem.open.includes(i) || mem.matched.has(i);
+    return `<button class="card${up ? '' : ' back'}${mem.matched.has(i) ? ' matched' : ''}" data-nav data-i="${i}" aria-label="${up ? item : 'card'}">${up ? ANIMAL_ART[item] : CARD_BACK}</button>`;
+  }).join('');
+  $('task').innerHTML = `<div class="cards" style="--cols:${cols}">${cards}</div>`;
+  $('task').querySelectorAll('.card').forEach((b) => b.addEventListener('click', () => flipCard(Number(b.dataset.i))));
+  if (usingPad || focusIdx != null) $('task').querySelector(`.card[data-i="${focusIdx || 0}"]`)?.focus();
+}
+async function flipCard(i) {
+  if (!mem || mem.busy || locked || mem.matched.has(i) || mem.open.includes(i)) return;
+  mem.open.push(i); tone(520 + mem.open.length * 120, 0, 0.12, 'triangle', 0.2);
+  renderPairs(usingPad ? i : null);
+  if (mem.open.length < 2) return;
+  const [a, b] = mem.open, m = mem;
+  m.busy = true;
+  if (C.isPair(m.deck, a, b)) {
+    m.matched.add(a); m.matched.add(b); m.open = [];
+    sfx.right();
+    if (m.matched.size === m.deck.length) { locked = true; renderPairs(); confetti(); await funWin('You found all the pairs!'); return; }
+    renderPairs(usingPad ? i : null);
+    m.busy = false;
+    say(`Two ${PLURAL_ANIMAL[m.deck[a]]}!`);
+    return;
+  }
+  sfx.nearly();
+  say('Not a match. Try again!');
+  await wait(1300);
+  if (mem !== m) return;
+  m.open = []; m.busy = false;
+  renderPairs(usingPad ? i : null);
+}
+
 // Read-only snapshot for automated play-testing.
-window.__leoDebug = () => ({ round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
+window.__leoDebug = () => ({ build: bld ? { step: bld.step, layer: bld.b.layers[bld.step] || null } : null, deck: mem ? mem.deck.slice() : null, round: round ? { type: round.type, target: round.target, numbers: round.numbers } : null, tvMinutes: state.settings.tvMinutes, jigSel: jig ? jig.sel : null, goals: pen ? pen.goals : 0, locked, tune: tune ? { seq: tune.seq.slice(), playing: tune.playing, input: tune.input.length } : null });
 
 /* ---------- Reward ---------- */
 let rewardStage = 'box';

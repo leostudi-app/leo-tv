@@ -34,8 +34,45 @@
     { id: 'penalty', name: 'Penalty Shootout', types: ['penalty'] }, // just for fun
     { id: 'tune', name: 'Copy My Tune', types: ['simon'] }, // memory + music
     { id: 'animals', name: 'Animal Sounds', types: ['animal'] },
-    { id: 'order', name: 'Number Order', types: ['order'] }
+    { id: 'order', name: 'Number Order', types: ['order'] },
+    { id: 'build', name: 'Shape Builder', types: ['build'] }, // one colour per layer
+    { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] }
   ];
+
+  // Shape Builder: each picture is built layer by layer; every layer is one shape in one colour.
+  // Boxes are [x, y, width, height] on a 200 x 200 board.
+  const COLOURS = { red: '#e63946', blue: '#2a7de1', green: '#2fbf71', yellow: '#ffc93c', purple: '#8a5cf6',
+    orange: '#ff9a3c', pink: '#ff7eb6', black: '#2b2118', brown: '#8d5a2b' };
+  const BUILDS = [
+    { name: 'house', layers: [
+      { shape: 'square', colour: 'red', boxes: [[40, 95, 120, 95]] },
+      { shape: 'triangle', colour: 'blue', boxes: [[28, 30, 144, 68]] },
+      { shape: 'rectangle', colour: 'yellow', boxes: [[86, 132, 28, 58]] },
+      { shape: 'square', colour: 'green', boxes: [[52, 110, 26, 26], [122, 110, 26, 26]] }] },
+    { name: 'car', layers: [
+      { shape: 'rectangle', colour: 'red', boxes: [[16, 100, 168, 52]] },
+      { shape: 'rectangle', colour: 'blue', boxes: [[56, 60, 88, 42]] },
+      { shape: 'circle', colour: 'black', boxes: [[34, 130, 44, 44], [122, 130, 44, 44]] },
+      { shape: 'circle', colour: 'yellow', boxes: [[166, 110, 16, 16]] }] },
+    { name: 'rocket', layers: [
+      { shape: 'rectangle', colour: 'blue', boxes: [[74, 62, 52, 112]] },
+      { shape: 'triangle', colour: 'red', boxes: [[74, 16, 52, 48]] },
+      { shape: 'triangle', colour: 'orange', boxes: [[46, 132, 30, 44], [124, 132, 30, 44]] },
+      { shape: 'circle', colour: 'yellow', boxes: [[86, 84, 28, 28]] }] },
+    { name: 'tree', layers: [
+      { shape: 'rectangle', colour: 'brown', boxes: [[86, 118, 28, 72]] },
+      { shape: 'circle', colour: 'green', boxes: [[40, 20, 120, 112]] },
+      { shape: 'circle', colour: 'red', boxes: [[68, 52, 18, 18], [112, 44, 18, 18], [98, 86, 18, 18]] }] },
+    { name: 'train', layers: [
+      { shape: 'rectangle', colour: 'red', boxes: [[10, 92, 84, 58], [106, 92, 84, 58]] },
+      { shape: 'square', colour: 'yellow', boxes: [[30, 102, 26, 26], [126, 102, 26, 26]] },
+      { shape: 'rectangle', colour: 'black', boxes: [[150, 60, 16, 32]] },
+      { shape: 'circle', colour: 'black', boxes: [[18, 138, 30, 30], [56, 138, 30, 30], [114, 138, 30, 30], [152, 138, 30, 30]] }] }
+  ];
+  const BUILD_SHAPES = ['square', 'rectangle', 'triangle', 'circle', 'star', 'heart'];
+
+  // Memory Pairs: board sizes grow across a game (pairs per board).
+  const PAIRS_SIZES = [3, 3, 4, 5, 6];
 
   // LEO makes each noise himself; art for every animal lives in index.html.
   const ANIMALS = {
@@ -348,6 +385,29 @@
     return placed.length < numbers.length ? numbers[placed.length] : null;
   }
 
+  /** Three choices for a build layer: the right piece, the same shape in another colour, another shape in the same colour. */
+  function buildOptions(layer, rng = Math.random) {
+    const colours = Object.keys(COLOURS).filter((c) => c !== layer.colour);
+    const shapes = BUILD_SHAPES.filter((s) => s !== layer.shape);
+    const opts = [
+      { shape: layer.shape, colour: layer.colour },
+      { shape: layer.shape, colour: colours[Math.floor(rng() * colours.length)] },
+      { shape: shapes[Math.floor(rng() * shapes.length)], colour: layer.colour }
+    ];
+    return shuffle(opts, rng);
+  }
+
+  /** Shuffled memory cards: `pairs` different items, each appearing twice. */
+  function memoryDeck(pairs, items, rng = Math.random) {
+    if (!Number.isInteger(pairs) || pairs < 1 || pairs > items.length) throw new Error('bad number of pairs');
+    const chosen = shuffle(items, rng).slice(0, pairs);
+    return shuffle(chosen.concat(chosen), rng);
+  }
+
+  function isPair(deck, i, j) {
+    return i !== j && deck[i] !== undefined && deck[i] === deck[j];
+  }
+
   function addStar(state) {
     const stars = state.stars + 1;
     return { state: { ...state, stars }, rewardReady: stars >= state.settings.starsPerReward };
@@ -414,7 +474,7 @@
     extractYouTubeId, parseVideoList, clampInt, accuracy, isMastered, numberMax, shapePool,
     recordAnswer, pickWeighted, makeOptions, makeRound, nextRoundType,
     JIGSAW_COLS, JIGSAW_ROWS, JIGSAW_PIECES, PUZZLES, jigsawOrder, placePiece, isJigsawDone, takeNextPuzzle,
-    ANIMALS, orderRound, nextInOrder,
+    ANIMALS, orderRound, nextInOrder, COLOURS, BUILDS, BUILD_SHAPES, buildOptions, PAIRS_SIZES, memoryDeck, isPair,
     SIMON_PADS, simonSequence, simonLength, checkSimon, keeperDive,
     speechParts, clipKey, ORDER_LENGTHS,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin

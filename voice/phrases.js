@@ -35,6 +35,16 @@ for (let k = 2; k <= 4; k++) add(`Ready? ${k} notes this time!`);
 // Number order
 add('Put the numbers in order!');
 for (const len of new Set(C.ORDER_LENGTHS)) for (let start = 1; start + len - 1 <= 10; start++) add(`${nums.slice(start - 1, start - 1 + len).join(', ')}!`);
+// Shape builder
+const an = (w) => (/^[aeiou]/.test(w) ? 'an' : 'a');
+for (const b of C.BUILDS) {
+  add(`Let's build a ${b.name}!`, `You built a ${b.name}!`);
+  for (const l of b.layers) add(`Find the ${l.colour} ${l.shape}!`, `Yes! Now find the ${l.colour} ${l.shape}!`);
+}
+for (const colour of Object.keys(C.COLOURS)) for (const shape of C.BUILD_SHAPES) add(`That's ${an(colour)} ${colour} ${shape}.`);
+// Memory pairs
+add('Find the matching pairs! Turn over two cards.', 'Here are more cards!', 'Not a match. Try again!', 'You found all the pairs!');
+for (const p of ['dogs', 'cats', 'pigs', 'cows', 'sheep', 'ducks', 'frogs', 'lions']) add(`Two ${p}!`);
 // Rewards, video, friends
 add('Wow! You finished the game, Leo! Open your surprise!', 'Watch your video, or skip it?', "Let's dance!",
   'Here are all your friends!', 'Play games to find new friends!');
