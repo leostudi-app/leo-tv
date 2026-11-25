@@ -28,11 +28,12 @@ jobs:
             pip install --quiet piper-tts==1.2.0
             sudo apt-get install -y -qq ffmpeg >/dev/null
             mkdir -p /tmp/voice && cd /tmp/voice
-            for f in en_GB-cori-high.onnx en_GB-cori-high.onnx.json; do
-              curl -sSfL -o "$f" "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/cori/high/$f"
+            # LEO's voice: Poppy (Piper 'semaine' British voice, speaker poppy) - chosen by Leo's dad.
+            for f in en_GB-semaine-medium.onnx en_GB-semaine-medium.onnx.json; do
+              curl -sSfL -o "$f" "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_GB/semaine/medium/$f"
             done
             cd "$GITHUB_WORKSPACE"
-            python voice/record.py /tmp/voice/en_GB-cori-high.onnx
+            python voice/record.py /tmp/voice/en_GB-semaine-medium.onnx poppy
           } 2>&1 | tee voice/record-log.txt
       - name: Commit clips
         if: always()
