@@ -11,6 +11,60 @@ No containers need to be restarted.
 No user sessions are running outdated binaries.
 
 No VM guests are running outdated hypervisor (qemu) binaries on this host.
-[0;93m2026-11-26 00:00:22.790515158 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
+[0;93m2026-11-26 01:00:41.963116280 [W:onnxruntime:Default, device_discovery.cc:95 GetPciBusId] Skipping pci_bus_id for PCI path at "/sys/devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/MSFT1000:00/5620e0c7-8062-4dce-aeb7-520c7ef76171" because filename "5620e0c7-8062-4dce-aeb7-520c7ef76171" did not match expected pattern of [0-9a-f]+:[0-9a-f]+:[0-9a-f]+[.][0-9a-f]+[m
 voice: en_GB-semaine-medium.onnx/poppy speaker id 3
-recorded 1295 of 1295 phrases; failed 0
+phonemes letter A -> lˈɛtɐɹ ˈeɪ
+phonemes letter B -> lˈɛtɐ bˈiː
+phonemes letter C -> lˈɛtɐ sˈiː
+phonemes letter D -> lˈɛtɐ dˈiː
+phonemes letter E -> lˈɛtɐɹ ˈiː
+phonemes letter F -> lˈɛtɐɹ ˈɛf
+phonemes letter G -> lˈɛtɐ dʒˈiː
+phonemes letter H -> lˈɛtɐɹ ˈeɪtʃ
+phonemes letter I -> lˈɛtɐɹ ˈaɪ
+phonemes letter J -> lˈɛtɐ dʒˈeɪ
+phonemes letter K -> lˈɛtɐ kˈeɪ
+phonemes letter L -> lˈɛtɐɹ ˈɛl
+phonemes letter M -> lˈɛtɐɹ ˈɛm
+phonemes letter N -> lˈɛtɐɹ ˈɛn
+phonemes letter O -> lˈɛtɐɹ ˈəʊ
+phonemes letter P -> lˈɛtɐ pˈiː
+phonemes letter Q -> lˈɛtɐ kjˈuː
+phonemes letter R -> lˈɛtɐɹ ˈɑː
+phonemes letter S -> lˈɛtɐɹ ˈɛs
+phonemes letter T -> lˈɛtɐ tˈiː
+phonemes letter U -> lˈɛtɐ jˈuː
+phonemes letter V -> lˈɛtɐ vˈiː
+phonemes letter W -> lˈɛtɐ dˈʌbəljˌuː
+phonemes letter X -> lˈɛtɐɹ ˈɛks
+phonemes letter Y -> lˈɛtɐ wˈaɪ
+phonemes letter Z -> lˈɛtɐ zˈɛd
+phonemes Uranus -> jˈɔːɹænəs
+phonemes letter ay -> lˈɛtɐɹ ˈaɪ
+phonemes letter bee -> lˈɛtɐ bˈiː
+phonemes letter see -> lˈɛtɐ sˈiː
+phonemes letter dee -> lˈɛtɐ dˈiː
+phonemes letter ee -> lˈɛtɐɹ ˈiː
+phonemes letter eff -> lˈɛtɐɹ ˌiːˌɛfˈɛf
+phonemes letter jee -> lˈɛtɐ dʒˈiː
+phonemes letter aitch -> lˈɛtɐɹ ˈeɪtʃ
+phonemes letter eye -> lˈɛtɐɹ ˈaɪ
+phonemes letter jay -> lˈɛtɐ dʒˈeɪ
+phonemes letter kay -> lˈɛtɐ kˈeɪ
+phonemes letter ell -> lˈɛtɐɹ ˈɛl
+phonemes letter em -> lˈɛtɐɹ ˈɛm
+phonemes letter en -> lˈɛtɐɹ ˈɛn
+phonemes letter oh -> lˈɛtɐɹ ˈəʊ
+phonemes letter pee -> lˈɛtɐ pˈiː
+phonemes letter queue -> lˈɛtɐ kjˈuː
+phonemes letter ar -> lˈɛtɐɹ ˈɑː
+phonemes letter ess -> lˈɛtɐɹ ˈɛs
+phonemes letter tee -> lˈɛtɐ tˈiː
+phonemes letter you -> lˈɛtɐ juː
+phonemes letter vee -> lˈɛtɐ vˈiː
+phonemes letter double you -> lˈɛtɐ dˈʌbəl juː
+phonemes letter ex -> lˈɛtɐɹ ˈɛks
+phonemes letter why -> lˈɛtɐ wˈaɪ
+phonemes letter zed -> lˈɛtɐ zˈɛd
+phonemes Yoor-a-nuss -> jˈɔːɹɐnˈʌs
+recorded 1640 of 1640 phrases; failed 0
