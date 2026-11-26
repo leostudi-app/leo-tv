@@ -393,7 +393,7 @@ test('Spell It: tray holds the word letters (plus decoys above Little), never al
   for (const level of [1, 2, 3]) {
     let prev = null;
     for (let i = 0; i < 40; i++) {
-      const r = C.spellRound(level, rng, prev);
+      const r = C.spellRound(level, rng, prev ? [prev] : []);
       assert.notEqual(r.word, prev); prev = r.word;
       assert.ok(C.SPELL_WORDS[level].includes(r.word));
       assert.equal(r.tray.length, r.word.length + [0, 0, 1, 2][level]);
@@ -432,4 +432,37 @@ test('18 games, new ones at the end so prize videos keep their games', () => {
   assert.equal(C.GAMES.length, 18);
   assert.deepEqual(C.GAMES.slice(-3).map((g) => g.id), ['letters', 'spell', 'planets']);
   assert.equal(C.GAMES[14].id, 'race');
+});
+
+test('no question is repeated within a game of five', () => {
+  const rng = seeded(5);
+  for (const level of [1, 2, 3]) {
+    for (const type of ['planet', 'letterStart', 'findNumber', 'goal', 'findShape', 'shapeFit', 'animal', 'countIt']) {
+      for (let game = 0; game < 30; game++) {
+        const asked = [];
+        for (let i = 0; i < 5; i++) {
+          const r = C.freshRound(() => C.makeRound(type, C.defaultState(level), rng), asked);
+          const tiny = level === 1 && (type === 'findShape' || type === 'shapeFit') && i === 4; // only 4 shapes at Little
+          if (tiny) assert.notEqual(C.roundKey(r), asked[asked.length - 1]);
+          else assert.ok(!asked.includes(C.roundKey(r)), `${type} L${level} repeated ${C.roundKey(r)}`);
+          asked.push(C.roundKey(r));
+        }
+      }
+    }
+    const words = [];
+    for (let i = 0; i < 5; i++) { const r = C.spellRound(level, rng, words); assert.ok(!words.includes(r.word)); words.push(r.word); }
+  }
+});
+
+test('menu lists every game once, grouped by kind', () => {
+  assert.deepEqual([...C.MENU].sort(), C.GAMES.map((g) => g.id).sort());
+  assert.deepEqual(C.MENU.slice(0, 6), ['balloons', 'goal', 'count', 'order', 'letters', 'spell']);
+});
+
+test('Hide & Seek: everyone hides once in a game of five', () => {
+  const rng = seeded(9);
+  for (let g = 0; g < 30; g++) {
+    const used = []; let prev = null;
+    for (let i = 0; i < 5; i++) { const h = C.hideRound(i, prev, rng, 1, used); assert.ok(!used.includes(h.hider)); used.push(h.hider); prev = h; }
+  }
 });

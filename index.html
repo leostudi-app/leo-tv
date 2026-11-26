@@ -71,11 +71,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .games{--cols:6;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1120px}
 .games>.tile{flex:0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols))}
 .tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
-.tile svg{width:56%;height:auto;max-height:14vh}
+.tile svg{height:min(14vh,15vw);width:auto;max-width:78%;flex:none} /* same icon height on every tile so the names line up */
+.tile span{height:2.2em;display:flex;align-items:flex-start;justify-content:center;text-align:center} /* every name gets two lines; one-line names sit on the top line */
 @media (max-width:640px){.games{--cols:3}}
 /* TV and other landscape screens: 3 rows of 6, sized so the whole menu fits without scrolling */
-@media (min-width:641px) and (orientation:landscape){#home{gap:clamp(6px,1.4vh,16px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{max-height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
-@media (orientation:landscape) and (max-height:450px){#home{gap:6px}.leo-mini{width:40px}#home h2{font-size:22px}.tile svg{max-height:7.5vh}.tile{padding:4px}#home .big{padding-block:4px;font-size:20px}}
+@media (min-width:641px) and (orientation:landscape){#home{gap:clamp(6px,1.4vh,16px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
+@media (orientation:landscape) and (max-height:450px){#home{gap:6px}.leo-mini{width:40px}#home h2{font-size:22px}.tile svg{height:7.5vh}.tile{padding:4px}#home .big{padding-block:4px;font-size:20px}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
 .ans.balloon::after{content:"";position:absolute;bottom:-18px;left:50%;width:3px;height:22px;background:#fff8}
 /* Play */
@@ -1013,7 +1014,7 @@ function letterPraise(r) {
 }
 
 /* Space Trip: on a right answer LEO's rocket flies to the planet */
-let lastPlanetQ = null;
+let asked = []; // questions already asked in this game: none is repeated
 async function flyRocket(btn) {
   const rk = $('rocket'); if (!rk) return;
   const b = btn.getBoundingClientRect(), o = rk.getBoundingClientRect();
@@ -1025,7 +1026,7 @@ async function flyRocket(btn) {
 /* ---------- Spell It: tap the letters in order ---------- */
 let sp = null;
 function spellRoundStart() {
-  const r = C.spellRound(LV(), Math.random, sp && sp.word);
+  const r = C.spellRound(LV(), Math.random, asked); asked.push(r.word);
   sp = { ...r, typed: 0, used: [], misses: 0 };
   round = { type: 'spell', word: r.word }; locked = false; firstTry = true;
   renderSpell();
@@ -1068,7 +1069,7 @@ async function tapLetter(k, btn) {
 
 
 function renderMenu() {
-  $('gameTiles').innerHTML = C.GAMES.map((g, i) => `<button class="tile" data-nav${i === 0 ? ' data-start' : ''} data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
+  $('gameTiles').innerHTML = C.MENU.map((id) => C.GAMES.find((g) => g.id === id)).map((g, i) => `<button class="tile" data-nav${i === 0 ? ' data-start' : ''} data-game="${g.id}" aria-label="${g.name}">${GAME_ICON[g.id]}<span>${g.name}</span></button>`).join('');
   $('gameTiles').querySelectorAll('.tile').forEach((t) => {
     const g = C.GAMES.find((x) => x.id === t.dataset.game);
     t.addEventListener('click', () => startGame(g.id));
@@ -1077,7 +1078,7 @@ function renderMenu() {
 }
 function goHome() { if (typeof endTreatTimers === 'function' && treat) { endTreatTimers(); treat = null; } renderJars(); show('home'); say(`Hello ${N}! Pick a game!`); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; sp = null; lastPlanetQ = null; $('task').classList.remove('hidetask', 'firetask', 'racetask', 'spacetask'); state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; sp = null; asked = []; $('task').classList.remove('hidetask', 'firetask', 'racetask', 'spacetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -1093,10 +1094,8 @@ async function newRound() {
   if (currentGame === 'race') return raceRoundStart();
   if (currentGame === 'spell') return spellRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
-  round = C.makeRound(lastType, state);
-  if (round.type === 'planet') { // never the same question twice running
-    round = C.planetRound(LV(), Math.random, lastPlanetQ); lastPlanetQ = round.q;
-  }
+  round = C.freshRound(() => C.makeRound(lastType, state), asked);
+  asked.push(C.roundKey(round));
   $('task').classList.toggle('spacetask', round.type === 'planet');
   firstTry = true; locked = false;
   renderRound();
@@ -1584,7 +1583,7 @@ function hideScene(h, amount) {
 GAME_ICON.hide = `<svg viewBox="0 0 120 104"><g transform="translate(24 6) scale(.6)">${pup('Pip')}</g><g fill="#3fae62"><circle cx="30" cy="84" r="24"/><circle cx="60" cy="74" r="27"/><circle cx="90" cy="84" r="24"/><rect x="8" y="82" width="104" height="22" rx="10"/></g></svg>`;
 let hs = null;
 function hideRoundStart() {
-  const h = C.hideRound(roundIndex, hs && hs.h, Math.random, LV());
+  const h = C.hideRound(roundIndex, hs && hs.h, Math.random, LV(), asked); asked.push(h.hider);
   hs = { h, amount: h.peek, misses: 0 };
   round = { type: 'hide', hider: h.hider }; locked = false;
   const task = $('task');

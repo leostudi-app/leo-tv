@@ -142,8 +142,9 @@
   }
 
   /** Spell It: the letters to tap (shuffled, plus decoys at Middle/Big) and whether the word is shown faintly to copy. */
-  function spellRound(level, rng = Math.random, prev = null) {
-    const lv = clampLevel(level), pool = SPELL_WORDS[lv].filter((w) => w !== prev);
+  function spellRound(level, rng = Math.random, used = []) {
+    const lv = clampLevel(level), skip = [].concat(used || []);
+    const fresh = SPELL_WORDS[lv].filter((w) => !skip.includes(w)), pool = fresh.length ? fresh : SPELL_WORDS[lv];
     const word = pool[Math.floor(rng() * pool.length)];
     const extras = lv === 1 ? 0 : lv === 2 ? 1 : 2;
     const decoys = shuffle(ALPHABET.filter((l) => !up(word).includes(l)), rng).slice(0, extras);
@@ -465,6 +466,32 @@
     }
   }
 
+  /** What a question asks, so the same question isn't asked twice in one game. */
+  function roundKey(r) {
+    if (!r) return '';
+    if (r.q) return r.q; // Space Trip: the question text
+    if (r.ask && r.a != null) return `${r.a}${r.ask}${r.b}`; // sums
+    if (r.word) return `${r.ask || ''}:${r.word}`; // letter games
+    return `${r.type}:${r.target}`;
+  }
+  /** Makes rounds until one hasn't been asked yet in this game. If every question has been used
+   *  (Little's 4 shapes in a 5-question game), it still never asks the same one twice in a row. */
+  function freshRound(make, asked, tries = 40) {
+    const last = asked[asked.length - 1];
+    let r = make(), fallback = null;
+    for (let i = 0; i < tries && asked.includes(roundKey(r)); i++) {
+      if (!fallback && roundKey(r) !== last) fallback = r;
+      r = make();
+    }
+    if (asked.includes(roundKey(r)) && roundKey(r) === last && fallback) return fallback;
+    return r;
+  }
+
+  // Menu order, grouped by kind of game (rows of 6 on TV, 3 on phones). GAMES keeps its order so each game keeps its prize video.
+  const MENU = ['balloons', 'goal', 'count', 'order', 'letters', 'spell', // numbers, letters
+    'shapes', 'puzzle', 'build', 'jigsaw', 'tune', 'pairs', // shapes, memory and music
+    'animals', 'planets', 'hide', 'fire', 'race', 'penalty']; // the world around us, adventures
+
   /** Round type for a given game and round number (0-based). */
   function roundTypeFor(gameId, roundIndex) {
     const game = GAMES.find((g) => g.id === gameId);
@@ -595,10 +622,11 @@
   const HIDE_PEEK = LEVEL_SPEC[1].peek; // share of the peek still showing, round by round
 
   /** Who hides where this round: never the same spot or hider twice running. */
-  function hideRound(roundIndex, prev = null, rng = Math.random, level = 1) {
+  function hideRound(roundIndex, prev = null, rng = Math.random, level = 1, used = []) {
     const pick = (list, not) => { const pool = list.filter((x) => x !== not); return pool[Math.floor(rng() * pool.length)]; };
+    const fresh = HIDERS.filter((h) => !used.includes(h)); // everyone hides once before anyone hides again
     return {
-      hider: pick(HIDERS, prev && prev.hider),
+      hider: fresh.length ? pick(fresh, prev && prev.hider) || fresh[0] : pick(HIDERS, prev && prev.hider),
       spot: pick(HIDE_SPOTS, prev && prev.spot),
       peek: atRound(levelSpec(level).peek, roundIndex),
       clue: levelSpec(level).clue
@@ -775,6 +803,7 @@
     FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire, RACE_LENGTH, RACE_ROUNDS, raceRoundPlan, raceObstacles,
     TREATS, wheelSlices, pickTreat, WARDROBE, nextWardrobeItem, toggleWear, ZONES, WORLD_SIZE, worldProgress,
     SPELL_WORDS, LETTER_WORDS, ALPHABET, letterRound, spellRound, nextSpellLetter, SPACE, PLANETS, SPACE_QUIZ, planetRound, capital,
+    roundKey, freshRound, MENU,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });
