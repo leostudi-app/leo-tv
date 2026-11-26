@@ -235,10 +235,10 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .fscene{position:relative;width:min(100%,calc((100vh - 150px) * 1.786));aspect-ratio:1000/560;border-radius:22px;overflow:hidden;box-shadow:0 8px 0 #0002}
 .fscene>svg{position:absolute;inset:0;width:100%;height:100%}
 .fscene .truck{transition:transform .45s ease-in-out}
-.fscene .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flicker .5s infinite alternate;transition:transform .35s,opacity .35s}
+.fscene .flame{transform-box:fill-box;transform-origin:50% 100%;animation:fflicker .5s infinite alternate;transition:transform .35s,opacity .35s}
 .fscene .fire.out .flame{animation:none;transform:scale(0);opacity:0}
 .fscene .fire.new{animation:pop .4s}
-@keyframes flicker{from{transform:scale(1,1)}to{transform:scale(.9,1.12)}}
+@keyframes fflicker{from{transform:scale(1,1)}to{transform:scale(.9,1.12)}}
 .fscene .steam{opacity:0}.fscene .fire.out .steam{animation:steam 1s}
 @keyframes steam{0%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
 .fscene .water{stroke-dasharray:6 14;animation:spray .25s linear infinite}
@@ -284,11 +284,11 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .cel-skate .mover{left:calc(50% - min(13vh,15vw));bottom:18%;animation:skate 5s linear infinite}.cel-skate .bob{transform:rotate(14deg);animation:glide 1s ease-in-out infinite alternate}
 @keyframes skate{from{transform:rotate(0) translateX(min(30vh,32vw)) rotate(0)}to{transform:rotate(-360deg) translateX(min(30vh,32vw)) rotate(360deg)}}
 @keyframes glide{from{transform:rotate(14deg)}to{transform:rotate(22deg) translateY(-6px)}}
-.cel-stomp .mover{left:calc(50% - min(13vh,15vw));animation:stomp 1.2s ease-in infinite}.cel-stomp{animation:shake 1.2s infinite}
+.cel-stomp .mover{left:calc(50% - min(13vh,15vw));animation:stomp 1.2s ease-in infinite}.cel-stomp{animation:cshake 1.2s infinite}
 @keyframes stomp{0%,100%{transform:translateY(0) scale(1.1,.9)}40%{transform:translateY(-34%) scale(.95,1.05)}50%{transform:translateY(-38%) rotate(180deg)}60%{transform:translateY(-34%) rotate(360deg)}}
-@keyframes shake{0%,4%{transform:translate(0)}2%{transform:translate(-6px,4px)}}
-.cel-twirl .mover{left:calc(50% - min(13vh,15vw));animation:float 2s ease-in-out infinite alternate}.cel-twirl .bob{animation:twirl 1.4s linear infinite}
-@keyframes twirl{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}@keyframes float{from{transform:translateY(0)}to{transform:translateY(-14%)}}
+@keyframes cshake{0%,4%{transform:translate(0)}2%{transform:translate(-6px,4px)}}
+.cel-twirl .mover{left:calc(50% - min(13vh,15vw));animation:cfloat 2s ease-in-out infinite alternate}.cel-twirl .bob{animation:twirl 1.4s linear infinite}
+@keyframes twirl{from{transform:rotateY(0)}to{transform:rotateY(360deg)}}@keyframes cfloat{from{transform:translateY(0)}to{transform:translateY(-14%)}}
 /* Toy box */
 .toys{flex-direction:column;gap:12px;background:#ffffff26}.toypick .big{padding:10px 18px;font-size:clamp(18px,2.6vw,26px)}
 .toyarea{flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0}
@@ -298,9 +298,9 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .launch{position:absolute;left:50%;bottom:16px;transform:translateX(-50%)}
 .firework{position:absolute;width:0;height:0}.firework i{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--c);animation:burst 1.2s ease-out forwards;transform:rotate(var(--a)) translateY(0)}
 @keyframes burst{to{transform:rotate(var(--a)) translateY(-120px);opacity:0}}
-.bubbles{display:grid;grid-template-columns:repeat(5,1fr);gap:4vh 4vw;width:90%}
-.bubble{aspect-ratio:1;border-radius:50%;border:4px solid #fff;background:radial-gradient(circle at 30% 30%,#fff,hsl(var(--h,200) 90% 70% / .6));animation:bob 2s ease-in-out infinite alternate;animation-delay:var(--d)}
-.bubble.pop{animation:popb .5s forwards}@keyframes popb{to{transform:scale(1.6);opacity:0}}@keyframes bob{to{transform:translateY(-14px)}}
+.tbubbles{display:grid;grid-template-columns:repeat(5,1fr);gap:4vh 4vw;width:90%}
+.tbubble{aspect-ratio:1;border-radius:50%;border:4px solid #fff;background:radial-gradient(circle at 30% 30%,#fff,hsl(var(--h,200) 90% 70% / .6));animation:tbob 2s ease-in-out infinite alternate;animation-delay:var(--d)}
+.tbubble.pop{animation:popb .5s forwards}@keyframes popb{to{transform:scale(1.6);opacity:0}}@keyframes tbob{to{transform:translateY(-14px)}}
 /* Dress up */
 .dress{gap:4%;background:#ffffff26;padding:2%}.dresshost{width:min(46vh,34vw)}.dresshost svg{width:100%;height:auto}
 .dressside{display:flex;flex-direction:column;align-items:center;gap:14px;max-width:50%}.dressside h2{color:#fff;text-shadow:0 3px 0 #0003;text-align:center}
@@ -321,7 +321,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .worldinfo{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;color:#fff;font-size:clamp(18px,3vh,28px);text-shadow:0 2px 0 #0003}
 .worldinfo .score{background:#ffc93c;color:#2b2118;border-radius:14px;padding:4px 14px;font-weight:800;text-shadow:none}
 #stickers .worldinfo{color:var(--ink);text-shadow:none}
-@media (max-width:640px) and (orientation:portrait){#treatSkip{font-size:18px;padding:8px 14px}.mover{width:40vw}.cel-skate .mover,.cel-stomp .mover,.cel-twirl .mover{left:calc(50% - 20vw)}.dancer{width:46vw}.dress{flex-direction:column}.dresshost{width:40vw}.dressside{max-width:100%}.wardrobe{grid-template-columns:repeat(3,22vw)}.treattop h2{font-size:20px}}
+@media (max-width:640px) and (orientation:portrait){.tbubbles{grid-template-columns:repeat(3,1fr)}#treatSkip{font-size:18px;padding:8px 14px}.mover{width:40vw}.cel-skate .mover,.cel-stomp .mover,.cel-twirl .mover{left:calc(50% - 20vw)}.dancer{width:46vw}.dress{flex-direction:column}.dresshost{width:40vw}.dressside{max-width:100%}.wardrobe{grid-template-columns:repeat(3,22vw)}.treattop h2{font-size:20px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1921,8 +1921,8 @@ function openToy(id) {
     $('launch').addEventListener('click', (e) => { e.stopPropagation(); boom(10 + Math.random() * 80, 10 + Math.random() * 50); });
     $('sky').addEventListener('click', (e) => { const r = $('sky').getBoundingClientRect(); boom(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100); });
   } else {
-    area.innerHTML = `<div class="bubbles">${Array.from({ length: 10 }, (_, i) => `<button class="bubble" data-nav style="--d:${(i % 5) * 0.4}s"></button>`).join('')}</div>`;
-    area.querySelectorAll('.bubble').forEach((b) => b.addEventListener('click', () => {
+    area.innerHTML = `<div class="tbubbles">${Array.from({ length: 10 }, (_, i) => `<button class="tbubble" data-nav style="--d:${(i % 5) * 0.4}s"></button>`).join('')}</div>`;
+    area.querySelectorAll('.tbubble').forEach((b) => b.addEventListener('click', () => {
       if (b.classList.contains('pop')) return;
       b.classList.add('pop'); tone(600 + Math.random() * 500, 0, 0.12, 'sine', 0.2);
       setTimeout(() => { b.classList.remove('pop'); b.style.setProperty('--h', `${Math.floor(Math.random() * 360)}`); }, 700);
