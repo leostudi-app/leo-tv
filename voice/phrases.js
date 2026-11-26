@@ -69,6 +69,15 @@ add('Nee naw! Fire! Drive to the fire and spray the water!', 'Fire! Fire! Put it
 // Race Day
 add('Race day! Jump over the cones and win the race!', 'Another race! Jump over the cones!', 'Oops! Jump over the cones!', 'You won the race!', 'Try again! Jump over the cones!',
   "Ooh, you came second! So close! Let's race again!", "Ooh, you came third! Jump over the cones! Let's race again!");
+// First Letters, Spell It
+const cap = (t) => t[0].toUpperCase() + t.slice(1);
+for (const w of C.LETTER_WORDS) add(`${cap(w)}!`, `Which letter does ${w} start with?`, `Yes! ${cap(w)} starts with the letter ${w[0].toUpperCase()}!`);
+for (const l of C.ALPHABET) add(`That's the letter ${l}.`, `Yes! It's the letter ${l}!`, `Not that one! Find the letter ${l}.`, `The letter ${l}!`);
+add('Which letter is missing?', 'Tap the letters in order.');
+for (const lv of [1, 2, 3]) for (const w of C.SPELL_WORDS[lv]) add(`Let's spell ${w}!`, `You spelt ${w}!`);
+// Space Trip
+for (const lv of [1, 2, 3]) for (const x of C.SPACE_QUIZ[lv]) add(x.q);
+for (const p of C.SPACE) add(`That's ${p.name}.`, `Yes! ${p.fact}`);
 // Reward wheel and treats
 add(...C.TREATS.map((t) => t.say), 'Spin the wheel!', 'Watch me moonwalk!', 'Watch me skate!', 'Watch me stomp!', 'Watch me twirl!',
   'Pick a toy!', 'Pick what to wear!', 'Looking good!', 'Look at this!', 'A new piece for your world!', 'Your world is complete!',

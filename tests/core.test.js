@@ -125,9 +125,9 @@ test('loadState survives corrupt storage and keeps new defaults', () => {
   assert.equal(s.settings.starsPerReward, 5);
 });
 
-test('eight games, each mapping rounds to valid round types', () => {
-  assert.equal(C.GAMES.length, 15);
-  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide', 'fire', 'race'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
+test('every game maps rounds to valid round types', () => {
+  assert.equal(C.GAMES.length, 18);
+  for (const g of C.GAMES.filter((x) => !['jigsaw', 'penalty', 'tune', 'animals', 'order', 'build', 'pairs', 'hide', 'fire', 'race', 'letters', 'spell', 'planets'].includes(x.id))) for (let i = 0; i < 6; i++) assert.ok(C.ROUND_TYPES.includes(C.roundTypeFor(g.id, i)), g.id);
   assert.deepEqual([0, 1, 2].map((i) => C.roundTypeFor('count', i)), ['countIt', 'drumCount', 'countIt']);
   assert.throws(() => C.roundTypeFor('nope', 0), /Unknown game/);
 });
@@ -224,7 +224,7 @@ test('number order: consecutive, shuffled, growing; starts at 1 until mastered',
 test('each game has its own video, wrapping and skipping on errors', () => {
   const s = C.defaultState();
   s.settings.videoIds = ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9'];
-  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2', 'v3', 'v4']); // games 11-15 wrap until more videos are added
+  assert.deepEqual(C.GAMES.map((g) => C.videoForGame(s, g.id)), ['v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7', 'v8', 'v9', 'v0', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6', 'v7']); // games 11-18 wrap until more videos are added
   assert.equal(C.videoForGame(s, 'order', 1), 'v0'); // next one along when a video won't play
   s.settings.videoIds = ['a', 'b', 'c'];
   assert.equal(C.videoForGame(s, 'tune'), 'b'); // game 8 of 10 wraps round 3 videos
@@ -365,4 +365,71 @@ test('reward wheel: slices, no repeats, dress up and world progress', () => {
   assert.equal(C.worldProgress(7).zone, 1); assert.equal(C.worldProgress(7).placed, 1); assert.equal(C.worldProgress(7).score, 120);
   assert.equal(C.worldProgress(C.WORLD_SIZE).worlds, 1); assert.equal(C.worldProgress(C.WORLD_SIZE).zone, 0);
   assert.equal(C.defaultState().world, 0); assert.deepEqual(C.defaultState().wear, { hat: null, face: null });
+});
+
+test('letter games: first letter at Little/Middle, a missing inside letter at Big', () => {
+  const rng = seeded(7);
+  for (let i = 0; i < 60; i++) {
+    for (const level of [1, 2]) {
+      const r = C.makeRound('letterStart', C.defaultState(level), rng);
+      assert.equal(r.ask, 'first');
+      assert.equal(r.target, r.word[0].toUpperCase());
+      assert.equal(new Set(r.options).size, r.options.length);
+      assert.ok(r.options.includes(r.target));
+      assert.ok(C.LETTER_WORDS.includes(r.word));
+    }
+    const b = C.makeRound('letterStart', C.defaultState(3), rng);
+    assert.equal(b.ask, 'missing');
+    assert.ok(b.gap > 0 && b.gap < b.word.length - 1);
+    assert.equal(b.target, b.word[b.gap].toUpperCase());
+    assert.equal(b.options.length, 4);
+    assert.equal(new Set(b.options).size, 4);
+    assert.ok(b.options.includes(b.target));
+  }
+});
+
+test('Spell It: tray holds the word letters (plus decoys above Little), never already spelt', () => {
+  const rng = seeded(3);
+  for (const level of [1, 2, 3]) {
+    let prev = null;
+    for (let i = 0; i < 40; i++) {
+      const r = C.spellRound(level, rng, prev);
+      assert.notEqual(r.word, prev); prev = r.word;
+      assert.ok(C.SPELL_WORDS[level].includes(r.word));
+      assert.equal(r.tray.length, r.word.length + [0, 0, 1, 2][level]);
+      assert.notEqual(r.tray.join(''), r.word.toUpperCase());
+      const left = r.tray.slice();
+      for (const ch of r.word.toUpperCase()) { const k = left.indexOf(ch); assert.ok(k >= 0); left.splice(k, 1); }
+      assert.equal(r.guide, level === 1);
+    }
+  }
+  assert.equal(C.nextSpellLetter('cat', 0), 'C');
+  assert.equal(C.nextSpellLetter('cat', 2), 'T');
+  assert.equal(C.nextSpellLetter('cat', 3), null);
+});
+
+test('Space Trip: answers are in the options, Big asks only about planets, facts are right', () => {
+  const rng = seeded(11);
+  assert.deepEqual(C.PLANETS, ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune']);
+  for (const level of [1, 2, 3]) {
+    let prev = null;
+    for (let i = 0; i < 50; i++) {
+      const r = C.planetRound(level, rng, prev);
+      assert.notEqual(r.q, prev); prev = r.q;
+      assert.ok(r.options.includes(r.target));
+      assert.equal(new Set(r.options).size, r.options.length);
+      if (level === 3) assert.ok(r.options.every((o) => C.PLANETS.includes(o)));
+      if (level === 1) assert.ok(r.options.every((o) => ['sun', 'moon', 'earth', 'mars', 'jupiter', 'saturn'].includes(o)));
+      assert.equal(r.labels, level > 1);
+    }
+  }
+  const third = C.SPACE_QUIZ[3].find((x) => x.q === 'Which planet is third from the Sun?');
+  assert.equal(third.a, 'earth');
+  assert.equal(C.SPACE_QUIZ[3].find((x) => x.q.includes('hottest')).a, 'venus');
+});
+
+test('18 games, new ones at the end so prize videos keep their games', () => {
+  assert.equal(C.GAMES.length, 18);
+  assert.deepEqual(C.GAMES.slice(-3).map((g) => g.id), ['letters', 'spell', 'planets']);
+  assert.equal(C.GAMES[14].id, 'race');
 });

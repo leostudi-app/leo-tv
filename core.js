@@ -39,7 +39,10 @@
     { id: 'pairs', name: 'Memory Pairs', types: ['pairs'] },
     { id: 'hide', name: 'Hide & Seek', types: ['hide'] }, // find the puppy family
     { id: 'fire', name: 'Fire Rescue', types: ['fire'] }, // drive the fire engine, spray the fires
-    { id: 'race', name: 'Race Day', types: ['race'] } // jump the cones, win the race
+    { id: 'race', name: 'Race Day', types: ['race'] }, // jump the cones, win the race
+    { id: 'letters', name: 'First Letters', types: ['letterStart'] }, // which letter does the picture start with?
+    { id: 'spell', name: 'Spell It', types: ['spell'] }, // tap the letters in order
+    { id: 'planets', name: 'Space Trip', types: ['planet'] } // find the planet, fly the rocket there
   ];
 
   // Shape Builder: each picture is built layer by layer; every layer is one shape in one colour.
@@ -107,6 +110,98 @@
   };
   const ORDER_LENGTHS = LEVEL_SPEC[1].order.lengths;
 
+  // Letter games: every word has a picture in index.html (WORD_ART).
+  const SPELL_WORDS = {
+    1: ['cat', 'dog', 'pig', 'cow', 'sun', 'hat', 'bus', 'egg', 'cup', 'bed', 'car', 'key'],
+    2: ['duck', 'frog', 'fish', 'moon', 'star', 'cake', 'tree', 'ball', 'boat', 'kite', 'lion', 'bus', 'cup', 'hat'],
+    3: ['apple', 'sheep', 'train', 'house', 'robot', 'rocket', 'banana', 'flower', 'rainbow', 'castle', 'pencil', 'planet']
+  };
+  const LETTER_WORDS = [...new Set(SPELL_WORDS[1].concat(SPELL_WORDS[2], SPELL_WORDS[3]))];
+  const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const VOWELS = ['A', 'E', 'I', 'O', 'U'];
+  const up = (w) => w.toUpperCase();
+
+  /** Letter round. Little/Middle: the word's first letter. Big: the missing letter inside a longer word. */
+  function letterRound(state, rng = Math.random) {
+    const level = levelOf(state), n = LEVEL_SPEC[level].options;
+    if (level === 3) {
+      const pool = SPELL_WORDS[3], word = pool[Math.floor(rng() * pool.length)];
+      const gap = 1 + Math.floor(rng() * (word.length - 2)); // never the first or last letter
+      const target = up(word[gap]);
+      // Wrong choices that look like real spellings: vowels for vowels, sound-alikes for consonants.
+      const alike = { C: ['K', 'S'], K: ['C'], S: ['C', 'Z'], N: ['M'], M: ['N'], B: ['D', 'P'], D: ['B', 'T'], P: ['B'], T: ['D'], L: ['R'], R: ['L', 'W'], W: ['R'], H: ['N'], E: ['A', 'I'] };
+      const near = VOWELS.includes(target) ? VOWELS : (alike[target] || []).concat(ALPHABET);
+      const others = [...new Set(near.filter((l) => l !== target))];
+      const options = shuffle([target, ...others.slice(0, Math.min(2, others.length)), ...shuffle(others.slice(2), rng)].slice(0, n), rng);
+      return { type: 'letterStart', skill: 'letters', ask: 'missing', word, gap, target, options, noStats: true };
+    }
+    const word = pickWeighted(LETTER_WORDS, state.stats.letters || {}, rng);
+    const target = up(word[0]);
+    const firsts = [...new Set(LETTER_WORDS.map((w) => up(w[0])))];
+    return { type: 'letterStart', skill: 'letters', ask: 'first', word, target, options: makeOptions(target, firsts, n, rng), statKey: word };
+  }
+
+  /** Spell It: the letters to tap (shuffled, plus decoys at Middle/Big) and whether the word is shown faintly to copy. */
+  function spellRound(level, rng = Math.random, prev = null) {
+    const lv = clampLevel(level), pool = SPELL_WORDS[lv].filter((w) => w !== prev);
+    const word = pool[Math.floor(rng() * pool.length)];
+    const extras = lv === 1 ? 0 : lv === 2 ? 1 : 2;
+    const decoys = shuffle(ALPHABET.filter((l) => !up(word).includes(l)), rng).slice(0, extras);
+    let tray = shuffle(up(word).split('').concat(decoys), rng);
+    for (let i = 0; i < 5 && tray.join('') === up(word); i++) tray = shuffle(tray, rng); // never already spelt
+    return { word, tray, guide: lv === 1 };
+  }
+  /** The letter wanted next, or null when the word is spelt. */
+  function nextSpellLetter(word, typed) {
+    return typed < word.length ? up(word[typed]) : null;
+  }
+
+  // Space Trip: the Sun, the eight planets in order, and the Moon.
+  const SPACE = [
+    { id: 'sun', name: 'the Sun', look: "It's a big, hot star!", fact: 'The Sun is a star. It keeps us warm!' },
+    { id: 'mercury', name: 'Mercury', fact: 'Mercury is the closest planet to the Sun.' },
+    { id: 'venus', name: 'Venus', fact: 'Venus is the hottest planet.' },
+    { id: 'earth', name: 'Earth', look: "It's blue and green!", fact: 'Earth is our home!' },
+    { id: 'mars', name: 'Mars', look: "It's red!", fact: 'Mars is the red planet.' },
+    { id: 'jupiter', name: 'Jupiter', look: "It's the biggest, with stripes!", fact: 'Jupiter is the biggest planet.' },
+    { id: 'saturn', name: 'Saturn', look: 'It has rings!', fact: 'Saturn has beautiful rings.' },
+    { id: 'uranus', name: 'Uranus', fact: 'Uranus spins on its side.' },
+    { id: 'neptune', name: 'Neptune', fact: 'Neptune is the farthest planet from the Sun.' },
+    { id: 'moon', name: 'the Moon', look: "It's grey and bumpy!", fact: 'The Moon goes round the Earth.' }
+  ];
+  const PLANETS = SPACE.slice(1, 9).map((p) => p.id); // in order from the Sun
+  const ORDINAL = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'];
+  const spaceName = (id) => SPACE.find((p) => p.id === id).name;
+  const capital = (t) => t[0].toUpperCase() + t.slice(1);
+  const SPACE_QUIZ = {
+    1: ['sun', 'moon', 'earth', 'mars', 'jupiter', 'saturn'].map((id) => {
+      const p = SPACE.find((x) => x.id === id);
+      return { q: `Can you find ${p.name}? ${p.look}`, a: id };
+    }),
+    2: [
+      { q: 'Find the red planet!', a: 'mars' }, { q: 'Find the planet with rings!', a: 'saturn' },
+      { q: 'Find the planet we live on!', a: 'earth' }, { q: 'Find the biggest planet!', a: 'jupiter' },
+      { q: 'Find the star that keeps us warm!', a: 'sun' }, { q: 'Find the Moon!', a: 'moon' },
+      ...['mercury', 'venus', 'uranus', 'neptune'].map((id) => ({ q: `Can you find ${spaceName(id)}?`, a: id }))
+    ],
+    3: [
+      { q: 'Which planet is closest to the Sun?', a: 'mercury' }, { q: 'Which planet is the hottest?', a: 'venus' },
+      { q: 'Which planet is farthest from the Sun?', a: 'neptune' }, { q: 'Which planet spins on its side?', a: 'uranus' },
+      { q: 'Which planet has a giant storm called the Great Red Spot?', a: 'jupiter' }, { q: 'Which planet is the smallest?', a: 'mercury' },
+      { q: 'Which planet has the biggest rings?', a: 'saturn' }, { q: 'Which planet comes after Earth?', a: 'mars' },
+      { q: 'Which planet comes before Earth?', a: 'venus' },
+      ...PLANETS.map((id, i) => ({ q: `Which planet is ${ORDINAL[i]} from the Sun?`, a: id }))
+    ]
+  };
+  /** A Space Trip question; prev (last question asked) is never asked twice in a row. */
+  function planetRound(level, rng = Math.random, prev = null) {
+    const lv = clampLevel(level), bank = SPACE_QUIZ[lv].filter((x) => x.q !== prev);
+    const { q, a } = bank[Math.floor(rng() * bank.length)];
+    const pool = lv === 1 ? ['sun', 'moon', 'earth', 'mars', 'jupiter', 'saturn'] : lv === 2 ? SPACE.map((p) => p.id) : PLANETS;
+    const fact = SPACE.find((p) => p.id === a).fact;
+    return { type: 'planet', skill: 'space', q, target: a, fact, options: makeOptions(a, pool, LEVEL_SPEC[lv].options, rng), labels: lv > 1, noStats: true };
+  }
+
   const SIMON_PADS = 4;
 
   const JIGSAW_COLS = 5;
@@ -164,12 +259,12 @@
       friends: [], // indexes into FRIENDS
       nextVideo: 0,
       nextPuzzle: 0,
-      stats: { numbers: {}, shapes: {}, animals: {} }, // item -> { right, tries }
+      stats: { numbers: {}, shapes: {}, animals: {}, letters: {} }, // item -> { right, tries }
       wardrobe: [], // dress-up items won (ids from WARDROBE)
       wear: { hat: null, face: null }, // what the host is wearing
       world: 0, // world pieces collected, all time
       lastTreat: null, // the wheel never lands on the same reward twice running
-      history: { numbers: [], shapes: [], animals: [] } // rolling first-try results (true/false)
+      history: { numbers: [], shapes: [], animals: [], letters: [] } // rolling first-try results (true/false)
     };
   }
 
@@ -363,6 +458,8 @@
         const target = pickWeighted(pool, state.stats.animals || {}, rng);
         return { type, skill: 'animals', target, sound: ANIMALS[target], options: makeOptions(target, pool, spec.options, rng) };
       }
+      case 'letterStart': return letterRound(state, rng);
+      case 'planet': return planetRound(levelOf(state), rng);
       default:
         throw new Error(`Unknown round type: ${type}`);
     }
@@ -677,6 +774,7 @@
     speechParts, clipKey, ORDER_LENGTHS, HIDERS, HIDE_SPOTS, HIDE_PEEK, hideRound,
     FIRE_COLS, FIRE_FLOORS, FIRE_ROUNDS, fireRoundPlan, nextFire, RACE_LENGTH, RACE_ROUNDS, raceRoundPlan, raceObstacles,
     TREATS, wheelSlices, pickTreat, WARDROBE, nextWardrobeItem, toggleWear, ZONES, WORLD_SIZE, worldProgress,
+    SPELL_WORDS, LETTER_WORDS, ALPHABET, letterRound, spellRound, nextSpellLetter, SPACE, PLANETS, SPACE_QUIZ, planetRound, capital,
     addStar, claimReward, takeNextVideo, videoForGame, isValidPin, checkPin
   };
 });

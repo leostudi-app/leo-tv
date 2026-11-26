@@ -68,12 +68,12 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 #home .top{position:absolute;top:calc(12px + var(--safe-t));left:16px;right:16px}
 .menu-head{display:flex;align-items:center;gap:12px}
 .leo-mini{width:clamp(70px,14vh,130px);height:auto}
-.games{--cols:5;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1000px}
+.games{--cols:6;--gap:clamp(8px,1.2vw,14px);display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap);width:100%;max-width:1120px}
 .games>.tile{flex:0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols))}
 .tile{background:#fff;border-radius:22px;padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 8px 0 #0002;font-size:clamp(14px,1.6vw,21px);font-weight:800;line-height:1.1}
 .tile svg{width:56%;height:auto;max-height:14vh}
 @media (max-width:640px){.games{--cols:3}}
-/* TV and other landscape screens: 3 rows of 5, sized so the whole menu fits without scrolling */
+/* TV and other landscape screens: 3 rows of 6, sized so the whole menu fits without scrolling */
 @media (min-width:641px) and (orientation:landscape){#home{gap:clamp(6px,1.4vh,16px)}.leo-mini{width:clamp(60px,11vh,110px)}.tile svg{max-height:9vh}.tile{padding:8px 6px 6px;font-size:clamp(13px,2.7vh,21px)}#home h2{font-size:clamp(26px,6.5vh,48px)}}
 @media (orientation:landscape) and (max-height:450px){#home{gap:6px}.leo-mini{width:40px}#home h2{font-size:22px}.tile svg{max-height:7.5vh}.tile{padding:4px}#home .big{padding-block:4px;font-size:20px}}
 .ans.balloon{border-radius:50% 50% 46% 46%/55% 55% 45% 45%;color:#fff;text-shadow:0 3px 0 #0003;position:relative}
@@ -194,6 +194,32 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .pad svg{width:46%;height:auto}
 .pad.lit{filter:brightness(1.3) saturate(1.2);transform:scale(1.12);box-shadow:0 0 0 8px #fff,0 10px 0 #0003}
 .pad:disabled{opacity:1}
+/* Letter games */
+.lword{display:flex;align-items:center;gap:clamp(10px,3vw,28px)}
+.show .lword>svg{width:clamp(90px,min(22vh,18vw),180px)}
+.lspell{display:flex;gap:4px;font-size:clamp(40px,min(10vh,9vw),88px);font-weight:800;color:#fff;text-shadow:0 4px 0 #0003;letter-spacing:.02em}
+.lspell .lgap{min-width:.8em;text-align:center;border-radius:14px;background:#ffffff33;outline:4px dashed #fff;outline-offset:-4px;animation:glow 1.2s infinite alternate}
+.ans.letter{color:#fff;text-shadow:0 4px 0 #0003;position:relative;line-height:1}
+.ans.letter small{position:absolute;right:12%;bottom:8%;font-size:.36em;opacity:.85}
+.spell{--b:min(calc(min(86vw,780px) / var(--len) - 10px),15vh,110px);display:flex;flex-direction:column;align-items:center;gap:clamp(8px,2.4vh,22px)}
+.spic svg{width:clamp(80px,20vh,170px);height:auto}
+.sboxes,.stray{display:flex;gap:clamp(6px,1.2vw,12px);justify-content:center;flex-wrap:wrap}
+.sbox{width:var(--b);height:var(--b);border-radius:18px;outline:4px dashed #fff;outline-offset:-4px;display:grid;place-items:center;font-size:calc(var(--b) * .62);font-weight:800;color:#fff;background:#ffffff22}
+.sbox i{font-style:normal;opacity:.35}
+.sbox.next{animation:glow 1.2s infinite alternate}
+.sbox.filled{outline:none;background:var(--ok);text-shadow:0 3px 0 #0003}.sbox.pop{animation:pop .4s}
+.stile{width:min(var(--b),12vh);height:min(var(--b),12vh);min-width:56px;min-height:56px;border-radius:18px;font-size:calc(min(var(--b),12vh) * .6);font-weight:800;color:#fff;text-shadow:0 3px 0 #0003;box-shadow:0 8px 0 #0003}
+.stile.gone{visibility:hidden;box-shadow:none}
+.stile.wrong{animation:wobble .4s}.stile.hint{animation:glow 1s 3}
+/* Space Trip */
+.task.spacetask{width:100%;border-radius:26px;padding:clamp(10px,2vh,20px);background:radial-gradient(circle at 20% 30%,#ffffff 0 1px,transparent 2px) 0 0/97px 83px,radial-gradient(circle at 70% 60%,#ffffffcc 0 1px,transparent 2px) 0 0/61px 71px,radial-gradient(circle at 40% 80%,#fff9 0 1.5px,transparent 2.5px) 0 0/131px 109px,linear-gradient(#0b1440,#2a1a5e);box-shadow:0 8px 0 #0002}
+.spacetask .show{min-height:clamp(70px,16vh,150px)}
+.rocket{width:clamp(60px,13vh,110px);transition:transform .8s cubic-bezier(.5,0,.3,1);z-index:3}.rocket svg{width:100%!important;height:auto;animation:bob 1.6s ease-in-out infinite}
+.ans.planet{background:#ffffff12;box-shadow:0 0 0 3px #ffffff33;position:relative}
+.ans.planet svg{width:80%;height:80%}
+.ans.planet b{position:absolute;bottom:6%;left:0;right:0;font-size:clamp(14px,2.4vh,22px);color:#fff;text-shadow:0 2px 0 #0008}
+.ans.planet.right{background:#2fbf7155}
+@media (max-width:640px) and (orientation:portrait){.spacetask .answers[style*="--n:4"]{grid-template-columns:repeat(2,minmax(0,1fr));max-width:330px}.ans.planet b{font-size:14px}.ans.planet svg{width:70%;height:70%;margin-bottom:12%}}
 /* Number order */
 .order{--o:min(12vw,17vh);display:flex;flex-direction:column;align-items:center;gap:clamp(12px,3vh,28px)}
 .oslots,.otray{display:flex;gap:clamp(8px,1.6vw,16px);justify-content:center;flex-wrap:wrap}
@@ -923,6 +949,122 @@ const ANIMAL_ART = {
 };
 const EAR = '<svg class="ear" viewBox="0 0 100 100"><path d="M20 38h16l22-18v60L36 62H20z" fill="#fff"/><path d="M68 34q10 16 0 32M78 24q18 26 0 52" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>';
 const GAME_ICON = { ...GAME_ICON_BASE, animals: ANIMAL_ART.cow };
+/* ---------- Letter games and Space Trip: picture words and planets ---------- */
+const WORD_ART = {
+  cat: ANIMAL_ART.cat, dog: ANIMAL_ART.dog, pig: ANIMAL_ART.pig, cow: ANIMAL_ART.cow, duck: ANIMAL_ART.duck, frog: ANIMAL_ART.frog,
+  lion: ANIMAL_ART.lion, sheep: ANIMAL_ART.sheep, ball: THING.ball, apple: THING.apple, star: THING.star,
+  sun: '<svg viewBox="0 0 100 100"><g stroke="#ffb300" stroke-width="6" stroke-linecap="round"><path d="M50 4v14M50 82v14M4 50h14M82 50h14M17 17l10 10M73 73l10 10M83 17 73 27M27 73 17 83"/></g><circle cx="50" cy="50" r="26" fill="#ffd54f" stroke="#ffb300" stroke-width="4"/><circle cx="41" cy="46" r="3.5" fill="#2b2118"/><circle cx="59" cy="46" r="3.5" fill="#2b2118"/><path d="M40 57q10 9 20 0" fill="none" stroke="#2b2118" stroke-width="3.5" stroke-linecap="round"/></svg>',
+  hat: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="72" rx="44" ry="13" fill="#2a7de1"/><path d="M26 70V40q0-18 24-18t24 18v30z" fill="#2a7de1"/><path d="M26 56h48v12H26z" fill="#e63946"/><ellipse cx="50" cy="70" rx="24" ry="5" fill="#0002"/></svg>',
+  bus: '<svg viewBox="0 0 100 100"><rect x="6" y="22" width="88" height="56" rx="10" fill="#ffc93c" stroke="#e0a400" stroke-width="3"/><g fill="#bfe6ff" stroke="#2b2118" stroke-width="2"><rect x="14" y="30" width="16" height="16" rx="3"/><rect x="34" y="30" width="16" height="16" rx="3"/><rect x="54" y="30" width="16" height="16" rx="3"/><rect x="74" y="30" width="13" height="30" rx="3"/></g><path d="M6 56h66" stroke="#e63946" stroke-width="5"/><circle cx="26" cy="80" r="9" fill="#2b2118"/><circle cx="74" cy="80" r="9" fill="#2b2118"/><circle cx="26" cy="80" r="3.5" fill="#bbb"/><circle cx="74" cy="80" r="3.5" fill="#bbb"/></svg>',
+  egg: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="86" rx="28" ry="6" fill="#0002"/><path d="M50 10c18 0 30 30 30 50s-13 26-30 26-30-6-30-26 12-50 30-50z" fill="#fff6e6" stroke="#e8d6b8" stroke-width="3"/><ellipse cx="40" cy="38" rx="6" ry="10" fill="#fff" transform="rotate(20 40 38)"/></svg>',
+  cup: '<svg viewBox="0 0 100 100"><path d="M40 10q-6 8 0 14t0 14M56 10q-6 8 0 14t0 14" fill="none" stroke="#bbb" stroke-width="3" stroke-linecap="round"/><path d="M76 52h6a10 10 0 0 1 0 20h-8" fill="none" stroke="#e63946" stroke-width="7"/><path d="M18 44h60l-6 38q-1 6-8 6H32q-7 0-8-6z" fill="#e63946"/><ellipse cx="48" cy="44" rx="30" ry="5" fill="#8d5a2b"/><path d="M30 60h36" stroke="#fff8" stroke-width="5" stroke-linecap="round"/></svg>',
+  bed: '<svg viewBox="0 0 100 100"><rect x="8" y="30" width="10" height="56" rx="3" fill="#8d5a2b"/><rect x="82" y="50" width="10" height="36" rx="3" fill="#8d5a2b"/><rect x="14" y="56" width="74" height="16" fill="#a06a3a"/><rect x="18" y="44" width="22" height="14" rx="6" fill="#fff" stroke="#ddd" stroke-width="2"/><path d="M36 48h48q6 0 6 8v6H36z" fill="#2a7de1"/><path d="M50 48v14M66 48v14" stroke="#ffffff66" stroke-width="3"/></svg>',
+  car: '<svg viewBox="0 0 100 100"><path d="M8 66V54q0-6 6-8l12-3 10-14q3-4 8-4h20q5 0 8 4l10 14 8 2q6 2 6 8v13z" fill="#e63946"/><path d="M38 30h11v14H30zM55 30h9l8 14H55z" fill="#bfe6ff"/><rect x="8" y="58" width="84" height="10" rx="4" fill="#c62828"/><circle cx="28" cy="70" r="11" fill="#2b2118"/><circle cx="72" cy="70" r="11" fill="#2b2118"/><circle cx="28" cy="70" r="4" fill="#ccc"/><circle cx="72" cy="70" r="4" fill="#ccc"/><circle cx="88" cy="54" r="3" fill="#ffd54f"/></svg>',
+  key: '<svg viewBox="0 0 100 100"><circle cx="30" cy="50" r="20" fill="none" stroke="#ffc93c" stroke-width="10"/><path d="M48 50h44M80 50v14M68 50v10" stroke="#ffc93c" stroke-width="10" stroke-linecap="round"/><circle cx="30" cy="50" r="20" fill="none" stroke="#e0a400" stroke-width="2"/></svg>',
+  fish: '<svg viewBox="0 0 100 100"><path d="M70 50 94 30v40z" fill="#ff7043"/><ellipse cx="44" cy="50" rx="34" ry="24" fill="#ff9a3c"/><path d="M36 30q10 20 0 40" fill="none" stroke="#ff7043" stroke-width="4"/><path d="M40 26q10-14 22-4" fill="#ff7043"/><circle cx="24" cy="44" r="6" fill="#fff"/><circle cx="23" cy="44" r="3" fill="#2b2118"/><path d="M14 58q6 3 10 0" fill="none" stroke="#2b2118" stroke-width="2.5" stroke-linecap="round"/></svg>',
+  moon: '<svg viewBox="0 0 100 100"><path d="M60 8a42 42 0 1 0 32 66A34 34 0 0 1 60 8z" fill="#ffe082" stroke="#ffca28" stroke-width="3"/><circle cx="40" cy="66" r="5" fill="#ffd54f"/><circle cx="30" cy="40" r="4" fill="#ffd54f"/><circle cx="52" cy="82" r="3" fill="#ffd54f"/></svg>',
+  cake: '<svg viewBox="0 0 100 100"><path d="M50 8q6 6 0 12-6-6 0-12z" fill="#ff9a3c"/><rect x="47" y="20" width="6" height="16" fill="#2a7de1"/><rect x="16" y="56" width="68" height="32" rx="6" fill="#ff7eb6"/><rect x="22" y="36" width="56" height="22" rx="6" fill="#fff0f6"/><path d="M22 48q7 8 14 0t14 0 14 0 14 0" fill="none" stroke="#ff7eb6" stroke-width="4"/><path d="M16 72h68" stroke="#fff" stroke-width="4"/><g fill="#e63946"><circle cx="30" cy="80" r="3"/><circle cx="50" cy="80" r="3"/><circle cx="70" cy="80" r="3"/></g></svg>',
+  tree: '<svg viewBox="0 0 100 100"><rect x="42" y="56" width="16" height="38" rx="4" fill="#8d5a2b"/><circle cx="50" cy="36" r="26" fill="#2fbf71"/><circle cx="30" cy="50" r="18" fill="#27a862"/><circle cx="70" cy="50" r="18" fill="#27a862"/><g fill="#e63946"><circle cx="40" cy="30" r="4"/><circle cx="62" cy="40" r="4"/><circle cx="34" cy="54" r="4"/></g></svg>',
+  boat: '<svg viewBox="0 0 100 100"><path d="M50 12v52" stroke="#8d5a2b" stroke-width="4"/><path d="M54 14q26 22 28 44H54z" fill="#fff" stroke="#ddd" stroke-width="2"/><path d="M46 22 22 58h24z" fill="#ffc93c"/><path d="M10 64h80l-12 18H22z" fill="#e63946"/><path d="M0 88q12-8 25 0t25 0 25 0 25 0" fill="none" stroke="#2a7de1" stroke-width="5"/></svg>',
+  kite: '<svg viewBox="0 0 100 100"><path d="M46 6 74 30 50 66 22 34z" fill="#e63946"/><path d="M46 6 50 66M22 34l52-4" stroke="#fff" stroke-width="3"/><path d="M46 6 74 30 48 32z" fill="#ffc93c"/><path d="M50 66q-8 8 0 14t-2 16" fill="none" stroke="#2b2118" stroke-width="2"/><g fill="#2a7de1"><path d="M44 74l6 2-4 4z"/><path d="M50 86l6 2-4 4z"/></g></svg>',
+  train: '<svg viewBox="0 0 100 100"><rect x="14" y="18" width="14" height="18" fill="#2b2118"/><rect x="8" y="34" width="56" height="36" rx="5" fill="#2fbf71"/><rect x="56" y="20" width="34" height="50" rx="5" fill="#e63946"/><rect x="62" y="28" width="22" height="16" rx="3" fill="#bfe6ff"/><rect x="4" y="66" width="90" height="8" rx="3" fill="#2b2118"/><g fill="#2b2118"><circle cx="22" cy="80" r="9"/><circle cx="46" cy="80" r="9"/><circle cx="74" cy="80" r="11"/></g><g fill="#ffc93c"><circle cx="22" cy="80" r="3"/><circle cx="46" cy="80" r="3"/><circle cx="74" cy="80" r="4"/></g><circle cx="20" cy="12" r="6" fill="#ddd"/></svg>',
+  house: '<svg viewBox="0 0 100 100"><rect x="66" y="16" width="10" height="20" fill="#8d5a2b"/><path d="M8 50 50 14l42 36z" fill="#e63946"/><rect x="16" y="48" width="68" height="44" fill="#ffc93c"/><rect x="42" y="64" width="16" height="28" rx="2" fill="#8d5a2b"/><circle cx="54" cy="78" r="1.8" fill="#ffc93c"/><g fill="#bfe6ff" stroke="#fff" stroke-width="3"><rect x="22" y="56" width="14" height="14"/><rect x="64" y="56" width="14" height="14"/></g></svg>',
+  robot: '<svg viewBox="0 0 100 100"><path d="M50 8v10" stroke="#9aa0aa" stroke-width="4"/><circle cx="50" cy="8" r="5" fill="#e63946"/><rect x="24" y="18" width="52" height="38" rx="8" fill="#b0bec5"/><circle cx="38" cy="36" r="7" fill="#fff"/><circle cx="62" cy="36" r="7" fill="#fff"/><circle cx="38" cy="36" r="3.5" fill="#2a7de1"/><circle cx="62" cy="36" r="3.5" fill="#2a7de1"/><rect x="38" y="46" width="24" height="5" rx="2" fill="#2b2118"/><rect x="30" y="60" width="40" height="32" rx="6" fill="#90a4ae"/><rect x="14" y="62" width="12" height="24" rx="5" fill="#b0bec5"/><rect x="74" y="62" width="12" height="24" rx="5" fill="#b0bec5"/><g fill="#ffc93c"><circle cx="42" cy="72" r="4"/><circle cx="58" cy="72" r="4"/></g><rect x="40" y="81" width="20" height="5" rx="2" fill="#2fbf71"/></svg>',
+  rocket: '<svg viewBox="0 0 100 100"><path d="M42 80q8 22 16 0z" fill="#ff9a3c"/><path d="M45 80q5 12 10 0z" fill="#ffd54f"/><path d="M36 60 20 80h20zM64 60l16 20H60z" fill="#e63946"/><path d="M50 4q20 18 16 76H34Q30 22 50 4z" fill="#eceff1" stroke="#b0bec5" stroke-width="2"/><path d="M50 4q10 9 14 22H36q4-13 14-22z" fill="#e63946"/><circle cx="50" cy="44" r="9" fill="#2a7de1" stroke="#90a4ae" stroke-width="3"/></svg>',
+  banana: '<svg viewBox="0 0 100 100"><path d="M18 22q-4 52 46 62 18 2 22-6-36-6-48-50z" fill="#ffd54f" stroke="#f9a825" stroke-width="3" stroke-linejoin="round"/><path d="M16 14l6 10-4 2z" fill="#8d5a2b"/><path d="M84 76l4 4" stroke="#5d4037" stroke-width="4" stroke-linecap="round"/><path d="M26 34q8 30 40 42" fill="none" stroke="#fff9" stroke-width="3" stroke-linecap="round"/></svg>',
+  flower: '<svg viewBox="0 0 100 100"><path d="M50 52v44" stroke="#2fbf71" stroke-width="5"/><path d="M50 80q-20-4-22-18 16 0 22 18zM50 74q18-6 20-18-14 0-20 18z" fill="#2fbf71"/><g fill="#ff7eb6"><circle cx="50" cy="18" r="13"/><circle cx="70" cy="32" r="13"/><circle cx="62" cy="54" r="13"/><circle cx="38" cy="54" r="13"/><circle cx="30" cy="32" r="13"/></g><circle cx="50" cy="38" r="11" fill="#ffc93c"/></svg>',
+  rainbow: '<svg viewBox="0 0 100 100"><g fill="none" stroke-width="7"><path d="M8 74a42 42 0 0 1 84 0" stroke="#e63946"/><path d="M15 74a35 35 0 0 1 70 0" stroke="#ff9a3c"/><path d="M22 74a28 28 0 0 1 56 0" stroke="#ffc93c"/><path d="M29 74a21 21 0 0 1 42 0" stroke="#2fbf71"/><path d="M36 74a14 14 0 0 1 28 0" stroke="#2a7de1"/></g><g fill="#fff"><circle cx="12" cy="78" r="9"/><circle cx="22" cy="80" r="8"/><circle cx="88" cy="78" r="9"/><circle cx="78" cy="80" r="8"/></g></svg>',
+  castle: '<svg viewBox="0 0 100 100"><path d="M50 6v16" stroke="#2b2118" stroke-width="2"/><path d="M50 6h14l-4 4 4 4H50z" fill="#e63946"/><path d="M8 92V30h6v6h6v-6h6v62zM74 92V30h6v6h6v-6h6v62z" fill="#9aa0aa"/><path d="M26 92V40h6v6h6v-6h6v6h6v-6h6v6h6v-6h6v52z" fill="#b0bec5"/><path d="M40 92V70a10 10 0 0 1 20 0v22z" fill="#8d5a2b"/><g fill="#2b2118"><rect x="14" y="46" width="6" height="10" rx="3"/><rect x="80" y="46" width="6" height="10" rx="3"/><rect x="47" y="50" width="6" height="10" rx="3"/></g><path d="M44 22h12v18H44z" fill="#9aa0aa"/></svg>',
+  pencil: '<svg viewBox="0 0 100 100"><g transform="rotate(-40 50 50)"><rect x="20" y="40" width="54" height="20" fill="#ffc93c"/><path d="M20 46h54M20 54h54" stroke="#e0a400" stroke-width="2"/><rect x="10" y="40" width="12" height="20" rx="3" fill="#ff7eb6"/><rect x="20" y="40" width="5" height="20" fill="#9aa0aa"/><path d="M74 40l18 10-18 10z" fill="#f3dcc0"/><path d="M86 47l6 3-6 3z" fill="#2b2118"/></g></svg>'
+};
+const SPACE_ART = {
+  sun: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#ffb300" opacity=".35"/><circle cx="50" cy="50" r="38" fill="#ffca28"/><circle cx="50" cy="50" r="30" fill="#ffe082"/><g fill="#ffb300" opacity=".6"><circle cx="38" cy="40" r="5"/><circle cx="62" cy="58" r="6"/><circle cx="56" cy="34" r="3"/></g></svg>',
+  mercury: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="22" fill="#9e9e9e"/><g fill="#757575"><circle cx="42" cy="44" r="5"/><circle cx="58" cy="56" r="4"/><circle cx="52" cy="38" r="2.5"/><circle cx="44" cy="60" r="3"/></g><path d="M36 64a22 22 0 0 0 36-26 24 24 0 0 1-36 26z" fill="#0003"/></svg>',
+  venus: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" fill="#f3c37a"/><path d="M22 40q28-8 56 0M20 54q30 8 60-2M28 68q22 6 44 0" fill="none" stroke="#e0a45a" stroke-width="5" stroke-linecap="round"/><path d="M30 74a32 32 0 0 0 48-42 34 34 0 0 1-48 42z" fill="#0002"/></svg>',
+  earth: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="#2a7de1"/><path d="M30 30q10-6 16 2t-4 14q-10 2-12 10-8-6-6-16 2-6 6-10zM58 22q12 2 18 14-8 0-12 6t-10 2q-4-10 4-22zM50 66q10-6 20 0 2 8-8 14-12 2-12-14z" fill="#2fbf71"/><path d="M36 20q14-4 28 0" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><path d="M30 76a34 34 0 0 0 50-44 36 36 0 0 1-50 44z" fill="#0003"/></svg>',
+  mars: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="#e2582b"/><g fill="#b23a16"><ellipse cx="42" cy="44" rx="8" ry="5"/><ellipse cx="60" cy="58" rx="6" ry="4"/><circle cx="56" cy="38" r="3"/></g><ellipse cx="50" cy="27" rx="9" ry="3" fill="#fff" opacity=".85"/><path d="M34 66a26 26 0 0 0 38-34 28 28 0 0 1-38 34z" fill="#0003"/></svg>',
+  jupiter: '<svg viewBox="0 0 100 100"><defs><clipPath id="jupclip"><circle cx="50" cy="50" r="46"/></clipPath></defs><circle cx="50" cy="50" r="46" fill="#e8c9a0"/><g clip-path="url(#jupclip)"><rect x="0" y="24" width="100" height="9" fill="#c98a4b"/><rect x="0" y="44" width="100" height="7" fill="#b9733a"/><rect x="0" y="62" width="100" height="10" fill="#c98a4b"/><rect x="0" y="80" width="100" height="6" fill="#b9733a"/><ellipse cx="64" cy="66" rx="10" ry="6" fill="#c0392b"/><path d="M22 86a46 46 0 0 0 72-60 48 48 0 0 1-72 60z" fill="#0002"/></g></svg>',
+  saturn: '<svg viewBox="0 0 100 100"><defs><clipPath id="satfront"><rect x="0" y="50" width="100" height="50"/></clipPath></defs><g transform="rotate(-16 50 50)"><ellipse cx="50" cy="50" rx="46" ry="12" fill="none" stroke="#c9b07a" stroke-width="7"/></g><circle cx="50" cy="50" r="24" fill="#e9cf8a"/><path d="M27 44q23-6 46 0M27 56q23 6 46 0" fill="none" stroke="#cfae63" stroke-width="4"/><g transform="rotate(-16 50 50)"><ellipse cx="50" cy="50" rx="46" ry="12" fill="none" stroke="#e3cd96" stroke-width="7" clip-path="url(#satfront)"/></g></svg>',
+  uranus: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="50" rx="8" ry="44" fill="none" stroke="#bfefff" stroke-width="3" transform="rotate(12 50 50)"/><circle cx="50" cy="50" r="28" fill="#8fe3e8"/><path d="M34 74a28 28 0 0 0 40-40 30 30 0 0 1-40 40z" fill="#0002"/></svg>',
+  neptune: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="28" fill="#3557d4"/><path d="M24 44q26-6 52 0M24 58q26 6 52 0" fill="none" stroke="#4f74ea" stroke-width="4"/><ellipse cx="40" cy="48" rx="7" ry="4" fill="#1d2f8a"/><path d="M34 74a28 28 0 0 0 40-40 30 30 0 0 1-40 40z" fill="#0003"/></svg>',
+  moon: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="26" fill="#cfd2d6"/><g fill="#a9adb3"><circle cx="40" cy="42" r="6"/><circle cx="60" cy="56" r="5"/><circle cx="56" cy="36" r="3"/><circle cx="42" cy="62" r="3.5"/></g><path d="M34 66a26 26 0 0 0 38-34 28 28 0 0 1-38 34z" fill="#0002"/></svg>'
+};
+WORD_ART.planet = SPACE_ART.saturn;
+const ROCKET = WORD_ART.rocket;
+const capital = (t) => t[0].toUpperCase() + t.slice(1);
+const spaceName = (id) => C.SPACE.find((p) => p.id === id).name;
+GAME_ICON.letters = '<svg viewBox="0 0 120 100"><rect x="6" y="18" width="50" height="64" rx="12" fill="#e63946"/><rect x="64" y="18" width="50" height="64" rx="12" fill="#2a7de1"/><g font-size="50" font-weight="800" text-anchor="middle" fill="#fff" font-family="inherit"><text x="31" y="68">A</text><text x="89" y="68">b</text></g></svg>';
+GAME_ICON.spell = '<svg viewBox="0 0 120 100"><g font-size="34" font-weight="800" text-anchor="middle" fill="#fff" font-family="inherit"><rect x="4" y="30" width="34" height="40" rx="8" fill="#2fbf71"/><text x="21" y="62">c</text><rect x="43" y="30" width="34" height="40" rx="8" fill="#ff9a3c"/><text x="60" y="62">a</text><rect x="82" y="30" width="34" height="40" rx="8" fill="#8a5cf6"/><text x="99" y="62">t</text></g></svg>';
+GAME_ICON.planets = SPACE_ART.saturn;
+
+/* Letter round art: the picture, and the word with the asked letter boxed */
+function letterShow(r) {
+  const letters = r.word.split('').map((ch, i) => {
+    const asked = r.ask === 'first' ? i === 0 : i === r.gap;
+    return asked ? '<span class="lgap">?</span>' : `<span>${ch}</span>`;
+  }).join('');
+  return `<div class="lword">${WORD_ART[r.word]}<div class="lspell">${letters}</div></div>`;
+}
+function letterPrompt(r) {
+  return r.ask === 'missing' ? `${capital(r.word)}! Which letter is missing?` : `${capital(r.word)}! Which letter does ${r.word} start with?`;
+}
+function letterPraise(r) {
+  return r.ask === 'missing' ? `Yes! It's the letter ${r.target}!` : `Yes! ${capital(r.word)} starts with the letter ${r.target}!`;
+}
+
+/* Space Trip: on a right answer LEO's rocket flies to the planet */
+let lastPlanetQ = null;
+async function flyRocket(btn) {
+  const rk = $('rocket'); if (!rk) return;
+  const b = btn.getBoundingClientRect(), o = rk.getBoundingClientRect();
+  sfx.kick();
+  rk.style.transform = `translate(${b.left + b.width / 2 - (o.left + o.width / 2)}px,${b.top + b.height * 0.2 - (o.top + o.height / 2)}px) scale(.7)`;
+  await wait(800);
+}
+
+/* ---------- Spell It: tap the letters in order ---------- */
+let sp = null;
+function spellRoundStart() {
+  const r = C.spellRound(LV(), Math.random, sp && sp.word);
+  sp = { ...r, typed: 0, used: [], misses: 0 };
+  round = { type: 'spell', word: r.word }; locked = false; firstTry = true;
+  renderSpell();
+  repeatPrompt();
+}
+function renderSpell(justTyped) {
+  const W = sp.word.toUpperCase();
+  const boxes = W.split('').map((ch, i) => i < sp.typed
+    ? `<div class="sbox filled${i === justTyped ? ' pop' : ''}">${ch}</div>`
+    : `<div class="sbox${i === sp.typed ? ' next' : ''}">${sp.guide ? `<i>${ch}</i>` : ''}</div>`).join('');
+  const tray = sp.tray.map((ch, k) => sp.used.includes(k) ? '<span class="stile gone"></span>'
+    : `<button class="stile" data-nav data-k="${k}" style="background:${BALLOON_COLOURS[k % BALLOON_COLOURS.length]}" aria-label="${ch}">${ch}</button>`).join('');
+  $('task').innerHTML = `<div class="spell" style="--len:${W.length}"><div class="spic">${WORD_ART[sp.word]}</div><div class="sboxes">${boxes}</div><div class="stray">${tray}</div></div>`;
+  $('task').querySelectorAll('.stile[data-k]').forEach((b) => b.addEventListener('click', () => tapLetter(Number(b.dataset.k), b)));
+  if (usingPad) $('task').querySelector('.stile[data-k]')?.focus();
+}
+async function tapLetter(k, btn) {
+  if (locked) return;
+  const want = C.nextSpellLetter(sp.word, sp.typed), ch = sp.tray[k];
+  if (ch !== want) {
+    sfx.nearly(); sp.misses++; firstTry = false;
+    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+    if (sp.misses >= 2) {
+      const hint = [...$('task').querySelectorAll('.stile[data-k]')].find((b) => sp.tray[Number(b.dataset.k)] === want);
+      hint?.classList.add('hint');
+    }
+    say(`Not that one! Find the letter ${want}.`);
+    return;
+  }
+  sp.used.push(k); sp.typed++; sp.misses = 0;
+  tone(440 + sp.typed * 90, 0, 0.18, 'triangle', 0.25);
+  renderSpell(sp.typed - 1);
+  if (C.nextSpellLetter(sp.word, sp.typed) !== null) {
+    if (LV() === 1) say(`The letter ${ch}!`);
+    return;
+  }
+  locked = true; confetti();
+  await funWin(`You spelt ${sp.word}! ${rand(PRAISE)}`);
+}
 
 
 function renderMenu() {
@@ -935,7 +1077,7 @@ function renderMenu() {
 }
 function goHome() { if (typeof endTreatTimers === 'function' && treat) { endTreatTimers(); treat = null; } renderJars(); show('home'); say(`Hello ${N}! Pick a game!`); }
 function startGame(id) {
-  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; $('task').classList.remove('hidetask', 'firetask', 'racetask'); state = { ...state, stars: 0 }; save();
+  currentGame = id; roundIndex = 0; pen = null; tune = null; jig = null; ord = null; bld = null; mem = null; hs = null; fr = null; race = null; sp = null; lastPlanetQ = null; $('task').classList.remove('hidetask', 'firetask', 'racetask', 'spacetask'); state = { ...state, stars: 0 }; save();
   show('play'); renderJars(); newRound();
 }
 
@@ -949,8 +1091,13 @@ async function newRound() {
   if (currentGame === 'hide') return hideRoundStart();
   if (currentGame === 'fire') return fireRoundStart();
   if (currentGame === 'race') return raceRoundStart();
+  if (currentGame === 'spell') return spellRoundStart();
   lastType = currentGame ? C.roundTypeFor(currentGame, roundIndex) : C.nextRoundType(lastType);
   round = C.makeRound(lastType, state);
+  if (round.type === 'planet') { // never the same question twice running
+    round = C.planetRound(LV(), Math.random, lastPlanetQ); lastPlanetQ = round.q;
+  }
+  $('task').classList.toggle('spacetask', round.type === 'planet');
   firstTry = true; locked = false;
   renderRound();
   await repeatPrompt();
@@ -978,6 +1125,9 @@ function promptFor(r) {
     case 'race': return r.retry ? 'Try again! Jump over the cones!' : roundIndex === 0 ? 'Race day! Jump over the cones and win the race!' : 'Another race! Jump over the cones!';
     case 'fire': return roundIndex === 0 ? 'Nee naw! Fire! Drive to the fire and spray the water!' : 'Fire! Fire! Put it out!';
     case 'hide': return `${roundIndex === 0 ? 'Hide and seek! ' : ''}Can you find ${r.hider}?`;
+    case 'letterStart': return letterPrompt(r);
+    case 'spell': return `Let's spell ${r.word}! Tap the letters in order.`;
+    case 'planet': return r.q;
   }
 }
 
@@ -998,6 +1148,12 @@ function renderRound() {
     if (r.ask) showHtml = `<div class="sum">${r.a} ${SUM_SIGN[r.ask]} ${r.b} = ?</div>`;
   } else if (r.type === 'animal') {
     answers = r.options.map((a) => `<button class="ans" data-nav data-v="${a}" aria-label="${a}">${ANIMAL_ART[a]}</button>`).join('');
+  } else if (r.type === 'letterStart') {
+    showHtml = letterShow(r);
+    answers = r.options.map((l, i) => `<button class="ans letter" data-nav data-v="${l}" style="background:${BALLOON_COLOURS[i % BALLOON_COLOURS.length]}" aria-label="${l}">${l}<small>${l.toLowerCase()}</small></button>`).join('');
+  } else if (r.type === 'planet') {
+    showHtml = `<div class="rocket" id="rocket">${ROCKET}</div>`;
+    answers = r.options.map((p) => `<button class="ans planet" data-nav data-v="${p}" aria-label="${spaceName(p)}">${SPACE_ART[p]}${r.labels ? `<b>${capital(spaceName(p).replace(/^the /, ''))}</b>` : ''}</button>`).join('');
   } else {
     // Same colour for every option in "fits" rounds so he matches by shape, not colour.
     answers = r.options.map((s) => `<button class="ans" data-nav data-v="${s}">${shapeSvg(s, 'fill', r.type === 'shapeFit' ? '#ffc93c' : undefined)}</button>`).join('');
@@ -1033,7 +1189,8 @@ async function answer(btn) {
   if (v !== round.target) {
     firstTry = false; sfx.nearly();
     btn.classList.add('wrong'); btn.disabled = true;
-    const named = round.skill === 'numbers' ? `That's number ${v}.` : `That's a ${v}.`;
+    const named = round.skill === 'numbers' ? `That's number ${v}.` : round.skill === 'letters' ? `That's the letter ${v}.`
+      : round.skill === 'space' ? `That's ${spaceName(v)}.` : `That's a ${v}.`;
     await say(`Ooh, nearly! ${named} ${promptFor(round)}`);
     return;
   }
@@ -1044,14 +1201,17 @@ async function answer(btn) {
     sfx.kick(); ball.style.transform = `translate(${b.left + b.width / 2 - (o.left + o.width / 2)}px,${b.top + b.height * 0.6 - (o.top + o.height / 2)}px) rotate(540deg)`;
     await wait(650); sfx.cheer();
   }
+  if (round.type === 'planet') await flyRocket(btn);
   sfx.right();
-  if (!round.noStats) state = C.recordAnswer(state, round.skill, round.target, firstTry);
+  if (!round.noStats) state = C.recordAnswer(state, round.skill, round.statKey ?? round.target, firstTry);
   const res = C.addStar(state); state = res.state; save(); renderJars(); roundIndex++;
   let praise = rand(PRAISE);
   if (round.type === 'countIt' || round.type === 'drumCount') praise = `${Array.from({ length: round.target }, (_, i) => i + 1).join(', ')}. ${NUM_WORD[round.target]}! ${praise}`;
   if (round.type === 'goal') praise = `Goal! Number ${round.target}! ${praise}`;
   if (round.type === 'shapeFit') praise = `Yes! The ${round.target} fits! ${praise}`;
   if (round.type === 'animal') praise = `Yes! The ${round.target} says ${round.sound} ${praise}`;
+  if (round.type === 'letterStart') praise = `${letterPraise(round)} ${praise}`;
+  if (round.type === 'planet') praise = `Yes! ${round.fact} ${praise}`;
   await say(praise);
   if (res.rewardReady) startReward(); else newRound();
 }
