@@ -319,10 +319,37 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 /* Funny clip */
 .clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.clip video{width:100%;height:100%;object-fit:contain}.clipplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(28px,6vh,48px)}
 /* Dance party */
-.disco{background:radial-gradient(circle at 50% 30%,#ff7eb6,#8a5cf6 60%,#2b1d5c)}
-.banner{position:absolute;top:6%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:clamp(28px,min(10vh,11vw),96px);font-weight:800;color:#fff;text-shadow:0 6px 0 #0004;animation:pop .6s infinite alternate}
-.dancer{position:absolute;bottom:6%;width:min(34vh,30vw);animation:dance .6s ease-in-out infinite alternate}.dancer svg{width:100%;height:auto}
-@keyframes dance{from{transform:rotate(-10deg) translateY(0)}to{transform:rotate(10deg) translateY(-8%)}}
+.disco{background:radial-gradient(ellipse at 50% 0%,#5b2a86,#1a0b2e 70%);perspective:600px}
+.disco.pulse{animation:discopulse .5s ease-out}@keyframes discopulse{0%{box-shadow:inset 0 0 120px #ff7eb655}100%{box-shadow:inset 0 0 0 #0000}}
+.beams i{position:absolute;top:-10%;width:18%;height:120%;transform-origin:50% 0;mix-blend-mode:screen;filter:blur(2px);animation:beam 4s ease-in-out infinite alternate}
+.beams i:nth-child(1){left:2%;background:linear-gradient(#ff2d95cc,#ff2d9500)}.beams i:nth-child(2){left:28%;background:linear-gradient(#22d3eecc,#22d3ee00);animation-delay:-1.5s}
+.beams i:nth-child(3){left:54%;background:linear-gradient(#facc15cc,#facc1500);animation-delay:-3s}.beams i:nth-child(4){left:80%;background:linear-gradient(#a3e635cc,#a3e63500);animation-delay:-.7s}
+@keyframes beam{from{transform:rotate(-28deg)}to{transform:rotate(28deg)}}
+.glints{position:absolute;inset:0;background-image:radial-gradient(circle,#fff 0 3px,transparent 4px),radial-gradient(circle,#ffd6ff 0 2px,transparent 3px);background-size:90px 70px,130px 110px;opacity:.55;animation:glint 6s linear infinite}
+@keyframes glint{to{background-position:360px 0,-390px 0}}
+.discoball{position:absolute;top:0;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;z-index:2}
+.discoball .string{width:3px;height:3vh;background:#ccc}
+.ball{width:min(13vh,11vw);aspect-ratio:1;border-radius:50%;background:repeating-linear-gradient(90deg,#fff3 0 6px,#0000 6px 12px),repeating-linear-gradient(0deg,#9aa4b8 0 6px,#e6ecf5 6px 12px);box-shadow:0 0 30px #fff8,inset -10px -10px 20px #0006;animation:ballspin 2s linear infinite}
+@keyframes ballspin{to{background-position:24px 0,0 0}}
+.neon{position:absolute;top:calc(3vh + min(13vh,11vw) + 2%);left:50%;transform:translateX(-50%);padding:1.2vh 3vw;border-radius:16px;border:3px solid #ff7eb6;box-shadow:0 0 18px #ff2d95,inset 0 0 18px #ff2d9577;z-index:2;white-space:nowrap}
+.neon span{display:block;font-size:clamp(28px,min(9vh,10vw),88px);font-weight:800;color:#fff;letter-spacing:.06em;text-shadow:0 0 6px #fff,0 0 14px #ff2d95,0 0 28px #ff2d95,0 0 48px #ff7eb6;animation:neonflick 3s infinite}
+@keyframes neonflick{0%,18%,22%,100%{opacity:1}20%{opacity:.6}}
+.bulbs b{position:absolute;width:8px;height:8px;border-radius:50%;background:#ffd761;box-shadow:0 0 8px #ffd761;animation:bulb 1s steps(2) infinite;animation-delay:calc(var(--i) * -.09s)}
+.bulbs b:nth-child(-n+11){top:-5px;left:calc(var(--i) * 9.5% + 2%)}.bulbs b:nth-child(n+12){bottom:-5px;left:calc((var(--i) - 11) * 9.5% + 2%)}
+@keyframes bulb{50%{opacity:.25}}
+.floor{position:absolute;left:-10%;right:-10%;bottom:-4%;height:34%;transform:rotateX(55deg);transform-origin:50% 100%}
+.tiles{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(3,1fr);gap:4px;height:100%}
+.tiles i{background:#2b1d4a;border-radius:4px;transition:background .12s;box-shadow:inset 0 0 12px #0008}
+.crew{position:absolute;left:0;right:0;bottom:8%;height:30%;z-index:1}
+.pal{position:absolute;bottom:0;width:min(17vh,13vw)}.pal svg{width:100%;height:auto;filter:drop-shadow(0 6px 0 #0005)}
+.pal0{left:4%;animation:sway .5s ease-in-out infinite alternate}.pal1{left:18%;bottom:12%;animation:hop .5s ease-in-out infinite alternate;width:min(13vh,10vw)}
+.pal2{right:18%;bottom:12%;animation:hop .5s ease-in-out infinite alternate-reverse;width:min(13vh,10vw)}.pal3{right:4%;animation:sway .5s ease-in-out infinite alternate-reverse}
+@keyframes sway{from{transform:rotate(-12deg)}to{transform:rotate(12deg) translateY(-6%)}}@keyframes hop{from{transform:translateY(0)}to{transform:translateY(-18%)}}
+.star{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:min(34vh,26vw);z-index:3}.star svg{width:100%;height:auto;display:block;filter:drop-shadow(0 10px 0 #0005)}
+.moves.bounce{animation:mbounce .5s ease-in-out infinite alternate}@keyframes mbounce{from{transform:translateY(0) scale(1.04,.96)}to{transform:translateY(-10%) scale(.97,1.03)}}
+.moves.spin{animation:mspin 1s linear infinite}@keyframes mspin{to{transform:rotateY(360deg)}}
+.moves.side{animation:mside 1s ease-in-out infinite}@keyframes mside{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-30%) rotate(-10deg)}75%{transform:translateX(30%) rotate(10deg)}}
+.moves.jump{animation:mjump 1s ease-in-out infinite}@keyframes mjump{0%,100%{transform:translateY(0)}40%{transform:translateY(-28%) rotate(-8deg)}60%{transform:translateY(-28%) rotate(8deg)}}
 /* My world */
 .world,.worldview{flex-direction:column;gap:10px}.worldview{display:flex;align-items:center}
 .worldbox{width:min(100%,calc((100vh - 230px) * 1.786));border-radius:20px;overflow:hidden;box-shadow:0 8px 0 #0002}.worldsvg{width:100%;height:auto;display:block}
@@ -330,7 +357,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .worldinfo{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:center;color:#fff;font-size:clamp(18px,3vh,28px);text-shadow:0 2px 0 #0003}
 .worldinfo .score{background:#ffc93c;color:#2b2118;border-radius:14px;padding:4px 14px;font-weight:800;text-shadow:none}
 #stickers .worldinfo{color:var(--ink);text-shadow:none}
-@media (max-width:640px) and (orientation:portrait){.toypick svg{display:none}.skybtns{flex-wrap:wrap;justify-content:center;width:92%}.bubblesky .skybtns{left:50%;right:auto;transform:translateX(-50%)}#treatSkip{font-size:18px;padding:8px 14px}.mover{width:40vw}.cel-skate .mover,.cel-stomp .mover,.cel-twirl .mover{left:calc(50% - 20vw)}.dancer{width:46vw}.dress{flex-direction:column}.dresshost{width:40vw}.dressside{max-width:100%}.wardrobe{grid-template-columns:repeat(3,22vw)}.treattop h2{font-size:20px}}
+@media (max-width:640px) and (orientation:portrait){.toypick svg{display:none}.skybtns{flex-wrap:wrap;justify-content:center;width:92%}.bubblesky .skybtns{left:50%;right:auto;transform:translateX(-50%)}#treatSkip{font-size:18px;padding:8px 14px}.mover{width:40vw}.cel-skate .mover,.cel-stomp .mover,.cel-twirl .mover{left:calc(50% - 20vw)}.star{width:44vw}.pal{width:20vw}.pal1,.pal2{display:none}.dress{flex-direction:column}.dresshost{width:40vw}.dressside{max-width:100%}.wardrobe{grid-template-columns:repeat(3,22vw)}.treattop h2{font-size:20px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -2184,15 +2211,61 @@ function clipTreat() {
   say('Look at this!');
 }
 
-/* 5. Dance party with their own jingle */
+/* 5. Dance party: disco ball, light-up floor, the child's name in neon, the host and friends dancing to a real beat */
+function drumKit() {
+  const a = audio(); if (!a) return null;
+  const kick = (t) => { const o = a.createOscillator(), g = a.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(45, t + 0.18); g.gain.setValueAtTime(0.55, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25); o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.3); };
+  const noise = (t, dur, vol, type, freq) => {
+    const buf = a.createBuffer(1, Math.floor(a.sampleRate * dur), a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
+    s.buffer = buf; f.type = type; f.frequency.value = freq; g.gain.value = vol; s.connect(f).connect(g).connect(a.destination); s.start(t);
+  };
+  const note = (t, freq, dur, type, vol) => { const o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + 0.02); };
+  return { a, kick, snare: (t) => { noise(t, 0.18, 0.35, 'bandpass', 1800); note(t, 190, 0.08, 'triangle', 0.12); }, hat: (t) => noise(t, 0.05, 0.12, 'highpass', 7000), note };
+}
 function danceTreat() {
   $('treatTitle').textContent = 'Dance party!';
-  $('treatStage').classList.add('disco');
-  $('treatStage').innerHTML = `<div class="lights"><i></i><i></i><i></i><i></i></div><div class="banner">${K.NAME}!</div><div class="dancer">${hostSvg()}</div><div class="sparkles"><i></i><i></i><i></i><i></i><i></i><i></i></div>`;
+  const stage = $('treatStage');
+  stage.classList.add('disco');
+  const owned = state.friends.length ? state.friends : [0, 1];
+  const pals = [0, 1, 2, 3].map((k) => C.FRIENDS[owned[k % owned.length]]);
+  const tiles = Array.from({ length: 24 }, (_, i) => `<i data-t="${i}"></i>`).join('');
+  const bulbs = Array.from({ length: 22 }, (_, i) => `<b style="--i:${i}"></b>`).join('');
+  stage.innerHTML = `<div class="beams"><i></i><i></i><i></i><i></i></div><div class="glints"></div>`
+    + `<div class="discoball"><div class="string"></div><div class="ball"></div></div>`
+    + `<div class="neon"><div class="bulbs">${bulbs}</div><span>${K.NAME}</span></div>`
+    + `<div class="floor"><div class="tiles">${tiles}</div></div>`
+    + `<div class="crew">${pals.map((f, i) => `<div class="pal pal${i}">${friendSvg(f)}</div>`).join('')}</div>`
+    + `<div class="star" id="danceStar"><div class="moves bounce">${hostSvg()}</div></div>`;
+  // The beat: 120 bpm, drums + bass + a bright tune, scheduled ahead with the audio clock so it stays in time.
+  const kit = drumKit(), t = treat, beat = 0.5;
+  const BASS = [65.41, 65.41, 98, 87.31, 73.42, 73.42, 98, 110]; // C C G F D D G A (low)
+  const TUNE = [523, 0, 659, 784, 0, 659, 880, 784, 698, 0, 659, 0, 587, 659, 523, 0];
+  const MOVES = ['bounce', 'spin', 'side', 'jump'];
+  let step = 0, next = kit ? kit.a.currentTime + 0.1 : 0;
+  const tilesEls = stage.querySelectorAll('.tiles i'), moves = stage.querySelector('.moves');
+  const schedule = () => {
+    if (treat !== t || !kit) return;
+    while (next < kit.a.currentTime + 0.25) {
+      const s = step, at = next, eighth = s % 2, beatNo = Math.floor(s / 2);
+      if (!eighth) { if (beatNo % 2 === 0) kit.kick(at); else { kit.kick(at); kit.snare(at); } }
+      kit.hat(at);
+      if (!eighth) kit.note(at, BASS[beatNo % BASS.length], beat * 0.9, 'triangle', 0.32);
+      const m = TUNE[s % TUNE.length]; if (m) kit.note(at, m, beat * 0.45, 'square', 0.05);
+      const delay = Math.max(0, (at - kit.a.currentTime) * 1000);
+      t.timers.push(setTimeout(() => {
+        if (treat !== t) return;
+        tilesEls.forEach((el, i) => { el.style.background = (i + s) % 3 === 0 ? `hsl(${(s * 40 + i * 25) % 360} 90% 60%)` : ''; });
+        if (!eighth && beatNo % 8 === 0) { moves.className = `moves ${MOVES[(beatNo / 8) % MOVES.length]}`; confetti(); }
+        if (!eighth) { stage.classList.remove('pulse'); void stage.offsetWidth; stage.classList.add('pulse'); }
+      }, delay));
+      step++; next += beat / 2;
+    }
+  };
+  schedule(); t.loops.push(setInterval(schedule, 100));
   const lines = [`Hey, hey, it's ${N}!`, 'Dance with me, one, two, three!', 'Clap your hands and spin around!', `${N}, you're a superstar!`];
-  treatMusic([523, 523, 659, 523, 784, 740, 659, 0, 523, 523, 659, 523, 880, 784, 659, 0], 0.26, 'square', true);
-  lines.concat(lines).forEach((l, i) => treat.timers.push(setTimeout(() => say(l), 1200 + i * 3400)));
-  treat.timers.push(setInterval(confetti, 6000));
+  lines.concat(lines).forEach((l, i) => t.timers.push(setTimeout(() => say(l), 1000 + i * 3500)));
   treatCountdown(30);
 }
 
