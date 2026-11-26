@@ -308,7 +308,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .wear{aspect-ratio:1;background:#fff;border-radius:18px;border:0;box-shadow:0 6px 0 #0003;padding:8%}.wear svg{width:100%;height:100%}
 .wear.on{box-shadow:0 0 0 6px #ffc93c,0 6px 0 #0003}.wear.new{animation:pop .6s 2}
 /* Funny clip */
-.clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.clip video{width:100%;height:100%;object-fit:contain}
+.clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.clip video{width:100%;height:100%;object-fit:contain}.clipplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(28px,6vh,48px)}
 /* Dance party */
 .disco{background:radial-gradient(circle at 50% 30%,#ff7eb6,#8a5cf6 60%,#2b1d5c)}
 .banner{position:absolute;top:6%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:clamp(28px,min(10vh,11vw),96px);font-weight:800;color:#fff;text-shadow:0 6px 0 #0004;animation:pop .6s infinite alternate}
@@ -1979,23 +1979,38 @@ function renderWardrobe(newItem) {
   $('dressDone').addEventListener('click', async () => { confetti(); await say('Looking good!'); finishTreat(); });
 }
 
-/* 4. Funny clip: a short, silly animal video with music */
+/* 4. Funny clip: a short, silly animal video with music; the countdown matches the clip */
 function clipTreat() {
-  const pool = clipList.slice();
+  const pool = clipList.slice(), t = treat;
+  $('treatStage').classList.add('clip');
   const play = () => {
-    if (!pool.length) { $('treatStage').innerHTML = ''; danceTreat(); return; }
+    if (treat !== t) return;
+    if (!pool.length) { $('treatStage').className = 'treatstage'; $('treatStage').innerHTML = ''; danceTreat(); return; }
     const c = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
     $('treatTitle').textContent = c.title;
-    $('treatStage').classList.add('clip');
-    $('treatStage').innerHTML = `<video src="clips/${c.id}.mp4" autoplay muted playsinline></video>`;
-    const v = $('treatStage').querySelector('video');
+    $('treatStage').innerHTML = '<button class="big clipplay" data-nav id="clipPlay" hidden>&#9654; Play</button>';
+    // Set up the way phones allow a video to start by itself: muted, inline, and set before it loads.
+    const v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.autoplay = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
     v.addEventListener('error', play, { once: true }); // missing or broken: try another
     v.addEventListener('ended', finishTreat);
-    v.play().catch(() => {});
+    let started = false;
+    v.addEventListener('playing', () => {
+      $('clipPlay').hidden = true;
+      if (started || treat !== t) return;
+      started = true;
+      treatCountdown(Math.max(1, Math.ceil((v.duration || 20) - v.currentTime)), finishTreat);
+    });
+    v.src = `clips/${c.id}.mp4`;
+    $('treatStage').prepend(v);
+    const tryPlay = () => v.play().catch(() => { if (treat === t && !started) { $('clipPlay').hidden = false; if (usingPad) $('clipPlay').focus(); } });
+    tryPlay();
+    t.timers.push(setTimeout(() => { if (!started && treat === t) { $('clipPlay').hidden = false; if (usingPad) $('clipPlay').focus(); } }, 1500));
+    $('clipPlay').addEventListener('click', () => { tryPlay(); });
   };
   play();
   treatMusic([392, 0, 523, 0, 440, 494, 523, 0], 0.25, 'square', false);
-  treatCountdown(22);
   say('Look at this!');
 }
 
