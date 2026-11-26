@@ -344,7 +344,7 @@ h1{font-size:clamp(40px,8vw,72px)}h2{font-size:clamp(26px,5vw,44px)}
 .wear{aspect-ratio:1;background:#fff;border-radius:18px;border:0;box-shadow:0 6px 0 #0003;padding:8%}.wear svg{width:100%;height:100%}
 .wear.on{box-shadow:0 0 0 6px #ffc93c,0 6px 0 #0003}.wear.new{animation:pop .6s 2}
 /* Funny clip */
-.clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.clip video{width:100%;height:100%;object-fit:contain}.clipplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(28px,6vh,48px)}
+.clip{background:radial-gradient(circle,#8a5cf6,#2b1d5c)}.treatstage.clip{border-radius:0;overflow:visible} /* TV video layers can vanish inside rounded, clipped boxes */.clip video{width:100%;height:100%;object-fit:contain}.clipplay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(28px,6vh,48px)}
 /* Dance party */
 .disco{background:radial-gradient(ellipse at 50% 0%,#5b2a86,#1a0b2e 70%);perspective:600px}
 .disco.pulse{animation:discopulse .5s ease-out}@keyframes discopulse{0%{box-shadow:inset 0 0 120px #ff7eb655}100%{box-shadow:inset 0 0 0 #0000}}
@@ -2349,6 +2349,9 @@ function clipTreat() {
     const v = document.createElement('video');
     v.muted = true; v.defaultMuted = true; v.playsInline = true; v.autoplay = true;
     v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+    v.preload = 'auto';
+    // TV WebViews draw a grey "play" picture over a video with no poster: use a see-through one.
+    v.poster = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     v.addEventListener('error', play, { once: true }); // missing or broken: try another
     v.addEventListener('ended', finishTreat);
     let started = false;
@@ -2362,7 +2365,9 @@ function clipTreat() {
     $('treatStage').prepend(v);
     const tryPlay = () => v.play().catch(() => { if (treat === t && !started) { $('clipPlay').hidden = false; if (usingPad) $('clipPlay').focus(); } });
     tryPlay();
-    t.timers.push(setTimeout(() => { if (!started && treat === t) { $('clipPlay').hidden = false; if (usingPad) $('clipPlay').focus(); } }, 1500));
+    t.timers.push(setTimeout(() => { if (!started && treat === t) { $('clipPlay').hidden = false; if (usingPad) $('clipPlay').focus(); tryPlay(); } }, 1500));
+    // Still nothing after 8 seconds (slow network, or the TV can't play this one): move on to another clip.
+    t.timers.push(setTimeout(() => { if (!started && treat === t && $('treatStage').contains(v)) { v.removeAttribute('src'); v.load(); play(); } }, 8000));
     $('clipPlay').addEventListener('click', () => { tryPlay(); });
   };
   play();
